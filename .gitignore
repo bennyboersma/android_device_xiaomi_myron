@@ -1,0 +1,24 @@
+.DS_Store
+
+# Local build/debug state
+_checkpoints/
+_remote_sync/
+out/
+
+# Local stock archives and extraction work
+_transfer/
+extracted_20260302_140152/
+ota_payload/
+*.tar.gz
+*.tgz
+*.zip
+
+# Stock/prebuilt images kept locally for bring-up
+device/xiaomi/myron/prebuilt/*.img
+
+# Proprietary blob payloads
+vendor/xiaomi/myron/proprietary/
+
+# Keep placeholder module dir empty in git
+device/xiaomi/myron/modules/*
+!device/xiaomi/myron/modules/.placeholder

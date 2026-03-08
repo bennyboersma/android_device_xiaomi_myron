@@ -1,0 +1,92 @@
+<manifest version="1.0" type="device">
+    <!-- Display (AIDL v4) -->
+    <hal format="aidl">
+        <name>android.hardware.graphics.composer3</name>
+        <version>4</version>
+        <fqname>IComposer/default</fqname>
+    </hal>
+    <hal format="aidl">
+        <name>vendor.qti.hardware.display.config</name>
+        <version>13</version>
+        <fqname>IDisplayConfig/default</fqname>
+    </hal>
+    <hal format="aidl">
+        <name>vendor.xiaomi.hardware.displayfeature_aidl</name>
+        <version>2</version>
+        <fqname>IDisplayFeature/default</fqname>
+    </hal>
+
+    <!-- Camera (AIDL v3) -->
+    <hal format="aidl">
+        <name>android.hardware.camera.provider</name>
+        <version>3</version>
+        <fqname>ICameraProvider/vendor_qti/0</fqname>
+    </hal>
+
+    <!-- Lights (AIDL) -->
+    <hal format="aidl">
+        <name>android.hardware.lights</name>
+        <version>1</version>
+        <fqname>ILights/default</fqname>
+    </hal>
+
+    <!-- USB Gadget (AIDL) -->
+    <hal format="aidl">
+        <name>android.hardware.usb.gadget</name>
+        <version>2</version>
+        <fqname>IUsbGadget/default</fqname>
+    </hal>
+
+    <!-- Memtrack (AIDL) -->
+    <hal format="aidl">
+        <name>android.hardware.memtrack</name>
+        <version>1</version>
+        <fqname>IMemtrack/default</fqname>
+    </hal>
+
+    <!-- Boot (AIDL) -->
+    <hal format="aidl">
+        <name>android.hardware.boot</name>
+        <version>1</version>
+        <fqname>IBootControl/default</fqname>
+    </hal>
+
+    <!-- Health (AIDL v4) -->
+    <hal format="aidl">
+        <name>android.hardware.health</name>
+        <version>4</version>
+        <fqname>IHealth/default</fqname>
+    </hal>
+
+    <!-- Power (AIDL v6) -->
+    <hal format="aidl">
+        <name>android.hardware.power</name>
+        <version>6</version>
+        <fqname>IPower/default</fqname>
+    </hal>
+
+    <!-- Sensors (AIDL v3) -->
+    <hal format="aidl">
+        <name>android.hardware.sensors</name>
+        <version>3</version>
+        <fqname>ISensors/default</fqname>
+    </hal>
+    <!-- Security (AIDL v3) -->
+    <hal format="aidl">
+        <name>android.hardware.security.keymint</name>
+        <version>3</version>
+        <fqname>IKeyMintDevice/default</fqname>
+    </hal>
+    <hal format="aidl">
+        <name>android.hardware.gatekeeper</name>
+        <fqname>IGatekeeper/default</fqname>
+    </hal>
+
+    <!-- Thermal (AIDL) -->
+    <hal format="aidl">
+        <name>android.hardware.thermal</name>
+        <version>1</version>
+        <fqname>IThermal/default</fqname>
+    </hal>
+
+</manifest>
