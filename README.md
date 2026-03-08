@@ -2,6 +2,57 @@
 
 Last updated: 2026-03-08
 
+LineageOS bring-up workspace for Poco F8 Ultra (`myron`) on Qualcomm SM8850.
+
+This repository intentionally contains:
+- device tree sources and common-tree integration
+- vendor makefiles and extraction workflow glue
+- bring-up tooling, flash helpers, capture scripts, and runbooks
+- status and handoff documentation
+
+This repository intentionally does not contain:
+- stock firmware archives
+- extracted stock image payloads
+- local build outputs or checkpoints
+- proprietary blob payload directories
+
+## Getting Started
+
+If you are continuing work from scratch, read in this order:
+
+1. `HANDOFF.md`
+2. `README.md`
+3. `tools/runbooks/full_userspace_validation.md`
+
+Current proven install path:
+
+1. stock `boot`
+2. stock `vendor_boot`
+3. custom `init_boot`
+
+Current next milestone:
+
+1. complete full userspace image build
+2. pass:
+   - `tools/check_userspace_flash_readiness.sh`
+   - `tools/check_partition_package_sanity.sh`
+3. perform the first slot-safe custom userspace flash
+
+## Repository Layout
+
+- `device/xiaomi/myron`
+  - device-specific tree
+- `device/xiaomi/sm8850-common`
+  - common tree shared by the current bring-up
+- `vendor/xiaomi/*`
+  - generated vendor makefiles and symlink packaging glue
+- `tools/`
+  - bring-up tooling, flash helpers, validation scripts, runbooks, issue templates
+- `HANDOFF.md`
+  - shortest current-state summary for another AI or engineer
+- `README.md`
+  - canonical status and phase history
+
 ## Single Source Of Truth
 
 This file is the canonical project status and phase history.
