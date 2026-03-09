@@ -20,6 +20,7 @@ need_cmd() {
 
 need_cmd bash
 need_cmd python3
+need_cmd tee
 
 if [[ "${APPLY_PROACTIVE_PRUNE}" == "1" ]]; then
   step "apply proactive retry-prep prune"
@@ -43,9 +44,52 @@ if [[ "${APPLY_PROACTIVE_PRUNE}" == "1" ]]; then
   fi
 fi
 
+run_gate1_build() {
+  local log_path="$1"
+  set +e
+  m nothing -j"${JOBS}" 2>&1 | tee "${log_path}"
+  local build_rc=${PIPESTATUS[0]}
+  set -e
+  return "${build_rc}"
+}
+
 step "gate 1"
 set +u
 source "${TOP_DIR}/build/envsetup.sh" >/dev/null
 lunch "lineage_${PRODUCT}-trunk_staging-userdebug" >/dev/null
 set -u
-m nothing -j"${JOBS}"
+
+gate1_log="$(mktemp)"
+if run_gate1_build "${gate1_log}"; then
+  rm -f "${gate1_log}"
+  exit 0
+fi
+
+if grep -q "includes non-existent modules in PRODUCT_PACKAGES" "${gate1_log}"; then
+  missing_packages="$(mktemp)"
+  awk '
+    /Offending entries:/ { capture=1; next }
+    capture && /^build\/make\/core\/main\.mk:1074: error: Build failed\.$/ { capture=0; next }
+    capture && NF { print }
+  ' "${gate1_log}" | awk '!seen[$0]++' > "${missing_packages}"
+
+  if [[ -s "${missing_packages}" ]]; then
+    step "prune unresolved generated PRODUCT_PACKAGES"
+    python3 "${SCRIPT_DIR}/prune_generated_vendor_product_packages.py" \
+      "${TOP_DIR}/vendor/xiaomi/myron/myron-vendor.mk" \
+      --file "${missing_packages}"
+
+    rm -f "${gate1_log}"
+    gate1_log="$(mktemp)"
+    if run_gate1_build "${gate1_log}"; then
+      rm -f "${gate1_log}" "${missing_packages}"
+      exit 0
+    fi
+  fi
+
+  rm -f "${missing_packages}"
+fi
+
+cat "${gate1_log}" >&2
+rm -f "${gate1_log}"
+exit 1

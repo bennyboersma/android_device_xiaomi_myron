@@ -215,8 +215,15 @@ Current highest-confidence retry blockers after stock-vs-built comparison:
 
 Current state:
 1. Phone has been successfully restored from the complete official Xiaomi EEA fastboot package and is booting stock on slot `a`.
-2. Host-side retry prep Gate 1 (`m nothing -j10`) passes successfully using an aggressive keep/drop list.
-3. Gate 2 no longer fails for the original 13-path cluster; it is now narrowed to display plus `qseecomd`.
+2. Host-side retry prep Gate 1 (`m nothing -j10`) passes again on the remote tree after adding an automatic fallback prune for dead generated `PRODUCT_PACKAGES` in `vendor/xiaomi/myron/myron-vendor.mk`.
+3. Gate 2 is still failing, but it is narrowed to a 7-path vendor ownership/install cluster:
+   - `vendor/etc/init/android.hardware.gatekeeper-service-qti.rc`
+   - `vendor/bin/hw/android.hardware.gatekeeper-rust-service-qti`
+   - `vendor/etc/vintf/manifest/android.hardware.gatekeeper-service-qti.xml`
+   - `vendor/etc/init/qseecomd.rc`
+   - `vendor/etc/init/vendor.qti.hardware.secureprocessor.rc`
+   - `vendor/bin/hw/vendor.qti.hardware.secureprocessor`
+   - `vendor/etc/vintf/manifest/vendor.qti.hardware.secureprocessor.xml`
 4. The display stack was silently excluded because the Qualcomm display config did not recognize Android 16 (`Baklava`) and defaulted to the stub/headless path.
 5. The remote `kaanapali` display tree is now patched for:
    - Android 16 (`Baklava`) `composer_version := v3_3`
@@ -234,10 +241,14 @@ Current state:
 As of the latest remote session on `john@192.168.200.33`:
 
 - Gate 1: PASS
-- Gate 2: improved substantially, but not fully green yet
+- Gate 2: FAIL with `missing_boot_critical_vendor_outputs=7`
 - `qseecomd` path:
-  - prebuilt ownership is fixed
-  - direct final install to `vendor/bin/qseecomd` works when the build is invoked with an absolute `OUT_DIR`
+  - binary ownership is fixed
+  - `vendor/bin/qseecomd` is present in output
+  - `vendor/etc/init/qseecomd.rc` is still missing in output
+- New repo-side Gate 1 guard:
+  - `tools/prune_generated_vendor_product_packages.py`
+  - `tools/run_retry_prep_gate1.sh` now retries once after extracting dead generated `PRODUCT_PACKAGES` from the Kati failure log and pruning them from `vendor/xiaomi/myron/myron-vendor.mk`
 - display path:
   - namespace and gralloc-shape blockers are fixed
   - current failures are later Qualcomm display link/build issues, not the original missing-module problem

@@ -214,6 +214,14 @@ Follow-up progress after this postmortem:
 - The boot-critical failure set was reduced substantially from the original 13-path miss list.
 - `qseecomd` ownership has been restored as a source-backed prebuilt.
 - The display stack is no longer missing because of Android 16 config misdetection; the remaining blockers are later Qualcomm display source/build issues.
+- Latest revalidation after stock baseline recovery:
+  - Gate 1 is green again after adding a fallback prune for dead generated `PRODUCT_PACKAGES` in `vendor/xiaomi/myron/myron-vendor.mk`
+  - Gate 2 currently fails with `missing_boot_critical_vendor_outputs=7`
+  - the exact remaining misses are:
+    - gatekeeper rc + binary + VINTF
+    - `qseecomd.rc`
+    - secureprocessor rc + binary + VINTF
+  - display composer/allocator are no longer in the active missing-output set
 
 ## Recommended next debugging path
 

@@ -1,4 +1,7 @@
 # kind relative_output_path
+init vendor/etc/init/android.hardware.gatekeeper-service-qti.rc
+bin vendor/bin/hw/android.hardware.gatekeeper-rust-service-qti
+vintf vendor/etc/vintf/manifest/android.hardware.gatekeeper-service-qti.xml
 init vendor/etc/init/android.hardware.health-service.qti.rc
 bin vendor/bin/hw/android.hardware.health-service.qti
 vintf vendor/etc/vintf/manifest/android.hardware.health-service.qti.xml
@@ -11,4 +14,8 @@ vintf vendor/etc/vintf/manifest/vendor.qti.hardware.display.composer-service*.xm
 init vendor/etc/init/vendor.qti.hardware.display.allocator-service.rc
 bin vendor/bin/hw/vendor.qti.hardware.display.allocator-service
 vintf vendor/etc/vintf/manifest/vendor.qti.hardware.display.allocator-service.xml
+init vendor/etc/init/qseecomd.rc
 bin vendor/bin/qseecomd
+init vendor/etc/init/vendor.qti.hardware.secureprocessor.rc
+bin vendor/bin/hw/vendor.qti.hardware.secureprocessor
+vintf vendor/etc/vintf/manifest/vendor.qti.hardware.secureprocessor.xml

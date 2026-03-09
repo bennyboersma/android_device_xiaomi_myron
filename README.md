@@ -227,6 +227,9 @@ Current work focus:
   - `tools/runbooks/first_userspace_attempt_postmortem_20260309.md`
 - Retry-prep progressed materially after the first postmortem pass:
   - Gate 1 (`m nothing -j10`) is now clean on the remote retry-prep tree
+  - the repo now has a generated-make fallback prune for dead `PRODUCT_PACKAGES`:
+    - `tools/prune_generated_vendor_product_packages.py`
+    - `tools/run_retry_prep_gate1.sh` retries once after pruning the exact non-existent generated package names reported by Kati
   - `qseecomd` has been restored as a source-owned prebuilt and can land in `vendor/bin/`
   - the Qualcomm display stack is no longer missing because of Baklava misdetection
   - the remaining display blocker is now deeper in kaanapali source/build compatibility, not silent module exclusion
@@ -256,8 +259,33 @@ Current highest-confidence retry blockers after stock-vs-built comparison:
 ### Retry-Prep Delta After Initial Postmortem
 
 - Gate 1 is now passing on the remote retry-prep tree.
-- Gate 2 was reduced from the original broad missing-service cluster to the remaining display/qseecomd path.
+- Gate 2 is now reduced from the original broad missing-service cluster to the remaining 7-path vendor ownership/install set:
+  - gatekeeper rc + binary + VINTF
+  - `qseecomd.rc`
+  - secureprocessor rc + binary + VINTF
 - The local Gate 2 checker now accepts versioned composer VINTF filenames:
+
+### Latest Retry-Prep Snapshot (2026-03-09 late)
+
+- Device baseline:
+  - full official Xiaomi stock restore completed successfully
+  - stock slot `_a` remains the authoritative safe baseline
+- Remote retry-prep state:
+  - `bash tools/run_retry_prep_gate1.sh ~/android/lineage myron` PASS
+  - `bash tools/run_retry_prep_gate2.sh ~/android/lineage myron` FAIL
+  - current Gate 2 result: `missing_boot_critical_vendor_outputs=7`
+- Exact remaining Gate 2 misses:
+  - `vendor/etc/init/android.hardware.gatekeeper-service-qti.rc`
+  - `vendor/bin/hw/android.hardware.gatekeeper-rust-service-qti`
+  - `vendor/etc/vintf/manifest/android.hardware.gatekeeper-service-qti.xml`
+  - `vendor/etc/init/qseecomd.rc`
+  - `vendor/etc/init/vendor.qti.hardware.secureprocessor.rc`
+  - `vendor/bin/hw/vendor.qti.hardware.secureprocessor`
+  - `vendor/etc/vintf/manifest/vendor.qti.hardware.secureprocessor.xml`
+- Interpretation:
+  - display composer/allocator is no longer the active retry-prep blocker
+  - `qseecomd` binary ownership is fixed, but its init rc still does not install
+  - gatekeeper and secureprocessor still need real installable vendor ownership, not just blob presence under `vendor/xiaomi/myron/proprietary`
   - `vendor.qti.hardware.display.composer-service*.xml`
 - The Qualcomm display fixes already applied on the remote tree include:
   - Android 16 (`Baklava`) composer version mapping

@@ -253,13 +253,14 @@ odm/lib64/vendor.xiaomi.hardware.seaaudio-V1-ndk.so
 # vendor/bin/hw/android.hardware.bluetooth@aidl-service-qti (Source-built)
 # vendor/bin/hw/android.hardware.boot-service.qti;MAKE_COPY_RULE_ONLY
 # vendor/bin/hw/android.hardware.drm-service.clearkey (Source-built)
-# vendor/bin/hw/android.hardware.gatekeeper-rust-service-qti (Source-built)
+vendor/bin/hw/android.hardware.gatekeeper-rust-service-qti
 # vendor/bin/hw/android.hardware.gnss-aidl-service-qti (Source-built)
 # vendor/bin/hw/android.hardware.media.c2-mi-service (Source-built preferred)
 # vendor/etc/init/android.hardware.media.c2-mi-service.rc (Source-built)
 # vendor/bin/hw/android.hardware.power-service (provided by source)
 # vendor/bin/hw/android.hardware.security.onekeymint-service-qti (Source-built)
 # vendor/bin/hw/android.hardware.security.secretkeeper-service-qti (Source-built)
+vendor/bin/hw/vendor.qti.hardware.secureprocessor
 # vendor/bin/hw/android.hardware.wifi-service (provided by source)
 # vendor/etc/a2dp_audio_policy_configuration.xml (Source-generated)
 # vendor/etc/aconfig/flag.info (Source-generated)
@@ -274,13 +275,15 @@ odm/lib64/vendor.xiaomi.hardware.seaaudio-V1-ndk.so
 # vendor/etc/init/android.hardware.bluetooth@aidl-service-qti-debug.rc (Source-built)
 # vendor/etc/init/android.hardware.boot-service.qti.rc (Source-built)
 # vendor/etc/init/android.hardware.drm-service.clearkey.rc (Source-built)
-# vendor/etc/init/android.hardware.gatekeeper-service-qti.rc (Source-built)
+vendor/etc/init/android.hardware.gatekeeper-service-qti.rc
 # vendor/etc/init/android.hardware.gnss-aidl-service-qti.rc (Source-built)
 # vendor/etc/init/android.hardware.health-service.qti.rc (Source-built)
 # vendor/etc/init/android.hardware.media.c2-mi-service.rc (Source-built)
 # vendor/etc/init/android.hardware.power-service.rc (Source-built)
+vendor/etc/init/qseecomd.rc
 # vendor/etc/init/android.hardware.security.onekeymint-service-qti.rc (Source-built)
 # vendor/etc/init/android.hardware.security.secretkeeper-service-qti.rc (Source-built)
+vendor/etc/init/vendor.qti.hardware.secureprocessor.rc
 # vendor/etc/init/android.hardware.sensors-service-multihal.rc (Source-built)
 # vendor/etc/init/android.hardware.thermal-service.qti.rc (Source-built)
 # vendor/etc/init/android.hardware.usb-service.qti.rc (Source-built)
@@ -353,13 +356,14 @@ odm/lib64/vendor.xiaomi.hardware.seaaudio-V1-ndk.so
 # vendor/etc/vintf/compatibility_matrix.xml (Source-provided)
 # vendor/etc/vintf/manifest/android.hardware.drm-service.clearkey.xml (Source-built)
 # vendor/etc/vintf/manifest/android.hardware.drm-service.xml (Source-built)
-# vendor/etc/vintf/manifest/android.hardware.gatekeeper-service-qti.xml (Source-built)
+vendor/etc/vintf/manifest/android.hardware.gatekeeper-service-qti.xml
 # vendor/etc/vintf/manifest/android.hardware.gnss-aidl-service-qti.xml (Source-built)
 # vendor/etc/vintf/manifest/android.hardware.health-service.qti.xml (Source-built)
 # vendor/etc/vintf/manifest/android.hardware.security.onekeymint-service-qti.xml (Source-built)
 # vendor/etc/vintf/manifest/android.hardware.security.secretkeeper-service-qti.xml (Source-built)
 # vendor/etc/vintf/manifest/android.hardware.security.secureclock-service-qti.xml (Source-built)
 # vendor/etc/vintf/manifest/android.hardware.security.sharedsecret-service-qti.xml (Source-built)
+vendor/etc/vintf/manifest/vendor.qti.hardware.secureprocessor.xml
 # vendor/etc/vintf/manifest/android.hardware.sensors-multihal.xml (Source-built)
 # vendor/etc/vintf/manifest/android.hardware.thermal-service.qti.xml (Source-built)
 # vendor/etc/vintf/manifest/android.hardware.usb-service.qti.xml (Source-built)
