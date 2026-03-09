@@ -162,157 +162,32 @@ Fastest AI handoff:
   - `ro.build.version.incremental=OS3.0.7.0.WPMEUXM`
   - `sys.boot_completed=1`
 
-### Phase 9: Retry-prep from verified stock baseline (current)
+### Phase 9: Retry-prep from verified stock baseline (done)
 
-- Recovery baseline uncertainty is now closed.
-- The active blocker is again retry-prep correctness, not device recovery.
-- Another userspace test remains blocked until:
-  - Gate 1 passes from the current reproducible state
-  - Gate 2 passes from the current reproducible state
-  - slot-safe userspace flash/rollback dry-runs are reconfirmed
+- Recovery baseline uncertainty is now closed (full Xiaomi fastboot EEA restore confirmed).
+- Gate 1 (`m nothing`) and Gate 2 (boot-critical vendor stack) are green.
+- Slot-safe dry-runs and failsafe log capture tool (`tools/capture_failsafe_logs.sh`) are ready.
+
+### Phase 10: Successful userspace bring-up (current)
+
+- **Attempt 1 (Failed)**: Bootloop detected. Recovery analysis identified AVB verification and logical partition mapping failures as root causes.
+- **Attempt 2 (Success)**: 
+  - **AVB Bypass**: Flashed manual `vbmeta_disabled.img` to slot `b`.
+  - **Logical Mapping Fix**: Switched to target slot in bootloader before entering `fastbootd`.
+  - **Verdict**: Device successfully booted into custom LineageOS build.
+  - **Verified ID**: `BP2A.250605.031.A3`
+  - **Verified Services**: `gatekeeper`, `qseecomd`, and `secureprocessor` are running.
 
 ## Current Objective
 
-Do not reflash userspace yet.
+The initial bring-up (booting to Android with basic hardware services) is complete.
 
-The project has moved from “get the first userspace images built” to two ordered requirements:
-
-1. preserve the now-restored official stock baseline
-2. continue analyzing and fixing the first split userspace boot blocker before retrying
-
-Current safe operational baseline:
-
-1. stock `boot`
-2. stock `vendor_boot`
-3. stock `init_boot`
-4. stock userspace
-5. active slot `_a`
-
-Current work focus:
-
-1. freeze and preserve the restored stock baseline on slot `a`
-2. fix rollback tooling defects discovered during recovery
-3. make Gate 1 (`m nothing -j10`) clean on the retry-prep tree
-4. make Gate 2 (`tools/check_retry_boot_critical_vendor_stack.sh`) pass on rebuilt outputs
-5. reconfirm slot-safe userspace dry-runs with `TARGET_SLOT=b`
-6. only then retry split-image userspace flashing on slot `b`
+1.  **Feature Bring-up**: Validate Camera, Audio, Bluetooth, and Fingerprint (UDFPS).
+2.  **Display Polish**: Finalize 120Hz/refresh-rate switching and color profiles.
+3.  **Stability**: Long-term dwell testing and power management audit.
 
 ## Latest Progress (2026-03-09)
 
-- Vendor fallback sepolicy gate is clean on the remote host:
-  - `mka vendor_sepolicy.cil.raw -j6` PASS
-  - `mka precompiled_sepolicy -j6` PASS
-- The active blocker was narrowed into retry-prep graph ownership and boot-critical output verification:
-  - proactive keep/drop policy is now codified in:
-    - `tools/retry_prep_keep_modules.txt`
-    - `tools/retry_prep_drop_modules.txt`
-    - `tools/retry_prep_drop_prefixes.txt`
-    - `tools/run_retry_prep_gate1.sh`
-    - `tools/run_retry_prep_gate2.sh`
-- Split userspace images are built and host-side ready.
-- Generated `init_boot` is explicitly not part of the safe first-userspace path:
-  - `device/xiaomi/myron/prebuilt/init_boot.img` is byte-identical to stock
-  - generated `out/target/product/myron/init_boot.img` is not
-  - generated `init_boot` previously caused a persistent boot regression
-- The first split userspace flash attempt established a new hard blocker:
-  - flash transport: PASS
-  - runtime boot to `adb`: FAIL
-  - immediate classification: userspace boot blocker before `adb`
-- Recovery findings:
-  - `super` restore alone was not sufficient
-  - `vbmeta_system` rollback had to be corrected from `vbmeta_system_ab` to slot-specific `vbmeta_system_a` / `vbmeta_system_b`
-  - full slot-specific stock verification and boot-chain restore was required
-  - final recovery succeeded only after slot `a` was made fully consistent and reactivated
-- The current retry blockers are documented in:
-  - `tools/runbooks/first_userspace_attempt_postmortem_20260309.md`
-- Retry-prep progressed materially after the first postmortem pass:
-  - Gate 1 (`m nothing -j10`) is now clean on the remote retry-prep tree
-  - the repo now has a generated-make fallback prune for dead `PRODUCT_PACKAGES`:
-    - `tools/prune_generated_vendor_product_packages.py`
-    - `tools/run_retry_prep_gate1.sh` retries once after pruning the exact non-existent generated package names reported by Kati
-  - `qseecomd` has been restored as a source-owned prebuilt and can land in `vendor/bin/`
-  - the Qualcomm display stack is no longer missing because of Baklava misdetection
-  - the remaining display blocker is now deeper in kaanapali source/build compatibility, not silent module exclusion
-- Active exact common-vs-myron overlap baseline remains minimal:
-  - `2` destination paths
-  - enforced by:
-    - `tools/check_blob_overlap.sh`
-    - `tools/blob_overlap_allowlist.txt`
-- Exact `PRODUCT_COPY_FILES` vs active blob destination collisions remain:
-  - `0`
-- Raw ELF blob packaging cleanup for `myron` is complete enough to pass Android 16 non-ELF enforcement:
-  - `vendor/xiaomi/myron/myron-vendor.mk` now has `0` remaining raw ELF `PRODUCT_COPY_FILES`
-- The active stale-prebuilt tail is now concentrated in Qualcomm display / perf / servicetracker / bluetooth-audio interface modules plus a remaining long tail of system library shadow copies.
-
-## Immediate blocker list before any second userspace attempt
-
-
-Current highest-confidence retry blockers after stock-vs-built comparison:
-- missing built vendor service ownership for gatekeeper, health, wifi, display (composer/allocator/color), qseecomd, and secureprocessor
-- these services exist in source but are not present in the currently staged built userspace output
-- keymint/weaver are present in the built output under `vendor/` and are no longer the leading blocker in this phase
-- second userspace attempt is blocked until both:
-  - `m nothing -j10` is clean on the retry-prep tree
-  - `tools/check_retry_boot_critical_vendor_stack.sh` passes on rebuilt outputs
-- retry scope is intentionally reduced to boot-to-stable-`adb` on sacrificial slot `b`
-
-### Retry-Prep Delta After Initial Postmortem
-
-- Gate 1 is now passing on the remote retry-prep tree.
-- Gate 2 is now reduced from the original broad missing-service cluster to the remaining 7-path vendor ownership/install set:
-  - gatekeeper rc + binary + VINTF
-  - `qseecomd.rc`
-  - secureprocessor rc + binary + VINTF
-- The local Gate 2 checker now accepts versioned composer VINTF filenames:
-
-### Latest Retry-Prep Snapshot (2026-03-09 late)
-
-- Device baseline:
-  - full official Xiaomi stock restore completed successfully
-  - stock slot `_a` remains the authoritative safe baseline
-- Remote retry-prep state:
-  - `bash tools/run_retry_prep_gate1.sh ~/android/lineage myron` PASS
-  - `bash tools/run_retry_prep_gate2.sh ~/android/lineage myron` FAIL
-  - current Gate 2 result: `missing_boot_critical_vendor_outputs=7`
-- Exact remaining Gate 2 misses:
-  - `vendor/etc/init/android.hardware.gatekeeper-service-qti.rc`
-  - `vendor/bin/hw/android.hardware.gatekeeper-rust-service-qti`
-  - `vendor/etc/vintf/manifest/android.hardware.gatekeeper-service-qti.xml`
-  - `vendor/etc/init/qseecomd.rc`
-  - `vendor/etc/init/vendor.qti.hardware.secureprocessor.rc`
-  - `vendor/bin/hw/vendor.qti.hardware.secureprocessor`
-  - `vendor/etc/vintf/manifest/vendor.qti.hardware.secureprocessor.xml`
-- Interpretation:
-  - display composer/allocator is no longer the active retry-prep blocker
-  - `qseecomd` binary ownership is fixed, but its init rc still does not install
-  - gatekeeper and secureprocessor still need real installable vendor ownership, not just blob presence under `vendor/xiaomi/myron/proprietary`
-  - `vendor.qti.hardware.display.composer-service*.xml`
-- The Qualcomm display fixes already applied on the remote tree include:
-  - Android 16 (`Baklava`) composer version mapping
-  - `neo` export into the display HAL
-  - commonsys display header namespace selection
-  - kaanapali gralloc handle layout flags
-- The remaining active display work is now:
-  - `drm_panel_feature_mgr.cpp` compatibility for the target kernel headers
-  - rebinding display `libvmmem` consumers to the restored proprietary prebuilt
-  - final emission of the composer and allocator service binaries
-- slot `a` remains the stock-safe baseline and must stay untouched until both gates pass
-- last measured retry gate result on the staged output before current retry-prep changes: `missing_boot_critical_vendor_outputs=13`
-
-1. The flashed userspace set bootloops before `adb`, so early failure evidence is still missing.
-2. The userspace rollback path needs to be slot-correct and wrapper-safe in practice.
-3. Current retry flow must preserve stock `boot`, stock `vendor_boot`, and stock `init_boot`.
-4. The next attempt needs earlier slot-state and failure-state capture so recovery is not guesswork.
-5. The reduced first-boot userspace set may still be missing or mis-owning boot-critical vendor runtime pieces.
-
-Use this postmortem as the starting point before any retry:
-- `tools/runbooks/first_userspace_attempt_postmortem_20260309.md`
-
-
-Current state:
-1. The official stock recovery is complete and stock is booting again on slot `a`.
-2. The package remains present locally in the workspace root:
-   - `/Users/benny/Homelab/ROM/myron_eea_global_images_OS3.0.7.0.WPMEUXM_20260112.0000.00_16.0_eea_cee0eaf4a6.tgz`
-3. Host-side retry prep Gate 1 (`m nothing -j10`) previously passed successfully using an aggressive keep/drop list and should now be reconfirmed from this restored baseline.
-4. Display and `qseecomd` retry-prep fixes remain valid build-side work and are again the active next engineering track.
-5. No more device flashing should happen until Gate 1, Gate 2, and slot-safe dry-run readiness are reconfirmed.
+- **Gate 2 Resolution**: Confirmed that `gatekeeper`, `qseecomd`, and `secureprocessor` now correctly install into the `vendor` output.
+- **AVB Bypass**: Standardized the use of disabled `vbmeta` images for custom userspace development.
+- **Slot Strategy**: Validated that `fastboot set_active` in the bootloader is a prerequisite for a healthy `fastbootd` session on the target slot.

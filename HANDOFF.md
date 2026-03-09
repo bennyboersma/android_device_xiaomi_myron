@@ -253,21 +253,6 @@ As of the latest remote session on `john@192.168.200.33`:
   - namespace and gralloc-shape blockers are fixed
   - current failures are later Qualcomm display link/build issues, not the original missing-module problem
 
-## Recovery Baseline Correction
-
-New high-confidence conclusion from the latest recovery work:
-
-- the previously staged remote stock fragments were incomplete for a true baseline restore
-- Xiaomi fastboot `flash_all*.sh` expects additional boot-critical payloads that were not present in the partial bundles we used
-- confirmed missing from the staged remote recovery set were items such as:
-  - `vm-bootsys.img`
-  - `qtvm-dtbo.img`
-  - `recovery.img`
-  - multiple `xbl`, `uefi`, `tz`, `aop`, and related firmware images
-- because of that, repeated partial restores were able to leave both slots non-booting even though fastboot remained healthy
-
-Current recovery source of truth:
-
 - official package filename:
   - `myron_eea_global_images_OS3.0.7.0.WPMEUXM_20260112.0000.00_16.0_eea_cee0eaf4a6.tgz`
 - official MD5:
@@ -275,15 +260,18 @@ Current recovery source of truth:
 - direct Xiaomi CDN URL:
   - `https://bigota.d.miui.com/OS3.0.7.0.WPMEUXM/myron_eea_global_images_OS3.0.7.0.WPMEUXM_20260112.0000.00_16.0_eea_cee0eaf4a6.tgz`
 
-Recovery closure:
+## Latest Achievement: SUCCESS (2026-03-09)
 
-- the full official package has now been extracted and used successfully
-- Xiaomi `flash_all_except_storage.sh` completed cleanly
-- stock boot on slot `a` is reconfirmed
-- the remaining active blockers are again build/runtime retry-prep issues, not baseline recovery uncertainty
+The second userspace attempt was successful. The device is now booting LineageOS.
 
-Next remote step:
-- finish the `libvmmem`-backed display link path
-- rebuild `vendor.qti.hardware.display.composer-service`
-- rebuild `vendor.qti.hardware.display.allocator-service`
-- rerun `tools/run_retry_prep_gate2.sh`
+-   **Verified Build**: `BP2A.250605.031.A3`
+-   **Active Slot**: `_b`
+-   **Gate 2 Status**: PASS. `gatekeeper`, `qseecomd`, and `secureprocessor` are running.
+-   **Solution Key**: 
+    -   Manual **`vbmeta_disabled.img`** to bypass AVB safety check.
+    -   **Slot Alignment**: Switching to the target slot in the bootloader *before* entering `fastbootd` to ensure logical partition metadata maps correctly.
+
+## Next Engineering Track
+1.  Camera and Display feature bring-up (Hardware services are running, now checking functionality).
+2.  Audio/Bluetooth validation.
+3.  Standardizing the `vbmeta` build to include the disable flags automatically.

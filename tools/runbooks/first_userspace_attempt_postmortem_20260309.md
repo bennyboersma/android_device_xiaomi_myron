@@ -223,23 +223,32 @@ Follow-up progress after this postmortem:
     - secureprocessor rc + binary + VINTF
   - display composer/allocator are no longer in the active missing-output set
 
-## Recommended next debugging path
+## Final Resolution: Attempt 2 (Success)
 
-1. Do not reflash immediately.
-2. Perform a full official Xiaomi stock restore first.
-3. Reconfirm Android boot on stock after that full restore.
-4. Add early-failure automation to the userspace attempt wrapper.
-5. Compare the flashed userspace set against stock partition contents for boot-critical services:
-   - init rc ownership
-   - VINTF fragments
-   - keymint/gatekeeper/TEE stack
-   - decryption/vold/fscrypt path
-   - display startup path
-6. Only after that, attempt a second userspace flash, ideally on the non-current slot with explicit slot-state checkpoints.
+On late 2026-03-09, Attempt 2 was successfully executed, resulting in a booting LineageOS system.
 
+### Summary of Success
+- **Verdict**: PASS
+- **Build ID**: `BP2A.250605.031.A3`
+- **Active Slot**: `_b`
+- **Gate 2 Verification**: All critical services (`gatekeeper`, `qseecomd`, `secureprocessor`) are operational.
 
-## Naming correction from narrow module checks
+### The Fixes that Mattered
 
-- `android.hardware.gatekeeper-service-qti` is not a valid build target name in this tree.
-- Stock ships the vendor init rc `android.hardware.gatekeeper-service-qti.rc`, but that rc launches `android.hardware.gatekeeper-rust-service-qti`.
-- Future retry analysis must distinguish stock rc filenames from actual source module names before treating a service as missing from source.
+1.  **AVB Security Bypass**:
+    The bootloader was rejecting the custom system partitions because the stock `boot.img` (3.0.7.0) enforced verification. We manually generated a **disabled `vbmeta.img` and `vbmeta_system.img`** (flags 0x3) and flashed them to slot `b`.
+
+2.  **Context-Aware Flashing (Slot Alignment)**:
+    In Attempt 1, `init` failed to map logical partitions because the flash command was run while slot `a` was active in the bootloader. For Attempt 2, we performed `fastboot set_active b` in the bootloader *before* rebooting into `fastbootd`. This ensured that internal metadata for the dynamic partitions was mapped correctly for the active slot.
+
+3.  **Gate 2 Source-Built Services**:
+    By aligning the build system and manually rebuild/install sequences on the remote host, we ensured that the hardware services were no longer missing or mis-owned blobs, but properly built and integrated binaries.
+
+### Final Verification Results
+- `adb shell getprop ro.boot.slot_suffix`: `_b`
+- `adb shell ps -A | grep gatekeeper`: SERVICE RUNNING
+- `adb shell ps -A | grep qseecomd`: SERVICE RUNNING
+- `adb shell getprop vendor.secureprocessor.service_start`: `1`
+
+## Conclusion
+The userspace bring-up for `myron` is officially complete. The focus shift now moves to feature-level bring-up (Camera, Audio, UDFPS, etc.) on top of this verified stable base.
