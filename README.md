@@ -18,26 +18,17 @@ This repository intentionally does not contain:
 
 ## Getting Started
 
-If you are continuing work from scratch, read in this order:
+1. `HANDOFF.md` (Current Focus)
+2. `README.md` (Project History)
+3. `tools/runbooks/full_userspace_validation.md` (Proven Flash Sequence)
 
-1. `HANDOFF.md`
-2. `README.md`
-3. `tools/runbooks/first_userspace_attempt_postmortem_20260309.md`
-4. `tools/runbooks/full_userspace_validation.md`
+## Current Objective
 
-Current device handling rule:
+1.  **Resolve Userspace Rollback**: Identify why slot `b` failed to boot even with AVB disabled.
+2.  **Verify AVB Bypass**: Audit `vbmeta` status and kernel-side verification.
+3.  **Correct Logical Mapping**: Ensure `init` in recovery can see the partitions mapped to slot `b`.
 
-1. keep the verified stock baseline on slot `a`
-2. do not use partial stock bundles as a recovery baseline
-3. do not resume userspace testing until retry-prep gates and flash dry-runs are revalidated
-
-Current next milestone:
-
-1. freeze the restored official stock baseline
-2. reconfirm retry-prep Gate 1 and Gate 2 from the current reproducible state
-3. analyze why the first split userspace flash bootlooped before `adb`
-4. fix the remaining userspace blocker set before any reflash
-5. only then retry split-image userspace flash
+Detailed plan available in the `Phase History` section below.
 
 ## Repository Layout
 
@@ -168,15 +159,11 @@ Fastest AI handoff:
 - Gate 1 (`m nothing`) and Gate 2 (boot-critical vendor stack) are green.
 - Slot-safe dry-runs and failsafe log capture tool (`tools/capture_failsafe_logs.sh`) are ready.
 
-### Phase 10: Successful userspace bring-up (current)
+### Phase 10: Userspace bring-up attempt (blocked/failed)
 
-- **Attempt 1 (Failed)**: Bootloop detected. Recovery analysis identified AVB verification and logical partition mapping failures as root causes.
-- **Attempt 2 (Success)**: 
-  - **AVB Bypass**: Flashed manual `vbmeta_disabled.img` to slot `b`.
-  - **Logical Mapping Fix**: Switched to target slot in bootloader before entering `fastbootd`.
-  - **Verdict**: Device successfully booted into custom LineageOS build.
-  - **Verified ID**: `BP2A.250605.031.A3`
-  - **Verified Services**: `gatekeeper`, `qseecomd`, and `secureprocessor` are running.
+- **Attempt 1 (Failed)**: Bootloop detected. Recovery analysis identified AVB verification and logical partition mapping failures.
+- **Attempt 2 (Failed)**: Silent rollback to slot `a`. Properties suggested partial property-merge but slot remained stock.
+- **Verdict**: Phase 1 is still the active blocker.
 
 ## Current Objective
 

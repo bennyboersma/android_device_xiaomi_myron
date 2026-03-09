@@ -9,15 +9,17 @@ This file is the shortest correct handoff for another AI agent.
 Canonical status remains:
 - `README.md`
 
-Operational runbooks:
-- `tools/runbooks/first_userspace_attempt_postmortem_20260309.md`
-- `tools/runbooks/full_userspace_validation.md`
-- `tools/runbooks/minimal_boot_chain_validation.md`
-- `tools/runbooks/boot_only_validation.md`
-
 ## Goal
 
-Continue bring-up toward a functional ROM for Poco F8 Ultra (`myron`) without regressing the now-recovered safe stock baseline.
+Finalize userspace bring-up (Phase 1) on Poco F8 Ultra (`myron`).
+
+Current focus: **Resolving silent rollback to slot _a_**.
+
+## Read This First
+
+Operational runbooks:
+- `tools/runbooks/full_userspace_validation.md` (Updated with SUCCESS sequence)
+- `tools/runbooks/first_userspace_attempt_postmortem_20260309.md` (Triage History)
 
 ## Environment
 
