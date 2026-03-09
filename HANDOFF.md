@@ -146,6 +146,7 @@ Flash/readiness:
 - `tools/evaluate_latest_firstboot.sh`
 - `tools/run_userspace_rollback.sh`
 - `tools/audit_userspace_outputs.sh`
+- `tools/userspace_image_manifest.txt`
 
 Capture/triage:
 - `tools/first_boot_capture_and_diff.sh`

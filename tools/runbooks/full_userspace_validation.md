@@ -16,8 +16,8 @@ DRY_RUN=1 bash tools/run_first_userspace_attempt.sh ~/android/lineage myron
   - stock `vendor_boot`
   - custom `init_boot`
 - Do not use this runbook until `tools/check_userspace_flash_readiness.sh` passes.
-- As of `2026-03-08`, the current host-side blocker is still vendor sepolicy fallback compatibility.
-- The full userspace image build should only be resumed after `mka vendor_sepolicy.cil.raw -j6` passes cleanly on the remote host.
+- `vendor_sepolicy.cil.raw` already passes on the remote host.
+- The active host-side work is the resumed full userspace image build and its next real compile, packaging, or image-generation blocker.
 
 ## Preconditions
 - Phone firmware stays on `3.0.7.0.WPMEUXM`.
@@ -54,6 +54,7 @@ First verify the full userspace artifacts and rollback assets are present:
 CHECK_ROLLBACK=1 REQUIRE_DEVICE=0 \
   bash tools/check_userspace_flash_readiness.sh ~/android/lineage myron
 bash tools/check_partition_package_sanity.sh ~/android/lineage myron
+bash tools/audit_userspace_outputs.sh ~/android/lineage myron
 ```
 
 Then confirm the device target and dry-run the flash plan:

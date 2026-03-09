@@ -1,0 +1,14 @@
+# Expected first-userspace image set for myron
+# Format: <kind> <name>
+# kind=required means the image must exist before the first logical-partition flash
+# kind=optional means the image may exist and should be reported if present
+
+required system.img
+required system_ext.img
+required product.img
+required vendor.img
+required odm.img
+required vendor_dlkm.img
+required system_dlkm.img
+optional vbmeta_system.img
+optional super.img

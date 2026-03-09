@@ -185,6 +185,8 @@ Keep the phone on the proven intermediate install path while host-side userspace
   - `tools/evaluate_latest_firstboot.sh`
   - `tools/run_userspace_rollback.sh`
   - `tools/audit_userspace_outputs.sh`
+  - expected image manifest:
+    - `tools/userspace_image_manifest.txt`
 - Ordered first-userspace triage checklist added:
   - `tools/runbooks/first_userspace_triage_checklist.md`
 - Platform naming debt audit completed:
