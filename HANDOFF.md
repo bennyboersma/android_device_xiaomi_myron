@@ -28,25 +28,10 @@ Continue bring-up toward a functional ROM for Poco F8 Ultra (`myron`) without re
 
 ## Current Safe Device State
 
-The phone is currently safe on this path:
+The phone is currently being held in bootloader fastboot pending a full official stock restore.
 
-- stock `boot`
-- stock `vendor_boot`
-- stock `init_boot`
-- stock userspace
-- active slot `_a`
-
-Verified after recovery:
-
-- `sys.boot_completed=1`
-- build `OS3.0.7.0.WPMEUXM`
-- `ro.boot.slot_suffix=_a`
-- `ro.boot.bootreason=reboot,fastboot`
-
-Do not replace `boot` by default.
-Do not replace `vendor_boot` by default.
-Do not replace `init_boot` by default.
-Do not retry userspace flashing until the postmortem blockers are addressed.
+Do not run any more partial restore or slot-only experiments.
+Do not retry userspace flashing until the official fastboot package restore is complete and stock boot is reconfirmed.
 
 ## Key Conclusions Already Proven
 
@@ -82,6 +67,13 @@ First split userspace flash attempt on slot `b`:
 Read first:
 - `tools/runbooks/first_userspace_attempt_postmortem_20260309.md`
 
+Additional recovery finding after that postmortem:
+
+- flashing stock-like partial sets to slot `b` was not enough to recover a trustworthy baseline
+- slot `b` still failed before `adb` even with matched stock `super + boot + init_boot + vendor_boot + dtbo + vbmeta + vbmeta_system`
+- later, slot `a` also stopped booting cleanly after repeated partial restore work
+- root cause is now considered recovery-image incompleteness, not just Lineage userspace contents
+
 ## Active Work In Progress
 
 Current work is no longer “flash the first userspace build.” Current work is postmortem and retry preparation.
@@ -91,7 +83,9 @@ Current work is no longer “flash the first userspace build.” Current work is
 3. Add earlier failure capture to the next userspace attempt path.
 4. Compare the flashed reduced userspace set against stock for early boot-critical regressions.
 5. Make Gate 1 clean and Gate 2 pass before any retry flash.
-6. Only then retry split-image userspace flashing on slot `b`.
+6. Acquire and stage the complete official Xiaomi fastboot package for `OS3.0.7.0.WPMEUXM`.
+7. Perform a full stock restore from that complete package.
+8. Only then retry split-image userspace flashing on slot `b`.
 
 ## Safe Boundaries
 
@@ -107,29 +101,38 @@ Not allowed by default:
 - persistent custom `boot` flashing
 - persistent custom `vendor_boot` flashing
 - generated `init_boot` testing in the retry path
-- firmware partition flashing
+- firmware partition flashing from incomplete bundles
 - mixing stock releases
+- treating partial stock image sets as a recovery-safe baseline
 
 ## Next Correct Steps
 
-1. Verify and freeze the recovered baseline:
+1. Use the complete official Xiaomi fastboot package:
+   - `myron_eea_global_images_OS3.0.7.0.WPMEUXM_20260112.0000.00_16.0_eea_cee0eaf4a6.tgz`
+   - verify MD5: `cee0eaf4a66294c29ae709a22073e670`
+2. Extract and verify the full `images/` tree contains the missing boot-critical payloads:
+   - `vm-bootsys.img`
+   - `qtvm-dtbo.img`
+   - `recovery.img`
+   - firmware/bootloader images referenced by Xiaomi `flash_all*.sh`
+3. Perform a full stock restore and verify baseline:
    - `adb shell getprop sys.boot_completed`
    - `adb shell getprop ro.build.version.incremental`
    - `adb shell getprop ro.boot.slot_suffix`
-2. Sync and verify the rollback helper fixes:
+4. Sync and verify the rollback helper fixes:
    - slot-specific `vbmeta_system_${slot}`
    - wrapper invocation that works in practice
-3. Implement earlier failure capture for the next userspace attempt:
+5. Implement earlier failure capture for the next userspace attempt:
    - slot metadata before flash
    - timeout branch when `adb` never appears
    - immediate fastboot/recovery state capture
-4. Compare the flashed reduced userspace set against stock for boot-critical areas:
+6. Compare the flashed reduced userspace set against stock for boot-critical areas:
    - init rc ownership
    - VINTF fragments
    - keymint/gatekeeper/TEE
    - vold/fscrypt/decryption path
    - display startup path
-5. Only after that, plan the second userspace attempt, ideally with explicit slot-state checkpoints and rollback validation.
+7. Only after that, plan the second userspace attempt, ideally with explicit slot-state checkpoints and rollback validation.
 
 ## Important Files
 
@@ -218,6 +221,28 @@ As of the latest remote session on `john@192.168.200.33`:
 - display path:
   - namespace and gralloc-shape blockers are fixed
   - current failures are later Qualcomm display link/build issues, not the original missing-module problem
+
+## Recovery Baseline Correction
+
+New high-confidence conclusion from the latest recovery work:
+
+- the previously staged remote stock fragments were incomplete for a true baseline restore
+- Xiaomi fastboot `flash_all*.sh` expects additional boot-critical payloads that were not present in the partial bundles we used
+- confirmed missing from the staged remote recovery set were items such as:
+  - `vm-bootsys.img`
+  - `qtvm-dtbo.img`
+  - `recovery.img`
+  - multiple `xbl`, `uefi`, `tz`, `aop`, and related firmware images
+- because of that, repeated partial restores were able to leave both slots non-booting even though fastboot remained healthy
+
+Current recovery source of truth:
+
+- official package filename:
+  - `myron_eea_global_images_OS3.0.7.0.WPMEUXM_20260112.0000.00_16.0_eea_cee0eaf4a6.tgz`
+- official MD5:
+  - `cee0eaf4a66294c29ae709a22073e670`
+- direct Xiaomi CDN URL:
+  - `https://bigota.d.miui.com/OS3.0.7.0.WPMEUXM/myron_eea_global_images_OS3.0.7.0.WPMEUXM_20260112.0000.00_16.0_eea_cee0eaf4a6.tgz`
 
 Next remote step:
 - finish the `libvmmem`-backed display link path

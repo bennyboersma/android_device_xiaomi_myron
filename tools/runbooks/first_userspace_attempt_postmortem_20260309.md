@@ -56,6 +56,29 @@ Recovered state:
 - active slot `_a`
 - `ro.boot.bootreason=reboot,fastboot`
 
+## Later correction to the recovery conclusion
+
+The initial postmortem correctly identified an early boot failure before `adb`, but later recovery work changed one important conclusion:
+
+- the staged remote "stock" recovery fragments were not a complete Xiaomi fastboot baseline
+- repeated partial restores were therefore not valid proof that stock slot `b` itself was bad
+- after enough partial recovery work, even slot `a` stopped booting reliably
+
+What this means:
+
+- the next required device action is a full official Xiaomi fastboot restore
+- no further interpretation should be made from partial stock restore behavior
+- no second Lineage userspace test should happen until that full stock restore is complete
+
+Authoritative recovery artifact:
+
+- package:
+  - `myron_eea_global_images_OS3.0.7.0.WPMEUXM_20260112.0000.00_16.0_eea_cee0eaf4a6.tgz`
+- MD5:
+  - `cee0eaf4a66294c29ae709a22073e670`
+- direct Xiaomi CDN:
+  - `https://bigota.d.miui.com/OS3.0.7.0.WPMEUXM/myron_eea_global_images_OS3.0.7.0.WPMEUXM_20260112.0000.00_16.0_eea_cee0eaf4a6.tgz`
+
 ## Concrete blockers before any retry
 
 ### 1. Userspace boot blocker is real and early
@@ -118,6 +141,20 @@ High-probability next investigation areas:
 3. trust/storage path regressions that occur before `adb`
 4. missing must-have vendor runtime pieces that were over-pruned for first boot
 
+### 6. Partial stock bundles are not recovery-safe
+
+Later inventory against Xiaomi `flash_all*.sh` proved the staged remote recovery set was missing boot-critical payloads, including:
+
+- `vm-bootsys.img`
+- `qtvm-dtbo.img`
+- `recovery.img`
+- multiple firmware / bootloader images such as `xbl`, `uefi`, `tz`, `aop`, and related files
+
+Required fix before retry:
+
+- restore from the complete official Xiaomi fastboot package, not from hand-assembled fragments
+- keep the phone in bootloader fastboot until that full package is extracted and verified
+
 
 ## First concrete boot-critical findings after recovery
 
@@ -159,18 +196,16 @@ Follow-up progress after this postmortem:
 ## Recommended next debugging path
 
 1. Do not reflash immediately.
-2. Freeze current recovery-safe baseline:
-   - slot `a`
-   - stock userspace
-   - stock boot chain
-3. Add early-failure automation to the userspace attempt wrapper.
-4. Compare the flashed userspace set against stock partition contents for boot-critical services:
+2. Perform a full official Xiaomi stock restore first.
+3. Reconfirm Android boot on stock after that full restore.
+4. Add early-failure automation to the userspace attempt wrapper.
+5. Compare the flashed userspace set against stock partition contents for boot-critical services:
    - init rc ownership
    - VINTF fragments
    - keymint/gatekeeper/TEE stack
    - decryption/vold/fscrypt path
    - display startup path
-5. Only after that, attempt a second userspace flash, ideally on the non-current slot with explicit slot-state checkpoints.
+6. Only after that, attempt a second userspace flash, ideally on the non-current slot with explicit slot-state checkpoints.
 
 
 ## Naming correction from narrow module checks
