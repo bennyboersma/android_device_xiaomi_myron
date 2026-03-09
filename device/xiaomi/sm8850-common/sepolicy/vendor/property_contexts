@@ -9,6 +9,34 @@ persist.vendor.sys.fp. u:object_r:vendor_fp_prop:s0
 # Thermal
 vendor.sys.thermal.data.path u:object_r:vendor_thermal_normal_prop:s0
 
+# Display
+vendor.display.disable_rounded_corner u:object_r:vendor_display_notch_prop:s0
+
+# IMS/RCS
+persist.vendor.rcs. u:object_r:vendor_persist_rcs_prop:s0
+
+# DPM
+persist.vendor.dpm. u:object_r:vendor_persist_dpm_prop:s0
+persist.dpm.feature u:object_r:vendor_persist_dpm_prop:s0
+persist.vendor.tcmd. u:object_r:vendor_persist_tcm_prop:s0
+vendor.perf.workloadclassifier.enable u:object_r:vendor_wlc_prop:s0
+persist.vendor.build.date.utc u:object_r:vendor_wlc_prop:s0
+vendor.mpctl.init.complete u:object_r:vendor_wlc_public_prop:s0
+
 # NFC
 ro.vendor.nfc. u:object_r:vendor_nfc_mi_prop:s0
 ro.vendor.se. u:object_r:vendor_nfc_mi_prop:s0
+
+# Qualcomm qva/vendor/test property contexts used by imported fallback policy
+vendor.debug.qspm u:object_r:vendor_qspm_dbg_prop:s0
+persist.vendor.debug.sensors. u:object_r:vendor_sensors_dbg_prop:s0
+vendor.debug.breakpoint.continue u:object_r:vendor_dbg_brkpoint_prop:s0
+vendor.myapp.property. u:object_r:vendor_myapp_prop:s0
+vendor.fda.property. u:object_r:vendor_fda_prop:s0
+vendor.qesdk.one. u:object_r:vendor_qesdk_one_prop:s0
+vendor.qsap.sanity. u:object_r:vendor_qsap_sanity_prop:s0
+persist.vendor.debug.mux. u:object_r:vendor_wfd_vendor_debug_prop:s0
+persist.vendor.debug.rtp. u:object_r:vendor_wfd_vendor_debug_prop:s0
+persist.vendor.debug.wfd. u:object_r:vendor_wfd_vendor_debug_prop:s0
+vendor.minksocketFullLog u:object_r:vendor_mink_trace_prop:s0
+persist.vendor.epi. u:object_r:vendor_episteme_prop:s0

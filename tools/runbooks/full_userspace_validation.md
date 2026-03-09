@@ -1,7 +1,13 @@
 # Myron Full Userspace Validation
 
 ## Goal
-Move from the proven `stock boot + custom init_boot` path to the first custom userspace test with the smallest reasonable flash scope.
+Move from the proven `stock boot + stock vendor_boot + custom init_boot` path to the first custom userspace test with the smallest reasonable flash scope.
+
+Fastest staged entrypoint:
+
+```bash
+DRY_RUN=1 bash tools/run_first_userspace_attempt.sh ~/android/lineage myron
+```
 
 ## Current status
 - This is the active next-step runbook.
@@ -10,6 +16,8 @@ Move from the proven `stock boot + custom init_boot` path to the first custom us
   - stock `vendor_boot`
   - custom `init_boot`
 - Do not use this runbook until `tools/check_userspace_flash_readiness.sh` passes.
+- As of `2026-03-08`, the current host-side blocker is still vendor sepolicy fallback compatibility.
+- The full userspace image build should only be resumed after `mka vendor_sepolicy.cil.raw -j6` passes cleanly on the remote host.
 
 ## Preconditions
 - Phone firmware stays on `3.0.7.0.WPMEUXM`.
@@ -62,6 +70,12 @@ Why this is the right next step:
 - `init_boot`-only persistent boot already proved the safe mutable boot-chain partition
 - the next unknown is custom userspace behavior, not top-level boot trust
 
+Equivalent one-command wrapper:
+
+```bash
+DRY_RUN=1 bash tools/run_first_userspace_attempt.sh ~/android/lineage myron
+```
+
 ## 2) Enter fastbootd and flash the logical partitions for the current slot
 The helper now enters `fastbootd` from either Android (`adb reboot fastboot`) or bootloader (`fastboot reboot fastboot`) before flashing logical partitions.
 
@@ -106,7 +120,7 @@ Accept the first custom userspace test only if all are true:
 - `sys.boot_completed` remains `1` after dwell
 - stable `adb`
 - no catastrophic crash loop in `init`, `system_server`, `vendor_init`, `vold`, `surfaceflinger`, `audioserver`, `tee`, or `qseecomd`
-- no major service-surface regression versus the stable `stock boot + custom init_boot` baseline
+- no major service-surface regression versus the stable `stock boot + stock vendor_boot + custom init_boot` baseline
 - no unexpected slot switch
 
 ## 5) Immediate rollback trigger

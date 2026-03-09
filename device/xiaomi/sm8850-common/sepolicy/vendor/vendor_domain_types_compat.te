@@ -1,0 +1,37 @@
+# Imported Qualcomm sm8750 fallback policy references these raw vendor domains
+# directly, but the source fallback path does not declare them in-tree.
+# Provide minimal domain declarations so the imported policy can compile.
+
+type vendor_dataservice_app, domain;
+type vendor_dpmd, domain;
+type vendor_fm_app, domain;
+type vendor_hal_qesdonehal_default, domain;
+type vendor_location_app, domain;
+type vendor_mmi_sys, domain;
+type vendor_perfservice, domain;
+type vendor_qcc_app, domain;
+type vendor_qcc_authmgr_app, domain;
+type vendor_qcc_lmtp_app, domain;
+type vendor_qcc_netstat_app, domain;
+type vendor_qcc_trd, domain;
+type vendor_qcc_utils_app, domain;
+type vendor_qspmsvc, domain;
+type vendor_qtelephony, domain;
+type vendor_qtiloopback_native, domain;
+type vendor_qvirtmgr, domain;
+type vendor_sysmonapp_app_test, domain;
+type vendor_systemhelper_app, domain;
+type vendor_usta_app, domain;
+type vendor_ustaservice_app, domain;
+type vendor_vpsservice, domain;
+type vendor_wfdservice, domain;
+type vendor_wfd_app, domain;
+type vendor_wifimyftmsvc, domain;
+type vendor_snapcam_app, domain;
+type vendor_hal_qvirtservice_qti, domain;
+
+attribute vendor_hal_qvrservice_qti_socket_fd_use_client;
+expandattribute vendor_hal_qvrservice_qti_socket_fd_use_client true;
+
+attribute vendor_hal_sxrservice_qti_socket_fd_use_client;
+expandattribute vendor_hal_sxrservice_qti_socket_fd_use_client true;

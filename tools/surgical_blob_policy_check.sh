@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-TREE_DIR="${1:-$HOME/android/lineage}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+TREE_DIR="${1:-$(cd "$SCRIPT_DIR/.." && pwd)}"
 ALLOW_BROAD_BLOB_EDITS="${ALLOW_BROAD_BLOB_EDITS:-0}"
 MAX_BLOB_LINE_CHURN="${MAX_BLOB_LINE_CHURN:-80}"
+REFRESH_BLOB_POLICY_BASELINE="${REFRESH_BLOB_POLICY_BASELINE:-0}"
 
 check_file_churn() {
   local repo_dir="$1"
@@ -37,6 +39,11 @@ check_file_churn() {
   fi
 
   mkdir -p "$baseline_root"
+  if [[ "$REFRESH_BLOB_POLICY_BASELINE" == "1" ]]; then
+    cp "$abs_file" "$baseline_file"
+    echo "[policy] baseline refreshed: $baseline_file"
+    return 0
+  fi
   if [[ ! -f "$baseline_file" ]]; then
     cp "$abs_file" "$baseline_file"
     echo "[policy] baseline initialized: $baseline_file"
@@ -59,6 +66,7 @@ check_file_churn() {
 status=0
 check_file_churn "$TREE_DIR/device/xiaomi/myron" "proprietary-files.txt" || status=1
 check_file_churn "$TREE_DIR/device/xiaomi/sm8850-common" "proprietary-files.txt" || status=1
+bash "$SCRIPT_DIR/check_blob_overlap.sh" "$TREE_DIR" || status=1
 
 if (( status != 0 )); then
   echo "[policy] FAIL (set ALLOW_BROAD_BLOB_EDITS=1 only for intentional wide edits)"

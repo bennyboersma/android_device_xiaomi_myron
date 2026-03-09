@@ -5,3 +5,14 @@ attribute vendor_hal_camerapostproc_xiaomi_server;
 
 # Media
 hal_attribute(dms)
+
+# Imported Qualcomm fallback policy expects these raw vendor attributes early,
+# before local file type declarations use them.
+attribute vendor_persist_type;
+expandattribute vendor_persist_type false;
+
+attribute vendor_spunvm_file_type;
+expandattribute vendor_spunvm_file_type false;
+
+attribute vendor_sys_sxrauxservice_qti_socket_client;
+expandattribute vendor_sys_sxrauxservice_qti_socket_client true;

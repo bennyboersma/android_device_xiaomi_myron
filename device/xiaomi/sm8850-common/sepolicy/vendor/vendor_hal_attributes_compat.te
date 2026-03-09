@@ -1,0 +1,625 @@
+# Temporary compatibility shim for the fallback Qualcomm vendor sepolicy import.
+# Device target remains SM8850/kaanapali, but the currently available fallback
+# vendor policy source is under device/qcom/sepolicy_vndr/sm8750.
+# Keep this file minimal, and remove entries once the matching kaanapali policy
+# lands or the symbol is declared in the imported Qualcomm source tree.
+
+attribute vendor_hal_alarm_qti;
+expandattribute vendor_hal_alarm_qti true;
+attribute vendor_hal_alarm_qti_client;
+expandattribute vendor_hal_alarm_qti_client true;
+attribute vendor_hal_alarm_qti_server;
+expandattribute vendor_hal_alarm_qti_server false;
+
+attribute vendor_hal_atfwd;
+expandattribute vendor_hal_atfwd true;
+attribute vendor_hal_atfwd_client;
+expandattribute vendor_hal_atfwd_client true;
+attribute vendor_hal_atfwd_server;
+expandattribute vendor_hal_atfwd_server false;
+
+attribute vendor_hal_c2pa;
+expandattribute vendor_hal_c2pa true;
+attribute vendor_hal_c2pa_client;
+expandattribute vendor_hal_c2pa_client true;
+attribute vendor_hal_c2pa_server;
+expandattribute vendor_hal_c2pa_server false;
+
+attribute vendor_hal_cacert_qti;
+expandattribute vendor_hal_cacert_qti true;
+attribute vendor_hal_cacert_qti_client;
+expandattribute vendor_hal_cacert_qti_client true;
+attribute vendor_hal_cacert_qti_server;
+expandattribute vendor_hal_cacert_qti_server false;
+
+attribute vendor_hal_capabilityconfigstore_qti;
+expandattribute vendor_hal_capabilityconfigstore_qti true;
+attribute vendor_hal_capabilityconfigstore_qti_client;
+expandattribute vendor_hal_capabilityconfigstore_qti_client true;
+attribute vendor_hal_capabilityconfigstore_qti_server;
+expandattribute vendor_hal_capabilityconfigstore_qti_server false;
+
+attribute vendor_hal_datafactory_qti;
+expandattribute vendor_hal_datafactory_qti true;
+attribute vendor_hal_datafactory_qti_client;
+expandattribute vendor_hal_datafactory_qti_client true;
+attribute vendor_hal_datafactory_qti_server;
+expandattribute vendor_hal_datafactory_qti_server false;
+
+attribute vendor_hal_dcservice_qti;
+expandattribute vendor_hal_dcservice_qti true;
+attribute vendor_hal_dcservice_qti_client;
+expandattribute vendor_hal_dcservice_qti_client true;
+attribute vendor_hal_dcservice_qti_server;
+expandattribute vendor_hal_dcservice_qti_server false;
+
+attribute vendor_hal_display_aiqe;
+expandattribute vendor_hal_display_aiqe true;
+attribute vendor_hal_display_aiqe_client;
+expandattribute vendor_hal_display_aiqe_client true;
+attribute vendor_hal_display_aiqe_server;
+expandattribute vendor_hal_display_aiqe_server false;
+
+attribute vendor_hal_display_color;
+expandattribute vendor_hal_display_color true;
+attribute vendor_hal_display_color_client;
+expandattribute vendor_hal_display_color_client true;
+attribute vendor_hal_display_color_server;
+expandattribute vendor_hal_display_color_server false;
+
+attribute vendor_hal_dspmanager;
+expandattribute vendor_hal_dspmanager true;
+attribute vendor_hal_dspmanager_client;
+expandattribute vendor_hal_dspmanager_client true;
+attribute vendor_hal_dspmanager_server;
+expandattribute vendor_hal_dspmanager_server false;
+
+attribute vendor_hal_embmssl;
+expandattribute vendor_hal_embmssl true;
+attribute vendor_hal_embmssl_client;
+expandattribute vendor_hal_embmssl_client true;
+attribute vendor_hal_embmssl_server;
+expandattribute vendor_hal_embmssl_server false;
+
+attribute vendor_hal_imsfactory;
+expandattribute vendor_hal_imsfactory true;
+attribute vendor_hal_imsfactory_client;
+expandattribute vendor_hal_imsfactory_client true;
+attribute vendor_hal_imsfactory_server;
+expandattribute vendor_hal_imsfactory_server false;
+
+attribute vendor_hal_imsrtphal;
+expandattribute vendor_hal_imsrtphal true;
+attribute vendor_hal_imsrtphal_client;
+expandattribute vendor_hal_imsrtphal_client true;
+attribute vendor_hal_imsrtphal_server;
+expandattribute vendor_hal_imsrtphal_server false;
+
+attribute vendor_hal_limits;
+expandattribute vendor_hal_limits true;
+attribute vendor_hal_limits_client;
+expandattribute vendor_hal_limits_client true;
+attribute vendor_hal_limits_server;
+expandattribute vendor_hal_limits_server false;
+
+attribute vendor_hal_mstatservice_qti;
+expandattribute vendor_hal_mstatservice_qti true;
+attribute vendor_hal_mstatservice_qti_client;
+expandattribute vendor_hal_mstatservice_qti_client true;
+attribute vendor_hal_mstatservice_qti_server;
+expandattribute vendor_hal_mstatservice_qti_server false;
+
+attribute vendor_hal_qdutils_disp;
+expandattribute vendor_hal_qdutils_disp true;
+attribute vendor_hal_qdutils_disp_client;
+expandattribute vendor_hal_qdutils_disp_client true;
+attribute vendor_hal_qdutils_disp_server;
+expandattribute vendor_hal_qdutils_disp_server false;
+
+attribute vendor_hal_trustedui;
+expandattribute vendor_hal_trustedui true;
+attribute vendor_hal_trustedui_client;
+expandattribute vendor_hal_trustedui_client true;
+attribute vendor_hal_trustedui_server;
+expandattribute vendor_hal_trustedui_server false;
+
+attribute vendor_hal_iwlanservice_qti;
+expandattribute vendor_hal_iwlanservice_qti true;
+attribute vendor_hal_iwlanservice_qti_client;
+expandattribute vendor_hal_iwlanservice_qti_client true;
+attribute vendor_hal_iwlanservice_qti_server;
+expandattribute vendor_hal_iwlanservice_qti_server false;
+
+attribute vendor_hal_MemHal;
+expandattribute vendor_hal_MemHal true;
+attribute vendor_hal_MemHal_client;
+expandattribute vendor_hal_MemHal_client true;
+attribute vendor_hal_MemHal_server;
+expandattribute vendor_hal_MemHal_server false;
+
+attribute vendor_hal_avf_qcvm_qti;
+expandattribute vendor_hal_avf_qcvm_qti true;
+attribute vendor_hal_avf_qcvm_qti_client;
+expandattribute vendor_hal_avf_qcvm_qti_client true;
+attribute vendor_hal_avf_qcvm_qti_server;
+expandattribute vendor_hal_avf_qcvm_qti_server false;
+
+attribute vendor_hal_bluetooth_dun;
+expandattribute vendor_hal_bluetooth_dun true;
+attribute vendor_hal_bluetooth_dun_client;
+expandattribute vendor_hal_bluetooth_dun_client true;
+attribute vendor_hal_bluetooth_dun_server;
+expandattribute vendor_hal_bluetooth_dun_server false;
+
+attribute vendor_hal_btconfigstore;
+expandattribute vendor_hal_btconfigstore true;
+attribute vendor_hal_btconfigstore_client;
+expandattribute vendor_hal_btconfigstore_client true;
+attribute vendor_hal_btconfigstore_server;
+expandattribute vendor_hal_btconfigstore_server false;
+
+attribute vendor_hal_cacertservice_qti;
+expandattribute vendor_hal_cacertservice_qti true;
+attribute vendor_hal_cacertservice_qti_client;
+expandattribute vendor_hal_cacertservice_qti_client true;
+attribute vendor_hal_cacertservice_qti_server;
+expandattribute vendor_hal_cacertservice_qti_server false;
+
+attribute vendor_hal_citsensorservice_xiaomi;
+expandattribute vendor_hal_citsensorservice_xiaomi true;
+attribute vendor_hal_citsensorservice_xiaomi_client;
+expandattribute vendor_hal_citsensorservice_xiaomi_client true;
+attribute vendor_hal_citsensorservice_xiaomi_server;
+expandattribute vendor_hal_citsensorservice_xiaomi_server false;
+
+attribute vendor_hal_cvp;
+expandattribute vendor_hal_cvp true;
+attribute vendor_hal_cvp_client;
+expandattribute vendor_hal_cvp_client true;
+attribute vendor_hal_cvp_server;
+expandattribute vendor_hal_cvp_server false;
+
+attribute vendor_hal_diaghal;
+expandattribute vendor_hal_diaghal true;
+attribute vendor_hal_diaghal_client;
+expandattribute vendor_hal_diaghal_client true;
+attribute vendor_hal_diaghal_server;
+expandattribute vendor_hal_diaghal_server false;
+
+attribute vendor_hal_display_demura;
+expandattribute vendor_hal_display_demura true;
+attribute vendor_hal_display_demura_client;
+expandattribute vendor_hal_display_demura_client true;
+attribute vendor_hal_display_demura_server;
+expandattribute vendor_hal_display_demura_server false;
+
+attribute vendor_hal_displayfeature_xiaomi;
+expandattribute vendor_hal_displayfeature_xiaomi true;
+attribute vendor_hal_displayfeature_xiaomi_client;
+expandattribute vendor_hal_displayfeature_xiaomi_client true;
+attribute vendor_hal_displayfeature_xiaomi_server;
+expandattribute vendor_hal_displayfeature_xiaomi_server false;
+
+attribute vendor_hal_dpmapiservice_qti;
+expandattribute vendor_hal_dpmapiservice_qti true;
+attribute vendor_hal_dpmapiservice_qti_client;
+expandattribute vendor_hal_dpmapiservice_qti_client true;
+attribute vendor_hal_dpmapiservice_qti_server;
+expandattribute vendor_hal_dpmapiservice_qti_server false;
+
+attribute vendor_hal_eid;
+expandattribute vendor_hal_eid true;
+attribute vendor_hal_eid_client;
+expandattribute vendor_hal_eid_client true;
+attribute vendor_hal_eid_server;
+expandattribute vendor_hal_eid_server false;
+
+attribute vendor_hal_factory_qti;
+expandattribute vendor_hal_factory_qti true;
+attribute vendor_hal_factory_qti_client;
+expandattribute vendor_hal_factory_qti_client true;
+attribute vendor_hal_factory_qti_server;
+expandattribute vendor_hal_factory_qti_server false;
+
+attribute vendor_hal_fm;
+expandattribute vendor_hal_fm true;
+attribute vendor_hal_fm_client;
+expandattribute vendor_hal_fm_client true;
+attribute vendor_hal_fm_server;
+expandattribute vendor_hal_fm_server false;
+
+attribute vendor_hal_fstman;
+expandattribute vendor_hal_fstman true;
+attribute vendor_hal_fstman_client;
+expandattribute vendor_hal_fstman_client true;
+attribute vendor_hal_fstman_server;
+expandattribute vendor_hal_fstman_server false;
+
+attribute vendor_hal_hexlp;
+expandattribute vendor_hal_hexlp true;
+attribute vendor_hal_hexlp_client;
+expandattribute vendor_hal_hexlp_client true;
+attribute vendor_hal_hexlp_server;
+expandattribute vendor_hal_hexlp_server false;
+
+attribute vendor_hal_mem_pasrmanager;
+expandattribute vendor_hal_mem_pasrmanager true;
+attribute vendor_hal_mem_pasrmanager_client;
+expandattribute vendor_hal_mem_pasrmanager_client true;
+attribute vendor_hal_mem_pasrmanager_server;
+expandattribute vendor_hal_mem_pasrmanager_server false;
+
+attribute vendor_hal_miaon_frame;
+expandattribute vendor_hal_miaon_frame true;
+attribute vendor_hal_miaon_frame_client;
+expandattribute vendor_hal_miaon_frame_client true;
+attribute vendor_hal_miaon_frame_server;
+expandattribute vendor_hal_miaon_frame_server false;
+
+attribute vendor_hal_minkipcbinder;
+expandattribute vendor_hal_minkipcbinder true;
+attribute vendor_hal_minkipcbinder_client;
+expandattribute vendor_hal_minkipcbinder_client true;
+attribute vendor_hal_minkipcbinder_server;
+expandattribute vendor_hal_minkipcbinder_server false;
+
+attribute vendor_hal_misensor_camera;
+expandattribute vendor_hal_misensor_camera true;
+attribute vendor_hal_misensor_camera_client;
+expandattribute vendor_hal_misensor_camera_client true;
+attribute vendor_hal_misensor_camera_server;
+expandattribute vendor_hal_misensor_camera_server false;
+
+attribute vendor_hal_mwqemadapter_qti;
+expandattribute vendor_hal_mwqemadapter_qti true;
+attribute vendor_hal_mwqemadapter_qti_client;
+expandattribute vendor_hal_mwqemadapter_qti_client true;
+attribute vendor_hal_mwqemadapter_qti_server;
+expandattribute vendor_hal_mwqemadapter_qti_server false;
+
+attribute vendor_hal_pasrmanager;
+expandattribute vendor_hal_pasrmanager true;
+attribute vendor_hal_pasrmanager_client;
+expandattribute vendor_hal_pasrmanager_client true;
+attribute vendor_hal_pasrmanager_server;
+expandattribute vendor_hal_pasrmanager_server false;
+
+attribute vendor_hal_perf;
+expandattribute vendor_hal_perf true;
+attribute vendor_hal_perf_client;
+expandattribute vendor_hal_perf_client true;
+attribute vendor_hal_perf_server;
+expandattribute vendor_hal_perf_server false;
+
+attribute vendor_hal_poweroptservice;
+expandattribute vendor_hal_poweroptservice true;
+attribute vendor_hal_poweroptservice_client;
+expandattribute vendor_hal_poweroptservice_client true;
+attribute vendor_hal_poweroptservice_server;
+expandattribute vendor_hal_poweroptservice_server false;
+
+attribute vendor_hal_qconfig;
+expandattribute vendor_hal_qconfig true;
+attribute vendor_hal_qconfig_client;
+expandattribute vendor_hal_qconfig_client true;
+attribute vendor_hal_qconfig_server;
+expandattribute vendor_hal_qconfig_server false;
+
+attribute vendor_hal_qesdhal;
+expandattribute vendor_hal_qesdhal true;
+attribute vendor_hal_qesdhal_client;
+expandattribute vendor_hal_qesdhal_client true;
+attribute vendor_hal_qesdhal_server;
+expandattribute vendor_hal_qesdhal_server false;
+
+attribute vendor_hal_qms_qti;
+expandattribute vendor_hal_qms_qti true;
+attribute vendor_hal_qms_qti_client;
+expandattribute vendor_hal_qms_qti_client true;
+attribute vendor_hal_qms_qti_server;
+expandattribute vendor_hal_qms_qti_server false;
+
+attribute vendor_hal_qseecom;
+expandattribute vendor_hal_qseecom true;
+attribute vendor_hal_qseecom_client;
+expandattribute vendor_hal_qseecom_client true;
+attribute vendor_hal_qseecom_server;
+expandattribute vendor_hal_qseecom_server false;
+
+attribute vendor_hal_qspa_qti;
+expandattribute vendor_hal_qspa_qti true;
+attribute vendor_hal_qspa_qti_client;
+expandattribute vendor_hal_qspa_qti_client true;
+attribute vendor_hal_qspa_qti_server;
+expandattribute vendor_hal_qspa_qti_server false;
+
+attribute vendor_hal_qvirtvendor;
+expandattribute vendor_hal_qvirtvendor true;
+attribute vendor_hal_qvirtvendor_client;
+expandattribute vendor_hal_qvirtvendor_client true;
+attribute vendor_hal_qvirtvendor_server;
+expandattribute vendor_hal_qvirtvendor_server false;
+
+attribute vendor_hal_qvrservice_qti;
+expandattribute vendor_hal_qvrservice_qti true;
+attribute vendor_hal_qvrservice_qti_client;
+expandattribute vendor_hal_qvrservice_qti_client true;
+attribute vendor_hal_qvrservice_qti_server;
+expandattribute vendor_hal_qvrservice_qti_server false;
+
+attribute vendor_hal_scve;
+expandattribute vendor_hal_scve true;
+attribute vendor_hal_scve_client;
+expandattribute vendor_hal_scve_client true;
+attribute vendor_hal_scve_server;
+expandattribute vendor_hal_scve_server false;
+
+attribute vendor_hal_seccam;
+expandattribute vendor_hal_seccam true;
+attribute vendor_hal_seccam_client;
+expandattribute vendor_hal_seccam_client true;
+attribute vendor_hal_seccam_server;
+expandattribute vendor_hal_seccam_server false;
+
+attribute vendor_hal_secureprocessor;
+expandattribute vendor_hal_secureprocessor true;
+attribute vendor_hal_secureprocessor_client;
+expandattribute vendor_hal_secureprocessor_client true;
+attribute vendor_hal_secureprocessor_server;
+expandattribute vendor_hal_secureprocessor_server false;
+
+attribute vendor_hal_sensorscalibrate_qti;
+expandattribute vendor_hal_sensorscalibrate_qti true;
+attribute vendor_hal_sensorscalibrate_qti_client;
+expandattribute vendor_hal_sensorscalibrate_qti_client true;
+attribute vendor_hal_sensorscalibrate_qti_server;
+expandattribute vendor_hal_sensorscalibrate_qti_server false;
+
+attribute vendor_hal_snapx_service_qti;
+expandattribute vendor_hal_snapx_service_qti true;
+attribute vendor_hal_snapx_service_qti_client;
+expandattribute vendor_hal_snapx_service_qti_client true;
+attribute vendor_hal_snapx_service_qti_server;
+expandattribute vendor_hal_snapx_service_qti_server false;
+
+attribute vendor_hal_soter;
+expandattribute vendor_hal_soter true;
+attribute vendor_hal_soter_client;
+expandattribute vendor_hal_soter_client true;
+attribute vendor_hal_soter_server;
+expandattribute vendor_hal_soter_server false;
+
+attribute vendor_hal_spu;
+expandattribute vendor_hal_spu true;
+attribute vendor_hal_spu_client;
+expandattribute vendor_hal_spu_client true;
+attribute vendor_hal_spu_server;
+expandattribute vendor_hal_spu_server false;
+
+attribute vendor_hal_srvctracker;
+expandattribute vendor_hal_srvctracker true;
+attribute vendor_hal_srvctracker_client;
+expandattribute vendor_hal_srvctracker_client true;
+attribute vendor_hal_srvctracker_server;
+expandattribute vendor_hal_srvctracker_server false;
+
+attribute vendor_hal_sxrservice_qti;
+expandattribute vendor_hal_sxrservice_qti true;
+attribute vendor_hal_sxrservice_qti_client;
+expandattribute vendor_hal_sxrservice_qti_client true;
+attribute vendor_hal_sxrservice_qti_server;
+expandattribute vendor_hal_sxrservice_qti_server false;
+
+attribute vendor_hal_tofsensorservice_xiaomi;
+expandattribute vendor_hal_tofsensorservice_xiaomi true;
+attribute vendor_hal_tofsensorservice_xiaomi_client;
+expandattribute vendor_hal_tofsensorservice_xiaomi_client true;
+attribute vendor_hal_tofsensorservice_xiaomi_server;
+expandattribute vendor_hal_tofsensorservice_xiaomi_server false;
+
+attribute vendor_hal_unsignedhexlp;
+expandattribute vendor_hal_unsignedhexlp true;
+attribute vendor_hal_unsignedhexlp_client;
+expandattribute vendor_hal_unsignedhexlp_client true;
+attribute vendor_hal_unsignedhexlp_server;
+expandattribute vendor_hal_unsignedhexlp_server false;
+
+attribute vendor_hal_vpp;
+expandattribute vendor_hal_vpp true;
+attribute vendor_hal_vpp_client;
+expandattribute vendor_hal_vpp_client true;
+attribute vendor_hal_vpp_server;
+expandattribute vendor_hal_vpp_server false;
+
+attribute vendor_hal_wifilearner;
+expandattribute vendor_hal_wifilearner true;
+attribute vendor_hal_wifilearner_client;
+expandattribute vendor_hal_wifilearner_client true;
+attribute vendor_hal_wifilearner_server;
+expandattribute vendor_hal_wifilearner_server false;
+
+attribute vendor_hal_wigig;
+expandattribute vendor_hal_wigig true;
+attribute vendor_hal_wigig_client;
+expandattribute vendor_hal_wigig_client true;
+attribute vendor_hal_wigig_server;
+expandattribute vendor_hal_wigig_server false;
+
+attribute vendor_hal_wigig_npt;
+expandattribute vendor_hal_wigig_npt true;
+attribute vendor_hal_wigig_npt_client;
+expandattribute vendor_hal_wigig_npt_client true;
+attribute vendor_hal_wigig_npt_server;
+expandattribute vendor_hal_wigig_npt_server false;
+
+attribute vendor_hal_xpanprovider;
+expandattribute vendor_hal_xpanprovider true;
+attribute vendor_hal_xpanprovider_client;
+expandattribute vendor_hal_xpanprovider_client true;
+attribute vendor_hal_xpanprovider_server;
+expandattribute vendor_hal_xpanprovider_server false;
+
+attribute vendor_hal_xrcommservice_qti;
+expandattribute vendor_hal_xrcommservice_qti true;
+attribute vendor_hal_xrcommservice_qti_client;
+expandattribute vendor_hal_xrcommservice_qti_client true;
+attribute vendor_hal_xrcommservice_qti_server;
+expandattribute vendor_hal_xrcommservice_qti_server false;
+
+attribute vendor_hal_dataconnection_qti;
+expandattribute vendor_hal_dataconnection_qti true;
+attribute vendor_hal_dataconnection_qti_client;
+expandattribute vendor_hal_dataconnection_qti_client true;
+attribute vendor_hal_dataconnection_qti_server;
+expandattribute vendor_hal_dataconnection_qti_server false;
+
+attribute vendor_hal_debugutils;
+expandattribute vendor_hal_debugutils true;
+attribute vendor_hal_debugutils_client;
+expandattribute vendor_hal_debugutils_client true;
+attribute vendor_hal_debugutils_server;
+expandattribute vendor_hal_debugutils_server false;
+
+attribute vendor_hal_dpmqmiservice_qti;
+expandattribute vendor_hal_dpmqmiservice_qti true;
+attribute vendor_hal_dpmqmiservice_qti_client;
+expandattribute vendor_hal_dpmqmiservice_qti_client true;
+attribute vendor_hal_dpmqmiservice_qti_server;
+expandattribute vendor_hal_dpmqmiservice_qti_server false;
+
+attribute vendor_hal_hbtp;
+expandattribute vendor_hal_hbtp true;
+attribute vendor_hal_hbtp_client;
+expandattribute vendor_hal_hbtp_client true;
+attribute vendor_hal_hbtp_server;
+expandattribute vendor_hal_hbtp_server false;
+
+attribute vendor_hal_qccvndhal;
+expandattribute vendor_hal_qccvndhal true;
+attribute vendor_hal_qccvndhal_client;
+expandattribute vendor_hal_qccvndhal_client true;
+attribute vendor_hal_qccvndhal_server;
+expandattribute vendor_hal_qccvndhal_server false;
+
+attribute vendor_hal_qspmhal;
+expandattribute vendor_hal_qspmhal true;
+attribute vendor_hal_qspmhal_client;
+expandattribute vendor_hal_qspmhal_client true;
+attribute vendor_hal_qspmhal_server;
+expandattribute vendor_hal_qspmhal_server false;
+
+attribute vendor_hal_qteeconnector;
+expandattribute vendor_hal_qteeconnector true;
+attribute vendor_hal_qteeconnector_client;
+expandattribute vendor_hal_qteeconnector_client true;
+attribute vendor_hal_qteeconnector_server;
+expandattribute vendor_hal_qteeconnector_server false;
+
+attribute vendor_hal_qvirtservice;
+expandattribute vendor_hal_qvirtservice true;
+attribute vendor_hal_qvirtservice_client;
+expandattribute vendor_hal_qvirtservice_client true;
+attribute vendor_hal_qvirtservice_server;
+expandattribute vendor_hal_qvirtservice_server false;
+
+attribute vendor_hal_systemhelper;
+expandattribute vendor_hal_systemhelper true;
+attribute vendor_hal_systemhelper_client;
+expandattribute vendor_hal_systemhelper_client true;
+attribute vendor_hal_systemhelper_server;
+expandattribute vendor_hal_systemhelper_server false;
+
+attribute vendor_hal_wifimyftm;
+expandattribute vendor_hal_wifimyftm true;
+attribute vendor_hal_wifimyftm_client;
+expandattribute vendor_hal_wifimyftm_client true;
+attribute vendor_hal_wifimyftm_server;
+expandattribute vendor_hal_wifimyftm_server false;
+
+attribute vendor_qccsyshal;
+expandattribute vendor_qccsyshal true;
+attribute vendor_qccsyshal_client;
+expandattribute vendor_qccsyshal_client true;
+attribute vendor_qccsyshal_server;
+expandattribute vendor_qccsyshal_server false;
+
+attribute vendor_qtiloopback;
+expandattribute vendor_qtiloopback true;
+attribute vendor_qtiloopback_client;
+expandattribute vendor_qtiloopback_client true;
+attribute vendor_qtiloopback_server;
+expandattribute vendor_qtiloopback_server false;
+
+attribute vendor_syshealthmon;
+expandattribute vendor_syshealthmon true;
+attribute vendor_syshealthmon_client;
+expandattribute vendor_syshealthmon_client true;
+attribute vendor_syshealthmon_server;
+expandattribute vendor_syshealthmon_server false;
+
+attribute vendor_wifidisplayhalservice;
+expandattribute vendor_wifidisplayhalservice true;
+attribute vendor_wifidisplayhalservice_client;
+expandattribute vendor_wifidisplayhalservice_client true;
+attribute vendor_wifidisplayhalservice_server;
+expandattribute vendor_wifidisplayhalservice_server false;
+
+neverallow { vendor_hal_alarm_qti_server -halserverdomain } domain:process fork;
+neverallow { vendor_hal_atfwd_server -halserverdomain } domain:process fork;
+neverallow { vendor_hal_c2pa_server -halserverdomain } domain:process fork;
+neverallow { vendor_hal_cacert_qti_server -halserverdomain } domain:process fork;
+neverallow { vendor_hal_capabilityconfigstore_qti_server -halserverdomain } domain:process fork;
+neverallow { vendor_hal_datafactory_qti_server -halserverdomain } domain:process fork;
+neverallow { vendor_hal_dcservice_qti_server -halserverdomain } domain:process fork;
+neverallow { vendor_hal_display_aiqe_server -halserverdomain } domain:process fork;
+neverallow { vendor_hal_display_color_server -halserverdomain } domain:process fork;
+neverallow { vendor_hal_dspmanager_server -halserverdomain } domain:process fork;
+neverallow { vendor_hal_embmssl_server -halserverdomain } domain:process fork;
+neverallow { vendor_hal_imsfactory_server -halserverdomain } domain:process fork;
+neverallow { vendor_hal_imsrtphal_server -halserverdomain } domain:process fork;
+neverallow { vendor_hal_limits_server -halserverdomain } domain:process fork;
+neverallow { vendor_hal_mstatservice_qti_server -halserverdomain } domain:process fork;
+neverallow { vendor_hal_qdutils_disp_server -halserverdomain } domain:process fork;
+neverallow { vendor_hal_trustedui_server -halserverdomain } domain:process fork;
+neverallow { vendor_hal_iwlanservice_qti_server -halserverdomain } domain:process fork;
+
+build_test_only(`
+neverallow { vendor_hal_alarm_qti_server -vendor_hal_alarm_qti } domain:process fork;
+neverallow { vendor_hal_alarm_qti_client -halclientdomain } domain:process fork;
+neverallow { vendor_hal_atfwd_server -vendor_hal_atfwd } domain:process fork;
+neverallow { vendor_hal_atfwd_client -halclientdomain } domain:process fork;
+neverallow { vendor_hal_c2pa_server -vendor_hal_c2pa } domain:process fork;
+neverallow { vendor_hal_c2pa_client -halclientdomain } domain:process fork;
+neverallow { vendor_hal_cacert_qti_server -vendor_hal_cacert_qti } domain:process fork;
+neverallow { vendor_hal_cacert_qti_client -halclientdomain } domain:process fork;
+neverallow { vendor_hal_capabilityconfigstore_qti_server -vendor_hal_capabilityconfigstore_qti } domain:process fork;
+neverallow { vendor_hal_capabilityconfigstore_qti_client -halclientdomain } domain:process fork;
+neverallow { vendor_hal_datafactory_qti_server -vendor_hal_datafactory_qti } domain:process fork;
+neverallow { vendor_hal_datafactory_qti_client -halclientdomain } domain:process fork;
+neverallow { vendor_hal_dcservice_qti_server -vendor_hal_dcservice_qti } domain:process fork;
+neverallow { vendor_hal_dcservice_qti_client -halclientdomain } domain:process fork;
+neverallow { vendor_hal_display_aiqe_server -vendor_hal_display_aiqe } domain:process fork;
+neverallow { vendor_hal_display_aiqe_client -halclientdomain } domain:process fork;
+neverallow { vendor_hal_display_color_server -vendor_hal_display_color } domain:process fork;
+neverallow { vendor_hal_display_color_client -halclientdomain } domain:process fork;
+neverallow { vendor_hal_dspmanager_server -vendor_hal_dspmanager } domain:process fork;
+neverallow { vendor_hal_dspmanager_client -halclientdomain } domain:process fork;
+neverallow { vendor_hal_embmssl_server -vendor_hal_embmssl } domain:process fork;
+neverallow { vendor_hal_embmssl_client -halclientdomain } domain:process fork;
+neverallow { vendor_hal_imsfactory_server -vendor_hal_imsfactory } domain:process fork;
+neverallow { vendor_hal_imsfactory_client -halclientdomain } domain:process fork;
+neverallow { vendor_hal_imsrtphal_server -vendor_hal_imsrtphal } domain:process fork;
+neverallow { vendor_hal_imsrtphal_client -halclientdomain } domain:process fork;
+neverallow { vendor_hal_limits_server -vendor_hal_limits } domain:process fork;
+neverallow { vendor_hal_limits_client -halclientdomain } domain:process fork;
+neverallow { vendor_hal_mstatservice_qti_server -vendor_hal_mstatservice_qti } domain:process fork;
+neverallow { vendor_hal_mstatservice_qti_client -halclientdomain } domain:process fork;
+neverallow { vendor_hal_qdutils_disp_server -vendor_hal_qdutils_disp } domain:process fork;
+neverallow { vendor_hal_qdutils_disp_client -halclientdomain } domain:process fork;
+neverallow { vendor_hal_trustedui_server -vendor_hal_trustedui } domain:process fork;
+neverallow { vendor_hal_trustedui_client -halclientdomain } domain:process fork;
+neverallow { vendor_hal_iwlanservice_qti_server -vendor_hal_iwlanservice_qti } domain:process fork;
+neverallow { vendor_hal_iwlanservice_qti_client -halclientdomain } domain:process fork;
+')
+
+type vendor_hal_atfwd_hwservice, hwservice_manager_type, protected_hwservice;

@@ -72,7 +72,7 @@ Accept only if all are true:
 - no new boot-critical AVC class
 
 Current result for the first `init_boot`-only test:
-- PASS for persistent boot-chain equivalence on `stock boot + custom init_boot`
+- PASS for persistent boot-chain equivalence on `stock boot + stock vendor_boot + custom init_boot`
 - known residual miss unchanged: `android.hardware.nfc.INfc/default`
 
 Do not escalate this runbook back to `boot + init_boot + vendor_boot` by default.

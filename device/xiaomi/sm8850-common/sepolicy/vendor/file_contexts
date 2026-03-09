@@ -1,7 +1,7 @@
 # Batterysecret
 /vendor/bin/batterysecret u:object_r:batterysecret_exec:s0
 /mnt/vendor/mi_ext(/.*)? u:object_r:mnt_vendor_file:s0
-/sys/devices/platform/soc/soc:qcom,pmic_glink/soc:qcom,pmic_glink:qcom,ucsi/typec/port0/data_role u:object_r:vendor_sysfs_usb_supply:s0
+/sys/devices/platform/soc/soc:qcom,pmic_glink/soc:qcom,pmic_glink:qcom,ucsi/typec/port0/data_role u:object_r:sysfs_usb:s0
 
 # Camera
 /(vendor|system/vendor)/bin/hw/vendor.xiaomi.hardware.quickcamera@1.0-service u:object_r:hal_quickcamera_default_exec:s0
@@ -54,3 +54,8 @@
 /sys/{class,devices/virtual}/thermal/thermal_message/flash_state u:object_r:sys_thermal_flash_state:s0
 /sys/{class,devices/virtual}/thermal/thermal_message/torch_real_level u:object_r:sys_thermal_torch_real_level:s0
 /sys/{class,devices/virtual}/thermal/thermal_message/wifi_limit u:object_r:sys_thermal_wifi_limit:s0
+
+# QESDK
+/vendor/bin/qesdk-one u:object_r:vendor_hal_qesdonehal_default_exec:s0
+/dev/socket/qesdk_one(/.*)? u:object_r:vendor_qesd_one_socket:s0
+/data/vendor/qesdk_token(/.*)? u:object_r:vendor_qesd_one_token_data_file:s0

@@ -1,0 +1,9 @@
+#####################################
+# use_diag_handler_ffbm(clientdomain)
+# Imported Qualcomm qva/common policy calls this macro, but on the current
+# fallback path it is only defined under qva/vendor/test.
+define(`use_diag_handler_ffbm', `
+  userdebug_or_eng(`
+    set_prop($1, vendor_boot_mode_prop);
+  ')
+')

@@ -1,0 +1,3 @@
+# Imported Qualcomm qva/common policy uses a normal HAL family for Wi-Fi CFR,
+# but this source tree does not define it.
+hal_attribute(wificfr)

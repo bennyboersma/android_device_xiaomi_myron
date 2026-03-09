@@ -1,0 +1,13 @@
+# Imported Qualcomm sm8750 fallback policy expects a small set of raw vendor
+# attributes that are not declared in-source on this path. The ordering-
+# sensitive ones live in the local `attributes` file so they are declared
+# before file type definitions reference them.
+
+attribute vendor_hal_qvrservice_qti_socket_client;
+expandattribute vendor_hal_qvrservice_qti_socket_client true;
+
+attribute vendor_hal_sxrservice_qti_socket_client;
+expandattribute vendor_hal_sxrservice_qti_socket_client true;
+
+attribute vendor_hal_xrcommservice_qti_socket_client;
+expandattribute vendor_hal_xrcommservice_qti_socket_client true;

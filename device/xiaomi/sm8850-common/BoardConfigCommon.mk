@@ -169,6 +169,9 @@ BOARD_ROOT_EXTRA_SYMLINKS += /lib/modules:/vendor/lib/modules
 # Platform
 TARGET_BOARD_PLATFORM := kaanapali
 TARGET_BOOTLOADER_BOARD_NAME := canoe
+# Temporary Qualcomm sepolicy fallback until a kaanapali-specific board policy
+# directory lands in device/qcom/sepolicy_vndr/sm8750.
+TARGET_SEPOLICY_DIR := canoe
 
 # Recovery
 TARGET_RECOVERY_FSTAB := $(COMMON_PATH)/init/fstab.qcom
@@ -182,6 +185,13 @@ ENABLE_VENDOR_RIL_SERVICE := true
 # SEPolicy
 BOARD_VENDOR_SEPOLICY_DIRS += $(COMMON_PATH)/sepolicy/vendor
 include device/qcom/sepolicy_vndr/SEPolicy.mk
+BOARD_VENDOR_SEPOLICY_DIRS += \
+    device/qcom/sepolicy_vndr/sm8750 \
+    device/qcom/sepolicy_vndr/sm8750/generic/vendor/common \
+    device/qcom/sepolicy_vndr/sm8750/generic/vendor/common/attribute \
+    device/qcom/sepolicy_vndr/sm8750/qva/vendor/common \
+    device/qcom/sepolicy_vndr/sm8750/generic/vendor/$(TARGET_SEPOLICY_DIR) \
+    device/qcom/sepolicy_vndr/sm8750/qva/vendor/$(TARGET_SEPOLICY_DIR)
 
 # System properties
 TARGET_ODM_PROP += $(COMMON_PATH)/configs/properties/odm.prop

@@ -1,6 +1,6 @@
 # Poco F8 Ultra (myron) Bring-up Status
 
-Last updated: 2026-03-08
+Last updated: 2026-03-09
 
 LineageOS bring-up workspace for Poco F8 Ultra (`myron`) on Qualcomm SM8850.
 
@@ -32,11 +32,13 @@ Current proven install path:
 
 Current next milestone:
 
-1. complete full userspace image build
+1. let the resumed full userspace image build run to the first real image-stage blocker or image outputs
 2. pass:
    - `tools/check_userspace_flash_readiness.sh`
    - `tools/check_partition_package_sanity.sh`
 3. perform the first slot-safe custom userspace flash
+4. prefer the staged wrapper:
+   - `tools/run_first_userspace_attempt.sh`
 
 ## Repository Layout
 
@@ -117,12 +119,12 @@ Fastest AI handoff:
 
 ## Current Objective
 
-Keep the phone on the proven intermediate install path while host-side userspace images finish building:
+Keep the phone on the proven intermediate install path while host-side userspace images are rebuilt:
 
 1. `boot.img` stays stock-exact.
 2. `vendor_boot.img` stays stock-exact.
 3. `init_boot.img` is the currently proven mutable boot-chain partition.
-4. Build full custom userspace images on the host.
+4. Keep the full userspace image build moving until it hits the next real compile, packaging, or image-generation blocker.
 5. Stage stock userspace rollback assets (`super.img`, `vbmeta_system.img`) on the remote host.
 6. Use a slot-safe logical-partition flash for the first custom userspace test:
    - `tools/check_userspace_flash_readiness.sh`
@@ -130,6 +132,56 @@ Keep the phone on the proven intermediate install path while host-side userspace
    - `tools/runbooks/full_userspace_validation.md`
 
 `fastboot boot` remains useful for safe experimentation, but it is no longer the primary next step. The next milestone is the first custom userspace boot on top of `stock boot + stock vendor_boot + custom init_boot`.
+
+## Latest Progress (2026-03-09)
+
+- Vendor fallback sepolicy gate is now clean on the remote host:
+  - `mka vendor_sepolicy.cil.raw -j6` PASS
+- The first full userspace image build has been resumed on the remote host:
+  - `mka systemimage productimage systemextimage vendorimage odmimage vendor_dlkmimage system_dlkmimage -j10`
+  - build is past the old sepolicy choke point and back in normal framework/native compilation
+- Proactive common-tree blob pruning completed for three confirmed late-collision paths already treated as source-built at the device layer:
+  - `vendor/etc/init/hw/init.qcom.rc`
+  - `vendor/etc/vintf/manifest/c2_manifest_vendor.xml`
+  - `vendor/etc/vintf/manifest/dumpstate-xiaomi.xml`
+- Common-vs-device blob overlap audit completed:
+  - current exact common-vs-myron overlap baseline:
+    - `622` destination paths
+    - enforced by:
+      - `tools/check_blob_overlap.sh`
+      - `tools/blob_overlap_allowlist.txt`
+  - earlier manual bucketing of the highest-risk overlap classes identified:
+    - `init`: `46`
+    - `vintf`: `24`
+    - `display`: `25`
+    - `seccomp`: `19`
+    - `power-perf`: `17`
+    - `radio-ims`: `11`
+  - this remains a documented likely packaging-risk class, not an unknown
+- Exact-duplicate high-risk overlap pruning completed:
+  - `94` exact destination-path duplicates across `init`, `vintf`, `seccomp_policy`, and `permissions/default-permissions` were commented out of `device/xiaomi/sm8850-common/proprietary-files.txt`
+  - matrix:
+    - `tools/runbooks/common_device_overlap_matrix.md`
+- Blob overlap regression gate added:
+  - new overlap growth now fails through:
+    - `tools/check_blob_overlap.sh`
+    - `tools/surgical_blob_policy_check.sh`
+- First userspace flash wrapper added:
+  - `tools/run_first_userspace_attempt.sh`
+  - wraps readiness, partition sanity, dry-run flash, real flash, and first-boot capture
+  - now emits a post-capture decision summary through:
+    - `tools/summarize_first_userspace_result.sh`
+- One-command helpers added:
+  - `tools/evaluate_latest_firstboot.sh`
+  - `tools/run_userspace_rollback.sh`
+  - `tools/audit_userspace_outputs.sh`
+- Ordered first-userspace triage checklist added:
+  - `tools/runbooks/first_userspace_triage_checklist.md`
+- Platform naming debt audit completed:
+  - documented in `tools/runbooks/platform_naming_debt.md`
+  - important distinction:
+    - device target remains `SM8850` / `kaanapali`
+    - remaining `sm8550` / `kalama` strings are mixed between harmless legacy path names and still-risky kernel/common naming debt
 
 ## Latest Progress (2026-03-08)
 
@@ -210,8 +262,27 @@ Keep the phone on the proven intermediate install path while host-side userspace
   - boot-critical AVC set improved slightly (`78 -> 77`)
 - Current remote host work in progress:
   - full userspace image build is running on `john@192.168.200.33`
-  - stock `super.img` staging to the remote rollback directory is in progress
-  - first userspace flash will not be attempted until `tools/check_userspace_flash_readiness.sh` passes
+  - stock userspace rollback assets are already staged on the remote host
+  - first userspace flash will not be attempted until `tools/check_userspace_flash_readiness.sh` and `tools/check_partition_package_sanity.sh` both pass
+- New host-side blocker class identified after userspace build restart:
+  - local stale device policy references to nonexistent vendor sysfs types were fixed:
+    - `vendor_sysfs_usb_c`
+    - `vendor_sysfs_battery_supply`
+    - `vendor_sysfs_usb_supply`
+  - root cause widened beyond local policy:
+    - imported Qualcomm vendor sepolicy fallback paths from `device/qcom/sepolicy_vndr/sm8750/...` were not actually present in resolved `BOARD_VENDOR_SEPOLICY_DIRS`
+    - `device/xiaomi/sm8850-common/BoardConfigCommon.mk` now explicitly appends the required Qualcomm fallback directories while keeping the device target on `SM8850` / `kaanapali`
+  - after that fix, the next failures moved into raw imported Qualcomm vendor attributes that are referenced but not declared in-source on this fallback path
+  - compatibility shim added:
+    - `device/xiaomi/sm8850-common/sepolicy/vendor/vendor_hal_attributes_compat.te`
+  - current shim scope:
+    - raw `vendor_hal_*` families used by imported `hal_*_domain` macros
+    - raw non-`vendor_hal_*` families such as `vendor_qccsyshal`, `vendor_qtiloopback`, `vendor_syshealthmon`, and `vendor_wifidisplayhalservice`
+  - narrowed target used for iteration:
+    - `mka vendor_sepolicy.cil.raw -j6`
+  - result:
+    - `vendor_sepolicy.cil.raw` now passes cleanly
+    - full userspace image build resumed
 
 What this means:
 
@@ -219,7 +290,8 @@ What this means:
 2. The persistent install-path blocker was not "Android can't boot"; it was "we were replacing the wrong partition with the wrong baseline."
 3. The correct durable intermediate path is now proven: `stock boot + stock vendor_boot + custom init_boot`.
 4. NFC is still not the current gating problem for installation.
-5. The next real risk is no longer boot-chain trust; it is the first custom userspace flash and whatever runtime regressions that surfaces.
+5. The immediate host-side blocker is vendor sepolicy fallback compatibility, not partition flashing.
+6. The next real risk after that is the first custom userspace flash and whatever runtime regressions that surfaces.
 
 ## Host-Side Tooling Additions (2026-03-05)
 

@@ -1,6 +1,11 @@
 # Startup Ownership Map (myron)
 
-Updated: 2026-03-04
+Updated: 2026-03-09
+
+Current note:
+- This ownership map is not the active host-side blocker.
+- `vendor_sepolicy.cil.raw` already passes on the remote build host.
+- The active host-side gate is now the resumed full userspace image build and its next real compile, packaging, or image-generation blocker.
 
 ## Must-Have Service Families
 

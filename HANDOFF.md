@@ -1,6 +1,6 @@
 # Myron AI Handoff
 
-Last updated: 2026-03-08
+Last updated: 2026-03-09
 
 ## Read This First
 
@@ -57,20 +57,29 @@ Do not replace `vendor_boot` by default.
 
 ## Active Work In Progress
 
-Two long-running jobs were active at handoff time:
+Current active work is the resumed full userspace image build after the vendor sepolicy blocker class was cleared.
 
-1. Remote full userspace build
+1. Remote narrowed vendor sepolicy rebuild
+   - status:
+     - complete
+   - result:
+     - `mka vendor_sepolicy.cil.raw -j6` now passes cleanly
+   - important resolved classes:
+     - stale local references to nonexistent `vendor_sysfs_*` labels
+     - missing Qualcomm fallback policy inclusion in `BOARD_VENDOR_SEPOLICY_DIRS`
+     - missing raw imported Qualcomm vendor attribute/domain/property/service families
+     - WFD/test-property fallback gaps
+
+2. Remote full userspace image build
    - host: `john@192.168.200.33`
-   - session id: `67879`
-   - command family:
-     - `mka systemimage productimage systemextimage vendorimage odmimage vendor_dlkmimage system_dlkmimage -j6`
-   - status at handoff:
-   - still running
-    - around `13%`
-    - no myron-specific failure yet
+   - current command:
+     - `mka systemimage productimage systemextimage vendorimage odmimage vendor_dlkmimage system_dlkmimage -j10`
+   - current status:
+     - running
+     - already past the old vendor sepolicy choke point
+     - no new blocker at last update
 
-2. Local-to-remote stock userspace rollback staging
-   - session id: `37634`
+3. Local-to-remote stock userspace rollback staging
    - payload:
      - stock `super.img`
      - stock `vbmeta_system.img`
@@ -80,7 +89,9 @@ Two long-running jobs were active at handoff time:
      - complete
      - rollback assets confirmed present on remote host
 
-These session ids may no longer be valid later; poll them first before assuming they still exist.
+Current note:
+- any session ids are transient; poll the remote host first instead of trusting a stale session number
+- the next expected blocker class is no longer vendor sepolicy; it is likely packaging, module-resolution, or image-generation
 
 ## Safe Boundaries
 
@@ -101,16 +112,17 @@ Not allowed by default:
 ## Next Correct Steps
 
 1. Poll the running remote build.
-2. Poll the `super.img` staging transfer.
-3. If the build fails:
-   - fix the first real build error only
-   - avoid speculative cleanup
-4. If the build succeeds:
+2. If `vendor_sepolicy.cil.raw` fails:
+   - this would be unexpected regression; fix the first real build error only
+3. Poll the running full userspace image build.
+4. If the userspace image build succeeds:
    - run:
      - `CHECK_ROLLBACK=1 REQUIRE_DEVICE=0 bash tools/check_userspace_flash_readiness.sh ~/android/lineage myron`
      - `bash tools/check_partition_package_sanity.sh ~/android/lineage myron`
 5. Only if readiness passes:
    - follow `tools/runbooks/full_userspace_validation.md`
+   - or use:
+     - `DRY_RUN=1 bash tools/run_first_userspace_attempt.sh ~/android/lineage myron`
    - flash logical userspace partitions only
    - keep:
      - stock `boot`
@@ -129,6 +141,11 @@ Flash/readiness:
 - `tools/check_userspace_flash_readiness.sh`
 - `tools/flash_userspace_images.sh`
 - `tools/rollback_userspace_images.sh`
+- `tools/run_first_userspace_attempt.sh`
+- `tools/summarize_first_userspace_result.sh`
+- `tools/evaluate_latest_firstboot.sh`
+- `tools/run_userspace_rollback.sh`
+- `tools/audit_userspace_outputs.sh`
 
 Capture/triage:
 - `tools/first_boot_capture_and_diff.sh`
@@ -137,9 +154,12 @@ Capture/triage:
 - `tools/compare_avc_sets.sh`
 
 Runbooks:
+- `tools/runbooks/common_device_overlap_matrix.md`
 - `tools/runbooks/full_userspace_validation.md`
+- `tools/runbooks/first_userspace_triage_checklist.md`
 - `tools/runbooks/minimal_boot_chain_validation.md`
 - `tools/runbooks/fastboot_myron_command_sheet.md`
+- `tools/runbooks/platform_naming_debt.md`
 - `tools/runbooks/firmware_lock_wpm_eu.md`
 - `tools/runbooks/rollback_pack_preparation.md`
 - `tools/runbooks/manifest_runtime_expectations.md`
@@ -179,6 +199,9 @@ Do not re-run the old wrong path unless there is a new concrete reason:
 - flashing custom `boot` alone
 - flashing custom `boot + vbmeta`
 - treating NFC as the next install blocker before first custom userspace boot
+- confusing the Qualcomm fallback source layer with the actual device target:
+  - device target remains `SM8850` / `kaanapali`
+  - only the currently available Qualcomm vendor sepolicy fallback layer is under `sm8750`
 
 Those paths were already explored and are not the current fastest route.
 
@@ -186,3 +209,26 @@ Those paths were already explored and are not the current fastest route.
 
 - remote `ccache` limit increased from `5G` to `50G`
 - remote rollback dry-run for userspace restore is already verified
+- imported Qualcomm fallback vendor sepolicy is now explicitly included from `device/xiaomi/sm8850-common/BoardConfigCommon.mk`
+- local vendor policy was cleaned up to stop referencing stale nonexistent `vendor_sysfs_*` labels
+- active common-vs-device blob overlap remains the most likely late packaging-risk class once the current userspace build reaches image assembly
+- the current exact overlap regression baseline is:
+  - `622` destination paths
+  - enforced by:
+    - `tools/check_blob_overlap.sh`
+    - `tools/blob_overlap_allowlist.txt`
+- exact high-risk overlap pruning then expanded that set:
+  - `94` exact destination-path duplicates across `init`, `vintf`, `seccomp_policy`, and `permissions/default-permissions` were commented out of `device/xiaomi/sm8850-common/proprietary-files.txt`
+  - keep-policy is documented in:
+    - `tools/runbooks/common_device_overlap_matrix.md`
+- overlap growth is now gated:
+  - `tools/check_blob_overlap.sh`
+  - baseline allowlist:
+    - `tools/blob_overlap_allowlist.txt`
+  - current known exact common-vs-myron overlap baseline:
+    - `622` destination paths
+  - `tools/surgical_blob_policy_check.sh` now fails if new exact overlap destinations are introduced
+- three high-confidence common-tree overlap entries were already pruned locally and synced remotely:
+  - `vendor/etc/init/hw/init.qcom.rc`
+  - `vendor/etc/vintf/manifest/c2_manifest_vendor.xml`
+  - `vendor/etc/vintf/manifest/dumpstate-xiaomi.xml`
