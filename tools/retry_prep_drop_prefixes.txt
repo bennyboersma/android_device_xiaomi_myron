@@ -1,0 +1,7 @@
+# Whole non-first-boot families that should be removed from the generated
+# retry-prep graph for the second userspace attempt.
+com.qti.chi
+com.qti.feature2.
+com.xiaomi.camhal.
+com.xiaomi.stubv1.
+vendor.xiaomi.sensor.

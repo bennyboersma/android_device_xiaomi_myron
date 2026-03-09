@@ -1,0 +1,6 @@
+# Preserve only modules that must remain generated for Gate 1. Source-owned
+# service/module overlaps should be removed from the generated graph so the
+# source provider can win and Gate 2 can validate the installed output.
+qseecomd
+libgps.utils
+qseecomd

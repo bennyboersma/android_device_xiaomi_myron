@@ -37,4 +37,3 @@ install_symlink {
     installed_location: "rfs/msm/mpss/readonly/mbnconfig",
     symlink_target: "/data/vendor/mbnconfig",
 }
-

@@ -15,10 +15,14 @@ DRY_RUN=1 bash tools/run_first_userspace_attempt.sh ~/android/lineage myron
   - stock `boot`
   - stock `vendor_boot`
   - stock `init_boot`
-- Do not use this runbook until `tools/check_userspace_flash_readiness.sh` passes.
-- Do not use this runbook until `tools/check_retry_boot_critical_vendor_stack.sh` passes.
+- Keep slot `a` untouched as the recovered stock-safe baseline.
+- The second retry is slot `b` only and optimized for boot-to-stable-`adb`.
+- Do not use this runbook until Gate 1 passes:
+  - `bash tools/run_retry_prep_gate1.sh ~/android/lineage myron`
+- Do not use this runbook until Gate 2 passes:
+  - `bash tools/run_retry_prep_gate2.sh ~/android/lineage myron`
 - `vendor_sepolicy.cil.raw` already passes on the remote host.
-- The active host-side work is the resumed full userspace image build and its next real compile, packaging, or image-generation blocker.
+- The active host-side work is retry-prep graph cleanup plus boot-critical vendor-output verification.
 
 ## Preconditions
 - Phone firmware stays on `3.0.7.0.WPMEUXM`.
@@ -50,7 +54,14 @@ Do not change firmware partitions.
 Do not change `vbmeta` unless the first userspace boot shows an explicit vbmeta-system verification blocker.
 
 ## 1) Confirm readiness, then dry-run the plan
-First verify the full userspace artifacts and rollback assets are present:
+First verify Gate 1 and Gate 2 are both clean:
+
+```bash
+bash tools/run_retry_prep_gate1.sh ~/android/lineage myron
+bash tools/run_retry_prep_gate2.sh ~/android/lineage myron
+```
+
+Then verify the full userspace artifacts and rollback assets are present:
 
 ```bash
 CHECK_ROLLBACK=1 REQUIRE_DEVICE=0 \
@@ -60,11 +71,12 @@ bash tools/check_partition_package_sanity.sh ~/android/lineage myron
 bash tools/audit_userspace_outputs.sh ~/android/lineage myron
 ```
 
-Then confirm the device target and dry-run the flash plan:
+Then confirm the device target, verify slot `b` is the retry target, and dry-run the flash plan:
 
 ```bash
 fastboot getvar product
 fastboot getvar current-slot
+fastboot set_active b
 DRY_RUN=1 REBOOT_TO_FASTBOOTD=1 USE_SUPER=0 FLASH_VBMETA_SYSTEM=0 \
   bash tools/flash_userspace_images.sh ~/android/lineage myron
 ```
@@ -80,10 +92,11 @@ Equivalent one-command wrapper:
 DRY_RUN=1 bash tools/run_first_userspace_attempt.sh ~/android/lineage myron
 ```
 
-## 2) Enter fastbootd and flash the logical partitions for the current slot
+## 2) Enter fastbootd and flash the logical partitions for slot `b`
 The helper now enters `fastbootd` from either Android (`adb reboot fastboot`) or bootloader (`fastboot reboot fastboot`) before flashing logical partitions.
 
 ```bash
+fastboot set_active b
 DRY_RUN=0 REBOOT_TO_FASTBOOTD=1 USE_SUPER=0 FLASH_VBMETA_SYSTEM=0 \
   bash tools/flash_userspace_images.sh ~/android/lineage myron
 fastboot reboot

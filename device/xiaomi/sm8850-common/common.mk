@@ -30,36 +30,40 @@ PRODUCT_PACKAGES += \
     checkpoint_gc
 
 # Audio
-PRODUCT_PACKAGES += \
-    android.hardware.audio@7.1-impl \
-    android.hardware.audio.effect@7.0-impl \
-    audio.primary.default \
-    audio.r_submix.default \
-    libtinycompress
-
-PRODUCT_PACKAGES += \
-    android.hardware.soundtrigger@2.2-impl \
-    android.hardware.soundtrigger@2.3-impl
-
-PRODUCT_PACKAGES += \
-    audioadsprpcd \
-    android.hardware.audio.service \
-    audio.primary.kalama \
-    sound_trigger.primary.kalama \
-    libagm_compress_plugin \
-    libagm_mixer_plugin \
-    libagm_pcm_plugin \
-    libagmclient \
-    libaudiochargerlistener \
-    libbatterylistener \
-    libfmpal \
-    libhfp_pal \
-    libsndcardparser \
-    libpalclient \
-    libqcompostprocbundle \
-    libqcomvisualizer \
-    libqcomvoiceprocessing \
-    libvolumelistener
+# Retry-prep: defer audio HAL/service stack until second userspace boot reaches stable adb.
+# The current fallback Qualcomm audio source path mixes Audio Core AIDL V3/V4 and is not
+# required for boot-to-adb, decryption, display startup, Wi-Fi bring-up, health, qseecomd,
+# or keymint/gatekeeper. Restore these packages after second-userspace boot is stable.
+# PRODUCT_PACKAGES += \
+#     android.hardware.audio@7.1-impl \
+#     android.hardware.audio.effect@7.0-impl \
+#     audio.primary.default \
+#     audio.r_submix.default \
+#     libtinycompress
+#
+# PRODUCT_PACKAGES += \
+#     android.hardware.soundtrigger@2.2-impl \
+#     android.hardware.soundtrigger@2.3-impl
+#
+# PRODUCT_PACKAGES += \
+#     audioadsprpcd \
+#     android.hardware.audio.service \
+#     audio.primary.kalama \
+#     sound_trigger.primary.kalama \
+#     libagm_compress_plugin \
+#     libagm_mixer_plugin \
+#     libagm_pcm_plugin \
+#     libagmclient \
+#     libaudiochargerlistener \
+#     libbatterylistener \
+#     libfmpal \
+#     libhfp_pal \
+#     libsndcardparser \
+#     libpalclient \
+#     libqcompostprocbundle \
+#     libqcomvisualizer \
+#     libqcomvoiceprocessing \
+#     libvolumelistener
 
 PRODUCT_COPY_FILES += \
     frameworks/av/services/audiopolicy/config/a2dp_audio_policy_configuration.xml:$(TARGET_COPY_OUT_VENDOR)/etc/a2dp_audio_policy_configuration.xml \
