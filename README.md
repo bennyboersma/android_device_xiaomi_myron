@@ -27,16 +27,16 @@ If you are continuing work from scratch, read in this order:
 
 Current device handling rule:
 
-1. keep the phone in bootloader fastboot until a full official stock restore is staged
+1. keep the verified stock baseline on slot `a`
 2. do not use partial stock bundles as a recovery baseline
-3. do not resume userspace testing until stock is revalidated from the complete official fastboot package
+3. do not resume userspace testing until retry-prep gates and flash dry-runs are revalidated
 
 Current next milestone:
 
-1. restore a full official stock baseline from the exact Xiaomi fastboot package
-2. reconfirm stock boot on a known-good baseline
+1. freeze the restored official stock baseline
+2. reconfirm retry-prep Gate 1 and Gate 2 from the current reproducible state
 3. analyze why the first split userspace flash bootlooped before `adb`
-4. fix the userspace blocker set before any reflash
+4. fix the remaining userspace blocker set before any reflash
 5. only then retry split-image userspace flash
 
 ## Repository Layout
@@ -141,7 +141,7 @@ Fastest AI handoff:
 - Follow-up recovery work proved the original staged stock fragments were incomplete for a trustworthy baseline restore.
 - The device should currently be treated as requiring a full official stock fastboot restore before any additional bring-up testing.
 
-### Phase 8: Recovery baseline correction (current)
+### Phase 8: Recovery baseline correction (done)
 
 - We proved the post-flash failure is not only a Lineage userspace packaging issue:
   - slot `b` failed before `adb` even after flashing matched stock-style sets
@@ -156,6 +156,20 @@ Fastest AI handoff:
 - The correct recovery artifact is the full official Xiaomi EEA fastboot package:
   - `myron_eea_global_images_OS3.0.7.0.WPMEUXM_20260112.0000.00_16.0_eea_cee0eaf4a6.tgz`
   - MD5 `cee0eaf4a66294c29ae709a22073e670`
+- That package was copied to the remote host, verified again by MD5, extracted, and restored with Xiaomi `flash_all_except_storage.sh`.
+- Stock boot was then reconfirmed:
+  - `ro.boot.slot_suffix=_a`
+  - `ro.build.version.incremental=OS3.0.7.0.WPMEUXM`
+  - `sys.boot_completed=1`
+
+### Phase 9: Retry-prep from verified stock baseline (current)
+
+- Recovery baseline uncertainty is now closed.
+- The active blocker is again retry-prep correctness, not device recovery.
+- Another userspace test remains blocked until:
+  - Gate 1 passes from the current reproducible state
+  - Gate 2 passes from the current reproducible state
+  - slot-safe userspace flash/rollback dry-runs are reconfirmed
 
 ## Current Objective
 
@@ -163,31 +177,31 @@ Do not reflash userspace yet.
 
 The project has moved from “get the first userspace images built” to two ordered requirements:
 
-1. restore a complete official stock baseline
-2. only then continue analyzing and fixing the first split userspace boot blocker before retrying
+1. preserve the now-restored official stock baseline
+2. continue analyzing and fixing the first split userspace boot blocker before retrying
 
 Current safe operational baseline:
 
-1. phone held in bootloader fastboot
-2. no further writes from partial stock bundles
-3. next write action must come from the complete official Xiaomi fastboot package
+1. stock `boot`
+2. stock `vendor_boot`
+3. stock `init_boot`
+4. stock userspace
+5. active slot `_a`
 
 Current work focus:
 
-1. verify and stage the official Xiaomi EEA fastboot package
-2. perform a full stock restore from that complete package
-3. reconfirm Android boot on stock before any more experiment work
-4. fix rollback tooling defects discovered during recovery
-5. make Gate 1 (`m nothing -j10`) clean on the retry-prep tree
-6. make Gate 2 (`tools/check_retry_boot_critical_vendor_stack.sh`) pass on rebuilt outputs
-7. only then retry split-image userspace flashing on slot `b`
+1. freeze and preserve the restored stock baseline on slot `a`
+2. fix rollback tooling defects discovered during recovery
+3. make Gate 1 (`m nothing -j10`) clean on the retry-prep tree
+4. make Gate 2 (`tools/check_retry_boot_critical_vendor_stack.sh`) pass on rebuilt outputs
+5. reconfirm slot-safe userspace dry-runs with `TARGET_SLOT=b`
+6. only then retry split-image userspace flashing on slot `b`
 
 ## Latest Progress (2026-03-09)
 
 - Vendor fallback sepolicy gate is clean on the remote host:
   - `mka vendor_sepolicy.cil.raw -j6` PASS
   - `mka precompiled_sepolicy -j6` PASS
-- The current retry-prep tree does not have a clean `m nothing -j10` yet.
 - The active blocker was narrowed into retry-prep graph ownership and boot-critical output verification:
   - proactive keep/drop policy is now codified in:
     - `tools/retry_prep_keep_modules.txt`
@@ -268,9 +282,9 @@ Use this postmortem as the starting point before any retry:
 
 
 Current state:
-1. The full official fastboot package is now the required recovery source of truth.
-2. The package is already present locally in the workspace root:
+1. The official stock recovery is complete and stock is booting again on slot `a`.
+2. The package remains present locally in the workspace root:
    - `/Users/benny/Homelab/ROM/myron_eea_global_images_OS3.0.7.0.WPMEUXM_20260112.0000.00_16.0_eea_cee0eaf4a6.tgz`
-3. Host-side retry prep Gate 1 (`m nothing -j10`) passes successfully using an aggressive keep/drop list.
-4. Display and `qseecomd` retry-prep fixes remain valid build-side work, but they are not the next device-side action.
-5. No more device flashing should happen until the full official stock restore set is extracted and verified.
+3. Host-side retry prep Gate 1 (`m nothing -j10`) previously passed successfully using an aggressive keep/drop list and should now be reconfirmed from this restored baseline.
+4. Display and `qseecomd` retry-prep fixes remain valid build-side work and are again the active next engineering track.
+5. No more device flashing should happen until Gate 1, Gate 2, and slot-safe dry-run readiness are reconfirmed.

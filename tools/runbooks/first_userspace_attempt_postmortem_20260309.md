@@ -79,6 +79,28 @@ Authoritative recovery artifact:
 - direct Xiaomi CDN:
   - `https://bigota.d.miui.com/OS3.0.7.0.WPMEUXM/myron_eea_global_images_OS3.0.7.0.WPMEUXM_20260112.0000.00_16.0_eea_cee0eaf4a6.tgz`
 
+## Closure note after full official restore
+
+This recovery work is now complete:
+
+- the stock baseline has been restored from the complete official Xiaomi package
+- the official package MD5 was verified locally and again on the remote host
+- Xiaomi `flash_all_except_storage.sh` completed successfully
+- stock boot was reconfirmed with:
+  - `ro.boot.slot_suffix=_a`
+  - `ro.build.version.incremental=OS3.0.7.0.WPMEUXM`
+  - `sys.boot_completed=1`
+
+Superseded conclusions:
+
+- conclusions drawn from partial-stock restore behavior should no longer be treated as authoritative
+- partial slot-`b` stock failures are no longer evidence of a proven stock slot-`b` defect
+
+Remaining valid conclusion from the first userspace attempt:
+
+- the flashed custom userspace still failed before `adb`
+- the next blocker investigation remains focused on retry-prep build/runtime correctness, not baseline stock recovery
+
 ## Concrete blockers before any retry
 
 ### 1. Userspace boot blocker is real and early

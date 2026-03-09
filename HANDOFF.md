@@ -28,10 +28,24 @@ Continue bring-up toward a functional ROM for Poco F8 Ultra (`myron`) without re
 
 ## Current Safe Device State
 
-The phone is currently being held in bootloader fastboot pending a full official stock restore.
+The phone is back on a verified stock-safe baseline after a full official Xiaomi restore.
 
-Do not run any more partial restore or slot-only experiments.
-Do not retry userspace flashing until the official fastboot package restore is complete and stock boot is reconfirmed.
+Verified on the restored baseline:
+
+- restore source:
+  - `myron_eea_global_images_OS3.0.7.0.WPMEUXM_20260112.0000.00_16.0_eea_cee0eaf4a6.tgz`
+- verified MD5:
+  - `cee0eaf4a66294c29ae709a22073e670`
+- restore method:
+  - Xiaomi `flash_all_except_storage.sh`
+- post-restore state:
+  - `ro.boot.slot_suffix=_a`
+  - `ro.build.version.incremental=OS3.0.7.0.WPMEUXM`
+  - `sys.boot_completed=1`
+
+No more partial recovery flashes are needed.
+The next device-side writes must be deliberate userspace-test actions, not recovery reconstruction.
+Do not retry userspace flashing until retry-prep gates and dry-run readiness are revalidated from this restored baseline.
 
 ## Key Conclusions Already Proven
 
@@ -73,6 +87,7 @@ Additional recovery finding after that postmortem:
 - slot `b` still failed before `adb` even with matched stock `super + boot + init_boot + vendor_boot + dtbo + vbmeta + vbmeta_system`
 - later, slot `a` also stopped booting cleanly after repeated partial restore work
 - root cause is now considered recovery-image incompleteness, not just Lineage userspace contents
+- this recovery uncertainty is now closed because the full official package restore succeeded and stock boot was reconfirmed
 
 ## Active Work In Progress
 
@@ -83,8 +98,8 @@ Current work is no longer “flash the first userspace build.” Current work is
 3. Add earlier failure capture to the next userspace attempt path.
 4. Compare the flashed reduced userspace set against stock for early boot-critical regressions.
 5. Make Gate 1 clean and Gate 2 pass before any retry flash.
-6. Acquire and stage the complete official Xiaomi fastboot package for `OS3.0.7.0.WPMEUXM`.
-7. Perform a full stock restore from that complete package.
+6. Reconfirm Gate 1 and Gate 2 from the reproducible retry-prep state.
+7. Reconfirm slot-safe flash/rollback dry-runs with `TARGET_SLOT=b`.
 8. Only then retry split-image userspace flashing on slot `b`.
 
 ## Safe Boundaries
@@ -104,35 +119,40 @@ Not allowed by default:
 - firmware partition flashing from incomplete bundles
 - mixing stock releases
 - treating partial stock image sets as a recovery-safe baseline
+- new slot-`b` stock experiments unless there is a specific scoped validation reason
 
 ## Next Correct Steps
 
-1. Use the complete official Xiaomi fastboot package:
-   - `myron_eea_global_images_OS3.0.7.0.WPMEUXM_20260112.0000.00_16.0_eea_cee0eaf4a6.tgz`
-   - verify MD5: `cee0eaf4a66294c29ae709a22073e670`
-2. Extract and verify the full `images/` tree contains the missing boot-critical payloads:
-   - `vm-bootsys.img`
-   - `qtvm-dtbo.img`
-   - `recovery.img`
-   - firmware/bootloader images referenced by Xiaomi `flash_all*.sh`
-3. Perform a full stock restore and verify baseline:
+1. Freeze the restored stock baseline operationally:
+   - keep stock `boot`
+   - keep stock `init_boot`
+   - keep stock `vendor_boot`
+   - keep stock userspace on slot `a`
+2. Reconfirm the restored baseline when needed:
    - `adb shell getprop sys.boot_completed`
    - `adb shell getprop ro.build.version.incremental`
    - `adb shell getprop ro.boot.slot_suffix`
-4. Sync and verify the rollback helper fixes:
+3. Sync and verify the rollback helper fixes:
    - slot-specific `vbmeta_system_${slot}`
    - wrapper invocation that works in practice
-5. Implement earlier failure capture for the next userspace attempt:
+4. Implement earlier failure capture for the next userspace attempt:
    - slot metadata before flash
    - timeout branch when `adb` never appears
    - immediate fastboot/recovery state capture
+5. Reconfirm retry-prep build gates:
+   - `tools/run_retry_prep_gate1.sh`
+   - `tools/run_retry_prep_gate2.sh`
 6. Compare the flashed reduced userspace set against stock for boot-critical areas:
    - init rc ownership
    - VINTF fragments
    - keymint/gatekeeper/TEE
    - vold/fscrypt/decryption path
    - display startup path
-7. Only after that, plan the second userspace attempt, ideally with explicit slot-state checkpoints and rollback validation.
+7. Reconfirm userspace flash readiness dry-runs:
+   - only slot-`b` logical partitions in dry-run
+   - rollback targets `vbmeta_system_b`
+   - attempt wrapper records planned commands and slot metadata
+8. Only after that, plan the second userspace attempt, ideally with explicit slot-state checkpoints and rollback validation.
 
 ## Important Files
 
@@ -194,7 +214,7 @@ Current highest-confidence retry blockers after stock-vs-built comparison:
 
 
 Current state:
-1. Phone remains on the recovered stock-safe baseline and is not being touched.
+1. Phone has been successfully restored from the complete official Xiaomi EEA fastboot package and is booting stock on slot `a`.
 2. Host-side retry prep Gate 1 (`m nothing -j10`) passes successfully using an aggressive keep/drop list.
 3. Gate 2 no longer fails for the original 13-path cluster; it is now narrowed to display plus `qseecomd`.
 4. The display stack was silently excluded because the Qualcomm display config did not recognize Android 16 (`Baklava`) and defaulted to the stub/headless path.
@@ -243,6 +263,13 @@ Current recovery source of truth:
   - `cee0eaf4a66294c29ae709a22073e670`
 - direct Xiaomi CDN URL:
   - `https://bigota.d.miui.com/OS3.0.7.0.WPMEUXM/myron_eea_global_images_OS3.0.7.0.WPMEUXM_20260112.0000.00_16.0_eea_cee0eaf4a6.tgz`
+
+Recovery closure:
+
+- the full official package has now been extracted and used successfully
+- Xiaomi `flash_all_except_storage.sh` completed cleanly
+- stock boot on slot `a` is reconfirmed
+- the remaining active blockers are again build/runtime retry-prep issues, not baseline recovery uncertainty
 
 Next remote step:
 - finish the `libvmmem`-backed display link path
