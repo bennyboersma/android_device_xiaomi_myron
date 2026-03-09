@@ -15,6 +15,8 @@ FLASH_VENDOR="${FLASH_VENDOR:-1}"
 FLASH_ODM="${FLASH_ODM:-1}"
 FLASH_VENDOR_DLKM="${FLASH_VENDOR_DLKM:-1}"
 FLASH_SYSTEM_DLKM="${FLASH_SYSTEM_DLKM:-1}"
+TARGET_SLOT="${TARGET_SLOT:-}"
+ALLOW_ACTIVE_SLOT_FLASH="${ALLOW_ACTIVE_SLOT_FLASH:-0}"
 
 need_cmd() {
   command -v "$1" >/dev/null 2>&1 || {
@@ -88,6 +90,23 @@ require_image() {
   fi
 }
 
+require_valid_slot() {
+  local slot="$1"
+  case "${slot}" in
+    a|b) ;;
+    *)
+      echo "Invalid TARGET_SLOT: ${slot}. Expected 'a' or 'b'." >&2
+      exit 2
+      ;;
+  esac
+}
+
+[[ -n "${TARGET_SLOT}" ]] || {
+  echo "TARGET_SLOT is required. Example: TARGET_SLOT=b" >&2
+  exit 2
+}
+require_valid_slot "${TARGET_SLOT}"
+
 if [[ "${USE_SUPER}" == "1" ]]; then
   require_image super "${OUT_DIR}/super.img"
 else
@@ -108,33 +127,40 @@ if [[ "${REBOOT_TO_FASTBOOTD}" == "1" ]]; then
 fi
 
 product="$(fastboot getvar product 2>&1 | awk -F': ' '/product:/{print $2}' | tail -n 1)"
-slot="$(fastboot getvar current-slot 2>&1 | awk -F': ' '/current-slot:/{print $2}' | tail -n 1)"
+current_slot="$(fastboot getvar current-slot 2>&1 | awk -F': ' '/current-slot:/{print $2}' | tail -n 1)"
 userspace="$(fastboot getvar is-userspace 2>&1 | awk -F': ' '/is-userspace:/{print $2}' | tail -n 1)"
 
 [[ "${product}" == "${PRODUCT}" ]] || { echo "Unexpected product: ${product}" >&2; exit 2; }
-[[ -n "${slot}" ]] || { echo "Unable to resolve current slot" >&2; exit 2; }
+[[ -n "${current_slot}" ]] || { echo "Unable to resolve current slot" >&2; exit 2; }
+
+if [[ "${TARGET_SLOT}" == "${current_slot}" && "${ALLOW_ACTIVE_SLOT_FLASH}" != "1" ]]; then
+  echo "Refusing to flash active slot ${current_slot}. Set ALLOW_ACTIVE_SLOT_FLASH=1 to override." >&2
+  exit 2
+fi
 
 flash_cmds=()
 if [[ "${USE_SUPER}" == "1" ]]; then
   flash_cmds+=("fastboot flash super ${OUT_DIR}/super.img")
 else
-  [[ "${FLASH_SYSTEM}" == "0" ]] || flash_cmds+=("fastboot flash system_${slot} ${OUT_DIR}/system.img")
-  [[ "${FLASH_SYSTEM_EXT}" == "0" ]] || flash_cmds+=("fastboot flash system_ext_${slot} ${OUT_DIR}/system_ext.img")
-  [[ "${FLASH_PRODUCT}" == "0" ]] || flash_cmds+=("fastboot flash product_${slot} ${OUT_DIR}/product.img")
-  [[ "${FLASH_VENDOR}" == "0" ]] || flash_cmds+=("fastboot flash vendor_${slot} ${OUT_DIR}/vendor.img")
-  [[ "${FLASH_ODM}" == "0" ]] || flash_cmds+=("fastboot flash odm_${slot} ${OUT_DIR}/odm.img")
-  [[ "${FLASH_VENDOR_DLKM}" == "0" ]] || flash_cmds+=("fastboot flash vendor_dlkm_${slot} ${OUT_DIR}/vendor_dlkm.img")
-  [[ "${FLASH_SYSTEM_DLKM}" == "0" ]] || flash_cmds+=("fastboot flash system_dlkm_${slot} ${OUT_DIR}/system_dlkm.img")
+  [[ "${FLASH_SYSTEM}" == "0" ]] || flash_cmds+=("fastboot flash system_${TARGET_SLOT} ${OUT_DIR}/system.img")
+  [[ "${FLASH_SYSTEM_EXT}" == "0" ]] || flash_cmds+=("fastboot flash system_ext_${TARGET_SLOT} ${OUT_DIR}/system_ext.img")
+  [[ "${FLASH_PRODUCT}" == "0" ]] || flash_cmds+=("fastboot flash product_${TARGET_SLOT} ${OUT_DIR}/product.img")
+  [[ "${FLASH_VENDOR}" == "0" ]] || flash_cmds+=("fastboot flash vendor_${TARGET_SLOT} ${OUT_DIR}/vendor.img")
+  [[ "${FLASH_ODM}" == "0" ]] || flash_cmds+=("fastboot flash odm_${TARGET_SLOT} ${OUT_DIR}/odm.img")
+  [[ "${FLASH_VENDOR_DLKM}" == "0" ]] || flash_cmds+=("fastboot flash vendor_dlkm_${TARGET_SLOT} ${OUT_DIR}/vendor_dlkm.img")
+  [[ "${FLASH_SYSTEM_DLKM}" == "0" ]] || flash_cmds+=("fastboot flash system_dlkm_${TARGET_SLOT} ${OUT_DIR}/system_dlkm.img")
 fi
 if [[ "${FLASH_VBMETA_SYSTEM}" == "1" ]]; then
-  flash_cmds+=("fastboot flash vbmeta_system_${slot} ${OUT_DIR}/vbmeta_system.img")
+  flash_cmds+=("fastboot flash vbmeta_system_${TARGET_SLOT} ${OUT_DIR}/vbmeta_system.img")
 fi
 
 echo "target_product=${product}"
-echo "target_slot=${slot}"
+echo "current_slot=${current_slot}"
+echo "target_slot=${TARGET_SLOT}"
 echo "is_userspace_fastboot=${userspace:-unknown}"
 echo "use_super=${USE_SUPER}"
 echo "flash_vbmeta_system=${FLASH_VBMETA_SYSTEM}"
+echo "allow_active_slot_flash=${ALLOW_ACTIVE_SLOT_FLASH}"
 printf '%s\n' "${flash_cmds[@]}"
 
 if [[ "${DRY_RUN}" == "1" ]]; then

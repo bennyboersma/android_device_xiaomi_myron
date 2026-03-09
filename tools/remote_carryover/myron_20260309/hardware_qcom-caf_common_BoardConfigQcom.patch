@@ -1,0 +1,79 @@
+diff --git a/BoardConfigQcom.mk b/BoardConfigQcom.mk
+index b40f592..3563be3 100644
+--- a/BoardConfigQcom.mk
++++ b/BoardConfigQcom.mk
+@@ -183,6 +183,7 @@ SOONG_CONFIG_qtidisplay += \
+     hwasan \
+     llvmcov \
+     mapper_ext \
++    neo \
+     ubwcp_headers \
+     wide_color \
+     target_kernel_version \
+@@ -213,7 +214,12 @@ SOONG_CONFIG_qtidisplay_var3 ?= false
+ SOONG_CONFIG_qtidisplay_hwasan ?= false
+ SOONG_CONFIG_qtidisplay_llvmcov ?= false
+ SOONG_CONFIG_qtidisplay_mapper_ext ?= true
++SOONG_CONFIG_qtidisplay_neo ?= false
+ SOONG_CONFIG_qtidisplay_ubwcp_headers ?= false
++
++ifeq ($(filter $(TARGET_BOARD_PLATFORM), neo61 kaanapali),$(TARGET_BOARD_PLATFORM))
++    SOONG_CONFIG_qtidisplay_neo := true
++endif
+ SOONG_CONFIG_qtidisplay_wide_color ?= false
+ SOONG_CONFIG_qtidisplay_target_kernel_version ?= 0
+ SOONG_CONFIG_qtidisplay_target_no_raw10_custom_format ?= false
+@@ -304,6 +310,13 @@ ifneq ($(filter $(UM_6_1_FAMILY) $(UM_6_6_FAMILY),$(TARGET_BOARD_PLATFORM)),)
+     SOONG_CONFIG_qtidisplay_ubwcp_headers := true
+ endif
+ 
++ifeq ($(TARGET_BOARD_PLATFORM),kaanapali)
++    SOONG_CONFIG_qtidisplay_drmpp := true
++    SOONG_CONFIG_qtidisplay_gralloc4 := true
++    SOONG_CONFIG_qtidisplay_displayconfig_enabled := true
++    SOONG_CONFIG_qtidisplay_ubwcp_headers := true
++endif
++
+ TARGET_ADDITIONAL_GRALLOC_10_USAGE_BITS ?= 0
+ 
+ # Mark GRALLOC_USAGE_EXTERNAL_DISP as valid gralloc bit
+@@ -344,6 +357,12 @@ else
+     TARGET_GRALLOC_HANDLE_HAS_UBWCP_FORMAT ?= false
+ endif
+ 
++ifeq ($(TARGET_BOARD_PLATFORM),kaanapali)
++    TARGET_GRALLOC_HANDLE_HAS_CUSTOM_CONTENT_MD_RESERVED_SIZE := true
++    TARGET_GRALLOC_HANDLE_HAS_RESERVED_SIZE := true
++    TARGET_GRALLOC_HANDLE_HAS_UBWCP_FORMAT := true
++endif
++
+ $(call soong_config_set,qtidisplay,gralloc_handle_has_custom_content_md_reserved_size,$(TARGET_GRALLOC_HANDLE_HAS_CUSTOM_CONTENT_MD_RESERVED_SIZE))
+ $(call soong_config_set,qtidisplay,gralloc_handle_has_reserved_size,$(TARGET_GRALLOC_HANDLE_HAS_RESERVED_SIZE))
+ $(call soong_config_set,qtidisplay,gralloc_handle_has_ubwcp_format,$(TARGET_GRALLOC_HANDLE_HAS_UBWCP_FORMAT))
+@@ -405,6 +424,15 @@ else
+     $(call soong_config_set,qtidisplay,headers_namespace,$(QCOM_SOONG_NAMESPACE)/display)
+ endif
+ 
++# Kaanapali uses the commonsys display interface headers even though it is not
++# classified under the current QSSI family lists.
++ifeq ($(TARGET_BOARD_PLATFORM),kaanapali)
++    PRODUCT_SOONG_NAMESPACES += \
++        vendor/qcom/opensource/commonsys/display \
++        vendor/qcom/opensource/commonsys-intf/display
++    $(call soong_config_set,qtidisplay,headers_namespace,vendor/qcom/opensource/commonsys-intf/display)
++endif
++
+ # Add data-ipa-cfg-mgr to PRODUCT_SOONG_NAMESPACES if needed
+ ifneq ($(USE_DEVICE_SPECIFIC_DATA_IPA_CFG_MGR),true)
+     ifneq ($(filter $(LEGACY_UM_PLATFORMS),$(TARGET_BOARD_PLATFORM)),)
+@@ -430,8 +458,8 @@ ifeq ($(BOARD_SUPPORTS_OPENSOURCE_STHAL),true)
+             $(call soong_config_set,qtiaudio,legacy_libarpal_namespace,$(QCOM_SOONG_NAMESPACE))
+         else
+             PRODUCT_SOONG_NAMESPACES += vendor/qcom/opensource/audio-hal/st-hal-ar
+-            $(call soong_config_set,qtiaudio,headers_namespace,$(QCOM_SOONG_NAMESPACE))
+-            $(call soong_config_set,qtiaudio,libarpal_namespace,$(QCOM_SOONG_NAMESPACE))
++            $(call soong_config_set,qtiaudio,headers_namespace,$(QCOM_SOONG_NAMESPACE)/audio/pal)
++            $(call soong_config_set,qtiaudio,libarpal_namespace,$(QCOM_SOONG_NAMESPACE)/audio/pal)
+         endif
+     endif
+ endif

@@ -36,6 +36,8 @@ REBOOT_TO_FASTBOOTD="${REBOOT_TO_FASTBOOTD:-1}"
 FLASH_VBMETA_SYSTEM="${FLASH_VBMETA_SYSTEM:-1}"
 REQUIRE_DEVICE="${REQUIRE_DEVICE:-1}"
 PRODUCT="${1:-myron}"
+TARGET_SLOT="${TARGET_SLOT:-}"
+ALLOW_ACTIVE_SLOT_ROLLBACK="${ALLOW_ACTIVE_SLOT_ROLLBACK:-0}"
 
 need_cmd() {
   command -v "$1" >/dev/null 2>&1 || {
@@ -102,6 +104,23 @@ enter_fastbootd() {
   exit 2
 }
 
+require_valid_slot() {
+  local slot="$1"
+  case "${slot}" in
+    a|b) ;;
+    *)
+      echo "Invalid TARGET_SLOT: ${slot}. Expected 'a' or 'b'." >&2
+      exit 2
+      ;;
+  esac
+}
+
+[[ -n "${TARGET_SLOT}" ]] || {
+  echo "TARGET_SLOT is required. Example: TARGET_SLOT=b" >&2
+  exit 2
+}
+require_valid_slot "${TARGET_SLOT}"
+
 [[ -f "${STOCK_SUPER_IMG}" ]] || {
   echo "Missing stock super image: ${STOCK_SUPER_IMG}" >&2
   exit 2
@@ -114,7 +133,7 @@ if [[ "${FLASH_VBMETA_SYSTEM}" == "1" ]]; then
 fi
 
 product="not-checked"
-slot="not-checked"
+current_slot="not-checked"
 userspace="not-checked"
 if [[ "${REQUIRE_DEVICE}" == "1" ]]; then
   if [[ "${REBOOT_TO_FASTBOOTD}" == "1" ]]; then
@@ -122,21 +141,27 @@ if [[ "${REQUIRE_DEVICE}" == "1" ]]; then
   fi
 
   product="$(fastboot getvar product 2>&1 | awk -F': ' '/product:/{print $2}' | tail -n 1)"
-  slot="$(fastboot getvar current-slot 2>&1 | awk -F': ' '/current-slot:/{print $2}' | tail -n 1)"
+  current_slot="$(fastboot getvar current-slot 2>&1 | awk -F': ' '/current-slot:/{print $2}' | tail -n 1)"
   userspace="$(fastboot getvar is-userspace 2>&1 | awk -F': ' '/is-userspace:/{print $2}' | tail -n 1)"
 
   [[ "${product}" == "${PRODUCT}" ]] || { echo "Unexpected product: ${product}" >&2; exit 2; }
-  [[ -n "${slot}" ]] || { echo "Unable to resolve current slot" >&2; exit 2; }
+  [[ -n "${current_slot}" ]] || { echo "Unable to resolve current slot" >&2; exit 2; }
+
+  if [[ "${TARGET_SLOT}" == "${current_slot}" && "${ALLOW_ACTIVE_SLOT_ROLLBACK}" != "1" ]]; then
+    echo "Refusing to rollback active slot ${current_slot}. Set ALLOW_ACTIVE_SLOT_ROLLBACK=1 to override." >&2
+    exit 2
+  fi
 fi
 
 echo "target_product=${product}"
-echo "target_slot=${slot}"
+echo "current_slot=${current_slot}"
+echo "target_slot=${TARGET_SLOT}"
 echo "is_userspace_fastboot=${userspace:-unknown}"
 echo "stock_super_img=${STOCK_SUPER_IMG}"
 echo "stock_vbmeta_system_img=${STOCK_VBMETA_SYSTEM_IMG}"
 echo "fastboot flash super ${STOCK_SUPER_IMG}"
 if [[ "${FLASH_VBMETA_SYSTEM}" == "1" ]]; then
-  echo "fastboot flash vbmeta_system_${slot} ${STOCK_VBMETA_SYSTEM_IMG}"
+  echo "fastboot flash vbmeta_system_${TARGET_SLOT} ${STOCK_VBMETA_SYSTEM_IMG}"
 fi
 
 echo "Note: this preserves the current boot/init_boot/vendor_boot path."
@@ -148,5 +173,5 @@ fi
 
 fastboot flash super "${STOCK_SUPER_IMG}"
 if [[ "${FLASH_VBMETA_SYSTEM}" == "1" ]]; then
-  fastboot flash "vbmeta_system_${slot}" "${STOCK_VBMETA_SYSTEM_IMG}"
+  fastboot flash "vbmeta_system_${TARGET_SLOT}" "${STOCK_VBMETA_SYSTEM_IMG}"
 fi

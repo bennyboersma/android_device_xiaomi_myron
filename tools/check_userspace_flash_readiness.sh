@@ -7,6 +7,7 @@ OUT_DIR="${TOP_DIR}/out/target/product/${PRODUCT}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REQUIRE_DEVICE="${REQUIRE_DEVICE:-0}"
 CHECK_ROLLBACK="${CHECK_ROLLBACK:-1}"
+TARGET_SLOT="${TARGET_SLOT:-b}"
 
 need_cmd() {
   command -v "$1" >/dev/null 2>&1 || {
@@ -50,7 +51,8 @@ fi
 if [[ "${CHECK_ROLLBACK}" == "1" ]]; then
   need_cmd bash
   echo "[rollback] probing rollback helper defaults"
-  DRY_RUN=1 REQUIRE_DEVICE=0 bash "${SCRIPT_DIR}/rollback_userspace_images.sh" "${PRODUCT}" >/tmp/rollback_userspace_readiness.$$ 2>&1 || true
+  DRY_RUN=1 REQUIRE_DEVICE=0 TARGET_SLOT="${TARGET_SLOT}" \
+    bash "${SCRIPT_DIR}/rollback_userspace_images.sh" "${PRODUCT}" >/tmp/rollback_userspace_readiness.$$ 2>&1 || true
   cat /tmp/rollback_userspace_readiness.$$
   if rg -q '^Missing stock super image:' /tmp/rollback_userspace_readiness.$$; then
     echo "[rollback] stock userspace assets are not staged on this host yet" >&2

@@ -1,0 +1,81 @@
+
+==> apply proactive retry-prep prune
+
+==> gate 1
+17:16:42 Build sandboxing disabled due to nsjail error.
+17:16:44 Build sandboxing disabled due to nsjail error.
+17:16:46 Build sandboxing disabled due to nsjail error.
+Running product configuration...
+============================================
+PLATFORM_VERSION_CODENAME=Baklava
+PLATFORM_VERSION=Baklava
+LINEAGE_VERSION=23.2-20260309-UNOFFICIAL-myron
+TARGET_PRODUCT=lineage_myron
+TARGET_BUILD_VARIANT=userdebug
+TARGET_ARCH=arm64
+TARGET_ARCH_VARIANT=armv9-a
+TARGET_CPU_VARIANT=generic
+HOST_OS=linux
+HOST_OS_EXTRA=Linux-6.8.0-101-generic-x86_64-Ubuntu-24.04.4-LTS
+HOST_CROSS_OS=windows
+BUILD_ID=BP4A.251205.006
+OUT_DIR=out
+PRODUCT_SOONG_NAMESPACES=vendor/xiaomi/myron hardware/qcom-caf/kaanapali hardware/qcom-caf/bootctrl vendor/qcom/opensource/commonsys/display vendor/qcom/opensource/commonsys-intf/display hardware/qcom-caf/kaanapali/data-ipa-cfg-mgr vendor/qcom/opensource/dataservices vendor/qcom/opensource/audio-hal/st-hal-ar hardware/qcom-caf/thermal hardware/qcom-caf/wlan hardware/qcom-caf/wlan/qcwcn
+SOONG_ONLY=false
+============================================
+[100% 1/1] bootstrap blueprint
+Running globs...
+[100% 2/2] analyzing Android.bp files and generating ninja file at out/soong/build.lineage_myron.ninja
+out/soong/release-config/release_config-lineage_myron-trunk_staging.vars was modified, regenerating...
+Adding CUSTOM_LOCALES [ast_ES gd_GB cy_GB fur_IT nn_NO] to PRODUCT_LOCALES [en_US en_US af_ZA am_ET ar_EG ar_XB as_IN az_AZ be_BY bg_BG bn_BD bs_BA ca_ES cs_CZ da_DK de_DE el_GR en_AU en_CA en_GB en_IN en_XA es_ES es_US et_EE eu_ES fa_IR fi_FI fr_CA fr_FR gl_ES gu_IN hi_IN hr_HR hu_HU hy_AM in_ID is_IS it_IT iw_IL ja_JP ka_GE kk_KZ km_KH kn_IN ko_KR ky_KG lo_LA lt_LT lv_LV mk_MK ml_IN mn_MN mr_IN ms_MY my_MM nb_NO ne_NP nl_NL or_IN pa_IN pl_PL pt_BR pt_PT ro_RO ru_RU si_LK sk_SK sl_SI sq_AL sr_Latn_RS sr_RS sv_SE sw_TZ ta_IN te_IN th_TH tl_PH tr_TR uk_UA ur_PK uz_UZ vi_VN zh_CN zh_HK zh_TW zu_ZA en_XC]
+out/soong/release-config/release_config-lineage_myron-trunk_staging.vars was modified, regenerating...
+[100% 3/3] initializing Make module parser
+Adding CUSTOM_LOCALES [ast_ES gd_GB cy_GB fur_IT nn_NO] to PRODUCT_LOCALES [en_US en_US af_ZA am_ET ar_EG ar_XB as_IN az_AZ be_BY bg_BG bn_BD bs_BA ca_ES cs_CZ da_DK de_DE el_GR en_AU en_CA en_GB en_IN en_XA es_ES es_US et_EE eu_ES fa_IR fi_FI fr_CA fr_FR gl_ES gu_IN hi_IN hr_HR hu_HU hy_AM in_ID is_IS it_IT iw_IL ja_JP ka_GE kk_KZ km_KH kn_IN ko_KR ky_KG lo_LA lt_LT lv_LV mk_MK ml_IN mn_MN mr_IN ms_MY my_MM nb_NO ne_NP nl_NL or_IN pa_IN pl_PL pt_BR pt_PT ro_RO ru_RU si_LK sk_SK sl_SI sq_AL sr_Latn_RS sr_RS sv_SE sw_TZ ta_IN te_IN th_TH tl_PH tr_TR uk_UA ur_PK uz_UZ vi_VN zh_CN zh_HK zh_TW zu_ZA en_XC]
+[ 26% 4/15] including out/soong/installs-lineage_myron.mk
+[ 33% 5/15] including out/soong/Android-lineage_myron.mk
+[ 40% 6/15] including build/make/target/board/android-info.mk
+[ 46% 7/15] including bootable/deprecated-ota/updater/Android.mk
+[ 53% 8/15] including hardware/broadcom/wlan/bcmdhd/Android.mk
+[ 60% 9/15] including hardware/qcom/Android.mk
+[ 66% 10/15] including hardware/synaptics/wlan/synadhd/Android.mk
+[ 73% 11/15] including kernel/xiaomi/sm8550-modules/Android.mk
+[ 80% 12/15] including kernel/xiaomi/sm8550/Android.mk
+[ 86% 13/15] including vendor/xiaomi/myron/Android.mk
+[ 93% 14/15] including vendor/xiaomi/sm8850-common/Android.mk
+[100% 15/15] including out/soong/late-lineage_myron.mk
+[100% 16/16] finishing Make module rules
+[100% 17/17] finishing Make module rules: Adding module dependencies
+[100% 18/18] finishing Make packaging rules
+[ 46% 19/41] including build/make/core/tasks/art-host-tests.mk
+[ 48% 20/41] including build/make/core/tasks/art.mk
+[ 51% 21/41] including build/make/core/tasks/berberis_test.mk
+[ 53% 22/41] including build/make/core/tasks/build_custom_images.mk
+[ 56% 23/41] including build/make/core/tasks/dex_preopt_check.mk
+[ 58% 24/41] including build/make/core/tasks/find-shareduid-violation.mk
+[ 60% 25/41] including build/make/core/tasks/fontchain_lint.mk
+[ 63% 26/41] including build/make/core/tasks/host_init_verifier.mk
+[ 65% 27/41] including build/make/core/tasks/meta-lic.mk
+[ 68% 28/41] including build/make/core/tasks/module-info.mk
+[ 70% 29/41] including build/make/core/tasks/oem_image.mk
+[ 73% 30/41] including build/make/core/tasks/platform_availability_check.mk
+[ 75% 31/41] including build/make/core/tasks/sdk-addon.mk
+[ 78% 32/41] including build/make/core/tasks/sdv.mk
+[ 80% 33/41] including build/make/core/tasks/vendor_module_check.mk
+[ 82% 34/41] including build/make/core/tasks/with-license.mk
+[ 85% 35/41] including vendor/lineage/build/tasks/bacon.mk
+[ 87% 36/41] including vendor/lineage/build/tasks/build-manifest_xml.mk
+[ 90% 37/41] including vendor/lineage/build/tasks/dt_image.mk
+[ 92% 38/41] including vendor/lineage/build/tasks/generate_lineage_sdk_coverage.mk
+[ 95% 39/41] including vendor/lineage/build/tasks/kernel.mk
+[ 97% 40/41] including device/generic/goldfish/build/tasks/combine_initramfs.mk
+[100% 41/41] finishing Make packaging rules
+[100% 42/42] finishing Make packaging rules: Adding phony targets
+[100% 43/43] finishing Make packaging rules: Checking licensing and SBOM
+[100% 44/44] writing make module actions
+No need to regenerate ninja file
+Starting ninja...
+[100% 45/45] nothing
+Successfully read the makefiles.
+
+#### build completed successfully (04:04 (mm:ss)) ####
+

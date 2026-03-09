@@ -1,0 +1,190 @@
+
+==> boot-critical vendor outputs
+[boot-critical] out_dir=/home/john/android/lineage/out/target/product/myron
+[ok:init] /home/john/android/lineage/out/target/product/myron/vendor/etc/init/android.hardware.health-service.qti.rc
+[ok:bin] /home/john/android/lineage/out/target/product/myron/vendor/bin/hw/android.hardware.health-service.qti
+[ok:vintf] /home/john/android/lineage/out/target/product/myron/vendor/etc/vintf/manifest/android.hardware.health-service.qti.xml
+[ok:init] /home/john/android/lineage/out/target/product/myron/vendor/etc/init/android.hardware.wifi-service.rc
+[ok:bin] /home/john/android/lineage/out/target/product/myron/vendor/bin/hw/android.hardware.wifi-service
+[ok:vintf] /home/john/android/lineage/out/target/product/myron/vendor/etc/vintf/manifest/android.hardware.wifi-service.xml
+[ok:init] /home/john/android/lineage/out/target/product/myron/vendor/etc/init/vendor.qti.hardware.display.composer-service.rc
+[ok:bin] /home/john/android/lineage/out/target/product/myron/vendor/bin/hw/vendor.qti.hardware.display.composer-service
+[ok:vintf] /home/john/android/lineage/out/target/product/myron/vendor/etc/vintf/manifest/vendor.qti.hardware.display.composer-service3_v3.xml
+[ok:init] /home/john/android/lineage/out/target/product/myron/vendor/etc/init/vendor.qti.hardware.display.allocator-service.rc
+[ok:bin] /home/john/android/lineage/out/target/product/myron/vendor/bin/hw/vendor.qti.hardware.display.allocator-service
+[ok:vintf] /home/john/android/lineage/out/target/product/myron/vendor/etc/vintf/manifest/vendor.qti.hardware.display.allocator-service.xml
+[ok:bin] /home/john/android/lineage/out/target/product/myron/vendor/bin/qseecomd
+[result] PASS
+
+==> userspace flash readiness
+[artifacts] out_dir=/home/john/android/lineage/out/target/product/myron
+[ok] /home/john/android/lineage/out/target/product/myron/system.img
+[ok] /home/john/android/lineage/out/target/product/myron/system_ext.img
+[ok] /home/john/android/lineage/out/target/product/myron/product.img
+[ok] /home/john/android/lineage/out/target/product/myron/vendor.img
+[ok] /home/john/android/lineage/out/target/product/myron/odm.img
+[ok] /home/john/android/lineage/out/target/product/myron/vendor_dlkm.img
+[ok] /home/john/android/lineage/out/target/product/myron/system_dlkm.img
+[info] optional missing: /home/john/android/lineage/out/target/product/myron/vbmeta_system.img
+[rollback] probing rollback helper defaults
+target_product=not-checked
+current_slot=not-checked
+target_slot=b
+is_userspace_fastboot=not-checked
+stock_super_img=/home/john/android/lineage/tools/../_transfer/rollback_wpm_eu/stock_userspace_20260308/super.img
+stock_vbmeta_system_img=/home/john/android/lineage/tools/../_transfer/rollback_wpm_eu/stock_userspace_20260308/vbmeta_system.img
+fastboot flash super /home/john/android/lineage/tools/../_transfer/rollback_wpm_eu/stock_userspace_20260308/super.img
+fastboot flash vbmeta_system_b /home/john/android/lineage/tools/../_transfer/rollback_wpm_eu/stock_userspace_20260308/vbmeta_system.img
+Note: this preserves the current boot/init_boot/vendor_boot path.
+DRY_RUN=1, no flashing performed
+[boot-critical] probing built vendor service stack
+[boot-critical] out_dir=/home/john/android/lineage/out/target/product/myron
+[ok:init] /home/john/android/lineage/out/target/product/myron/vendor/etc/init/android.hardware.health-service.qti.rc
+[ok:bin] /home/john/android/lineage/out/target/product/myron/vendor/bin/hw/android.hardware.health-service.qti
+[ok:vintf] /home/john/android/lineage/out/target/product/myron/vendor/etc/vintf/manifest/android.hardware.health-service.qti.xml
+[ok:init] /home/john/android/lineage/out/target/product/myron/vendor/etc/init/android.hardware.wifi-service.rc
+[ok:bin] /home/john/android/lineage/out/target/product/myron/vendor/bin/hw/android.hardware.wifi-service
+[ok:vintf] /home/john/android/lineage/out/target/product/myron/vendor/etc/vintf/manifest/android.hardware.wifi-service.xml
+[ok:init] /home/john/android/lineage/out/target/product/myron/vendor/etc/init/vendor.qti.hardware.display.composer-service.rc
+[ok:bin] /home/john/android/lineage/out/target/product/myron/vendor/bin/hw/vendor.qti.hardware.display.composer-service
+[ok:vintf] /home/john/android/lineage/out/target/product/myron/vendor/etc/vintf/manifest/vendor.qti.hardware.display.composer-service3_v3.xml
+[ok:init] /home/john/android/lineage/out/target/product/myron/vendor/etc/init/vendor.qti.hardware.display.allocator-service.rc
+[ok:bin] /home/john/android/lineage/out/target/product/myron/vendor/bin/hw/vendor.qti.hardware.display.allocator-service
+[ok:vintf] /home/john/android/lineage/out/target/product/myron/vendor/etc/vintf/manifest/vendor.qti.hardware.display.allocator-service.xml
+[ok:bin] /home/john/android/lineage/out/target/product/myron/vendor/bin/qseecomd
+[result] PASS
+[result] PASS
+
+==> partition sanity
+[sanity] product=myron
+[sanity] out_dir=/home/john/android/lineage/out/target/product/myron
+[config] device_super_size=18253611008
+[config] device_dynamic_group_size=12884901888
+[config] device_dynamic_partitions=system system_ext product vendor odm vendor_dlkm system_dlkm
+[config] system_fs=erofs
+[config] system_ext_fs=erofs
+[config] product_fs=erofs
+[config] vendor_fs=erofs
+[config] odm_fs=erofs
+[config] vendor_dlkm_fs=erofs
+[config] system_dlkm_fs=erofs
+[artifact] system.img size_bytes=588501188
+[artifact] system_ext.img size_bytes=249819272
+[artifact] product.img size_bytes=345338016
+[artifact] vendor.img size_bytes=14393344
+[artifact] odm.img size_bytes=1048576
+[artifact] vendor_dlkm.img size_bytes=53792768
+[artifact] system_dlkm.img size_bytes=348160
+[artifact] total_present_bytes=1253241324
+[artifact] dynamic_group_limit_bytes=12884901888
+[result] PASS
+
+==> artifact audit
+
+==> readiness
+[artifacts] out_dir=/home/john/android/lineage/out/target/product/myron
+[ok] /home/john/android/lineage/out/target/product/myron/system.img
+[ok] /home/john/android/lineage/out/target/product/myron/system_ext.img
+[ok] /home/john/android/lineage/out/target/product/myron/product.img
+[ok] /home/john/android/lineage/out/target/product/myron/vendor.img
+[ok] /home/john/android/lineage/out/target/product/myron/odm.img
+[ok] /home/john/android/lineage/out/target/product/myron/vendor_dlkm.img
+[ok] /home/john/android/lineage/out/target/product/myron/system_dlkm.img
+[info] optional missing: /home/john/android/lineage/out/target/product/myron/vbmeta_system.img
+[rollback] probing rollback helper defaults
+target_product=not-checked
+current_slot=not-checked
+target_slot=b
+is_userspace_fastboot=not-checked
+stock_super_img=/home/john/android/lineage/tools/../_transfer/rollback_wpm_eu/stock_userspace_20260308/super.img
+stock_vbmeta_system_img=/home/john/android/lineage/tools/../_transfer/rollback_wpm_eu/stock_userspace_20260308/vbmeta_system.img
+fastboot flash super /home/john/android/lineage/tools/../_transfer/rollback_wpm_eu/stock_userspace_20260308/super.img
+fastboot flash vbmeta_system_b /home/john/android/lineage/tools/../_transfer/rollback_wpm_eu/stock_userspace_20260308/vbmeta_system.img
+Note: this preserves the current boot/init_boot/vendor_boot path.
+DRY_RUN=1, no flashing performed
+[boot-critical] probing built vendor service stack
+[boot-critical] out_dir=/home/john/android/lineage/out/target/product/myron
+[ok:init] /home/john/android/lineage/out/target/product/myron/vendor/etc/init/android.hardware.health-service.qti.rc
+[ok:bin] /home/john/android/lineage/out/target/product/myron/vendor/bin/hw/android.hardware.health-service.qti
+[ok:vintf] /home/john/android/lineage/out/target/product/myron/vendor/etc/vintf/manifest/android.hardware.health-service.qti.xml
+[ok:init] /home/john/android/lineage/out/target/product/myron/vendor/etc/init/android.hardware.wifi-service.rc
+[ok:bin] /home/john/android/lineage/out/target/product/myron/vendor/bin/hw/android.hardware.wifi-service
+[ok:vintf] /home/john/android/lineage/out/target/product/myron/vendor/etc/vintf/manifest/android.hardware.wifi-service.xml
+[ok:init] /home/john/android/lineage/out/target/product/myron/vendor/etc/init/vendor.qti.hardware.display.composer-service.rc
+[ok:bin] /home/john/android/lineage/out/target/product/myron/vendor/bin/hw/vendor.qti.hardware.display.composer-service
+[ok:vintf] /home/john/android/lineage/out/target/product/myron/vendor/etc/vintf/manifest/vendor.qti.hardware.display.composer-service3_v3.xml
+[ok:init] /home/john/android/lineage/out/target/product/myron/vendor/etc/init/vendor.qti.hardware.display.allocator-service.rc
+[ok:bin] /home/john/android/lineage/out/target/product/myron/vendor/bin/hw/vendor.qti.hardware.display.allocator-service
+[ok:vintf] /home/john/android/lineage/out/target/product/myron/vendor/etc/vintf/manifest/vendor.qti.hardware.display.allocator-service.xml
+[ok:bin] /home/john/android/lineage/out/target/product/myron/vendor/bin/qseecomd
+[result] PASS
+[result] PASS
+
+==> partition sanity
+[sanity] product=myron
+[sanity] out_dir=/home/john/android/lineage/out/target/product/myron
+[config] device_super_size=18253611008
+[config] device_dynamic_group_size=12884901888
+[config] device_dynamic_partitions=system system_ext product vendor odm vendor_dlkm system_dlkm
+[config] system_fs=erofs
+[config] system_ext_fs=erofs
+[config] product_fs=erofs
+[config] vendor_fs=erofs
+[config] odm_fs=erofs
+[config] vendor_dlkm_fs=erofs
+[config] system_dlkm_fs=erofs
+[artifact] system.img size_bytes=588501188
+[artifact] system_ext.img size_bytes=249819272
+[artifact] product.img size_bytes=345338016
+[artifact] vendor.img size_bytes=14393344
+[artifact] odm.img size_bytes=1048576
+[artifact] vendor_dlkm.img size_bytes=53792768
+[artifact] system_dlkm.img size_bytes=348160
+[artifact] total_present_bytes=1253241324
+[artifact] dynamic_group_limit_bytes=12884901888
+[result] PASS
+
+==> boot-critical vendor stack
+[boot-critical] out_dir=/home/john/android/lineage/out/target/product/myron
+[ok:init] /home/john/android/lineage/out/target/product/myron/vendor/etc/init/android.hardware.health-service.qti.rc
+[ok:bin] /home/john/android/lineage/out/target/product/myron/vendor/bin/hw/android.hardware.health-service.qti
+[ok:vintf] /home/john/android/lineage/out/target/product/myron/vendor/etc/vintf/manifest/android.hardware.health-service.qti.xml
+[ok:init] /home/john/android/lineage/out/target/product/myron/vendor/etc/init/android.hardware.wifi-service.rc
+[ok:bin] /home/john/android/lineage/out/target/product/myron/vendor/bin/hw/android.hardware.wifi-service
+[ok:vintf] /home/john/android/lineage/out/target/product/myron/vendor/etc/vintf/manifest/android.hardware.wifi-service.xml
+[ok:init] /home/john/android/lineage/out/target/product/myron/vendor/etc/init/vendor.qti.hardware.display.composer-service.rc
+[ok:bin] /home/john/android/lineage/out/target/product/myron/vendor/bin/hw/vendor.qti.hardware.display.composer-service
+[ok:vintf] /home/john/android/lineage/out/target/product/myron/vendor/etc/vintf/manifest/vendor.qti.hardware.display.composer-service3_v3.xml
+[ok:init] /home/john/android/lineage/out/target/product/myron/vendor/etc/init/vendor.qti.hardware.display.allocator-service.rc
+[ok:bin] /home/john/android/lineage/out/target/product/myron/vendor/bin/hw/vendor.qti.hardware.display.allocator-service
+[ok:vintf] /home/john/android/lineage/out/target/product/myron/vendor/etc/vintf/manifest/vendor.qti.hardware.display.allocator-service.xml
+[ok:bin] /home/john/android/lineage/out/target/product/myron/vendor/bin/qseecomd
+[result] PASS
+
+==> artifacts
+[required] -rw-rw-r-- 1 john john 562M Mar  9 08:32 /home/john/android/lineage/out/target/product/myron/system.img
+[required] -rw-rw-r-- 1 john john 239M Mar  9 08:30 /home/john/android/lineage/out/target/product/myron/system_ext.img
+[required] -rw-rw-r-- 1 john john 330M Mar  9 08:29 /home/john/android/lineage/out/target/product/myron/product.img
+[required] -rw-r--r-- 1 john john 14M Mar  9 08:29 /home/john/android/lineage/out/target/product/myron/vendor.img
+[required] -rw-r--r-- 1 john john 1.0M Mar  9 08:29 /home/john/android/lineage/out/target/product/myron/odm.img
+[required] -rw-r--r-- 1 john john 52M Mar  9 08:29 /home/john/android/lineage/out/target/product/myron/vendor_dlkm.img
+[required] -rw-r--r-- 1 john john 340K Mar  9 08:29 /home/john/android/lineage/out/target/product/myron/system_dlkm.img
+[missing:optional] /home/john/android/lineage/out/target/product/myron/vbmeta_system.img
+[missing:optional] /home/john/android/lineage/out/target/product/myron/super.img
+
+==> dry-run flash plan
+target_product=myron
+current_slot=a
+target_slot=b
+is_userspace_fastboot=yes
+use_super=0
+flash_vbmeta_system=0
+allow_active_slot_flash=0
+fastboot flash system_b /home/john/android/lineage/out/target/product/myron/system.img
+fastboot flash system_ext_b /home/john/android/lineage/out/target/product/myron/system_ext.img
+fastboot flash product_b /home/john/android/lineage/out/target/product/myron/product.img
+fastboot flash vendor_b /home/john/android/lineage/out/target/product/myron/vendor.img
+fastboot flash odm_b /home/john/android/lineage/out/target/product/myron/odm.img
+fastboot flash vendor_dlkm_b /home/john/android/lineage/out/target/product/myron/vendor_dlkm.img
+fastboot flash system_dlkm_b /home/john/android/lineage/out/target/product/myron/system_dlkm.img
+DRY_RUN=1, no flashing performed
