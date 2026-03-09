@@ -26,12 +26,12 @@ odm/etc/audio/misound_res_spk4ch.bin
 # odm/etc/init/init.cirrus.rc (Duplicate in myron-specific list)
 odm/etc/backend_conf.xml
 odm/lib64/libaudioroute_ext.so
-vendor/etc/models/acd/event.eai
-vendor/etc/models/acd/music.eai
-vendor/etc/models/acd/speech.eai
+# vendor/etc/models/acd/event.eai (Duplicate in myron-specific list)
+# vendor/etc/models/acd/music.eai (Duplicate in myron-specific list)
+# vendor/etc/models/acd/speech.eai (Duplicate in myron-specific list)
 # vendor/etc/seccomp_policy/c2audio.vendor.base-arm64.policy (Duplicate in myron-specific list)
 # vendor/etc/seccomp_policy/c2audio.vendor.ext-arm64.policy (Duplicate in myron-specific list)
-vendor/etc/kvh2xml.xml
+# vendor/etc/kvh2xml.xml (Duplicate in myron-specific list)
 vendor/etc/misound_asc_model.tflite
 vendor/lib64/libPeripheralStateUtils.so
 vendor/lib64/lib_misound_asc.so
@@ -105,37 +105,37 @@ vendor/app/CACertService/CACertService.apk
 vendor/app/CneApp/CneApp.apk;REQUIRED=CneApp.libvndfwk_detect_jni.qti_vendor_symlink
 vendor/app/IWlanService/IWlanService.apk
 vendor/bin/cnd
-vendor/etc/cne/wqeclient/ATT/ATT_profile1.xml
-vendor/etc/cne/wqeclient/ATT/ATT_profile2.xml
-vendor/etc/cne/wqeclient/ATT/ATT_profile3.xml
-vendor/etc/cne/wqeclient/ATT/ATT_profile4.xml
-vendor/etc/cne/wqeclient/ATT/ATT_profile5.xml
-vendor/etc/cne/wqeclient/ATT/ATT_profile6.xml
-vendor/etc/cne/wqeclient/ATT/ATT_profile7.xml
-vendor/etc/cne/wqeclient/ROW/ROW_profile1.xml
-vendor/etc/cne/wqeclient/ROW/ROW_profile15.xml
-vendor/etc/cne/wqeclient/ROW/ROW_profile16.xml
-vendor/etc/cne/wqeclient/ROW/ROW_profile17.xml
-vendor/etc/cne/wqeclient/ROW/ROW_profile18.xml
-vendor/etc/cne/wqeclient/ROW/ROW_profile19.xml
-vendor/etc/cne/wqeclient/ROW/ROW_profile2.xml
-vendor/etc/cne/wqeclient/ROW/ROW_profile20.xml
-vendor/etc/cne/wqeclient/ROW/ROW_profile21.xml
-vendor/etc/cne/wqeclient/ROW/ROW_profile3.xml
-vendor/etc/cne/wqeclient/ROW/ROW_profile32.xml
-vendor/etc/cne/wqeclient/ROW/ROW_profile4.xml
-vendor/etc/cne/wqeclient/ROW/ROW_profile5.xml
-vendor/etc/cne/wqeclient/ROW/ROW_profile6.xml
-vendor/etc/cne/wqeclient/ROW/ROW_profile7.xml
-vendor/etc/cne/wqeclient/VZW/VZW_profile1.xml
-vendor/etc/cne/wqeclient/VZW/VZW_profile2.xml
-vendor/etc/cne/wqeclient/VZW/VZW_profile3.xml
-vendor/etc/cne/wqeclient/VZW/VZW_profile4.xml
-vendor/etc/cne/wqeclient/VZW/VZW_profile5.xml
-vendor/etc/cne/wqeclient/VZW/VZW_profile6.xml
-vendor/etc/cne/wqeclient/VZW/VZW_profile7.xml
-vendor/etc/cne/mwqem.conf
-vendor/etc/cne/profileMwqem.xml
+# vendor/etc/cne/wqeclient/ATT/ATT_profile1.xml (Duplicate in myron-specific list)
+# vendor/etc/cne/wqeclient/ATT/ATT_profile2.xml (Duplicate in myron-specific list)
+# vendor/etc/cne/wqeclient/ATT/ATT_profile3.xml (Duplicate in myron-specific list)
+# vendor/etc/cne/wqeclient/ATT/ATT_profile4.xml (Duplicate in myron-specific list)
+# vendor/etc/cne/wqeclient/ATT/ATT_profile5.xml (Duplicate in myron-specific list)
+# vendor/etc/cne/wqeclient/ATT/ATT_profile6.xml (Duplicate in myron-specific list)
+# vendor/etc/cne/wqeclient/ATT/ATT_profile7.xml (Duplicate in myron-specific list)
+# vendor/etc/cne/wqeclient/ROW/ROW_profile1.xml (Duplicate in myron-specific list)
+# vendor/etc/cne/wqeclient/ROW/ROW_profile15.xml (Duplicate in myron-specific list)
+# vendor/etc/cne/wqeclient/ROW/ROW_profile16.xml (Duplicate in myron-specific list)
+# vendor/etc/cne/wqeclient/ROW/ROW_profile17.xml (Duplicate in myron-specific list)
+# vendor/etc/cne/wqeclient/ROW/ROW_profile18.xml (Duplicate in myron-specific list)
+# vendor/etc/cne/wqeclient/ROW/ROW_profile19.xml (Duplicate in myron-specific list)
+# vendor/etc/cne/wqeclient/ROW/ROW_profile2.xml (Duplicate in myron-specific list)
+# vendor/etc/cne/wqeclient/ROW/ROW_profile20.xml (Duplicate in myron-specific list)
+# vendor/etc/cne/wqeclient/ROW/ROW_profile21.xml (Duplicate in myron-specific list)
+# vendor/etc/cne/wqeclient/ROW/ROW_profile3.xml (Duplicate in myron-specific list)
+# vendor/etc/cne/wqeclient/ROW/ROW_profile32.xml (Duplicate in myron-specific list)
+# vendor/etc/cne/wqeclient/ROW/ROW_profile4.xml (Duplicate in myron-specific list)
+# vendor/etc/cne/wqeclient/ROW/ROW_profile5.xml (Duplicate in myron-specific list)
+# vendor/etc/cne/wqeclient/ROW/ROW_profile6.xml (Duplicate in myron-specific list)
+# vendor/etc/cne/wqeclient/ROW/ROW_profile7.xml (Duplicate in myron-specific list)
+# vendor/etc/cne/wqeclient/VZW/VZW_profile1.xml (Duplicate in myron-specific list)
+# vendor/etc/cne/wqeclient/VZW/VZW_profile2.xml (Duplicate in myron-specific list)
+# vendor/etc/cne/wqeclient/VZW/VZW_profile3.xml (Duplicate in myron-specific list)
+# vendor/etc/cne/wqeclient/VZW/VZW_profile4.xml (Duplicate in myron-specific list)
+# vendor/etc/cne/wqeclient/VZW/VZW_profile5.xml (Duplicate in myron-specific list)
+# vendor/etc/cne/wqeclient/VZW/VZW_profile6.xml (Duplicate in myron-specific list)
+# vendor/etc/cne/wqeclient/VZW/VZW_profile7.xml (Duplicate in myron-specific list)
+# vendor/etc/cne/mwqem.conf (Duplicate in myron-specific list)
+# vendor/etc/cne/profileMwqem.xml (Duplicate in myron-specific list)
 # vendor/etc/default-permissions/com.qualcomm.qti.cne.xml (Duplicate in myron-specific list)
 # vendor/etc/init/cnd.rc (Duplicate in myron-specific list)
 vendor/lib64/libcne.so
@@ -208,7 +208,7 @@ vendor/bin/ssgtzd
 # vendor/etc/init/qwesd.rc (Duplicate in myron-specific list)
 vendor/etc/init/ssgtzd.rc
 # vendor/etc/seccomp_policy/qwesd@2.0.policy (Duplicate in myron-specific list)
-vendor/etc/ssg/tz_whitelist.json
+# vendor/etc/ssg/tz_whitelist.json (Duplicate in myron-specific list)
 
 # Context Hub
 vendor/bin/hw/android.hardware.contexthub-service.qmi
@@ -217,7 +217,7 @@ vendor/etc/chre/preloaded_nanoapps.json
 # DPM
 vendor/bin/dpmQmiMgr
 vendor/bin/vendor.dpmd
-vendor/etc/dpm_vndr/vendor.dpm.conf
+# vendor/etc/dpm_vndr/vendor.dpm.conf (Duplicate in myron-specific list)
 vendor/etc/init/dpmQmiMgr.rc
 # vendor/etc/init/vendor.dpmd.rc (Duplicate in myron-specific list)
 vendor/lib64/com.qualcomm.qti.dpm.api@1.0.so
@@ -241,7 +241,7 @@ vendor/bin/adpl
 vendor/bin/netmgrd
 vendor/bin/port-bridge
 vendor/bin/qti
-vendor/etc/data/dsi_config.xml
+# vendor/etc/data/dsi_config.xml (Duplicate in myron-specific list)
 vendor/etc/data/netmgr_config.xml
 # vendor/etc/init/dataadpl.rc (Duplicate in myron-specific list)
 # vendor/etc/init/dataqti.rc (Duplicate in myron-specific list)
@@ -305,9 +305,9 @@ vendor/etc/display/DPU720.xml
 vendor/etc/display/DPU7__.xml
 vendor/etc/display/DPU820.xml
 vendor/etc/display/DPU8__.xml
-vendor/etc/display/DPU9__.xml
-vendor/etc/display/advanced_sf_offsets.xml
-vendor/etc/display/thermallevel_to_fps.xml
+# vendor/etc/display/DPU9__.xml (Duplicate in myron-specific list)
+# vendor/etc/display/advanced_sf_offsets.xml (Duplicate in myron-specific list)
+# vendor/etc/display/thermallevel_to_fps.xml (Duplicate in myron-specific list)
 vendor/lib64/libbacklight-calib.so
 vendor/lib64/libclstc_algorithm_adapter.so
 vendor/lib64/libclstc_gcp_adapter.so
@@ -335,28 +335,28 @@ vendor/lib64/libsdm-color.so|c36b857c03f1ac8e89882fd59812ae501e4c9772
 vendor/etc/display/LUT0.txt
 vendor/etc/display/LUT1.txt
 vendor/etc/display/LUT2.txt
-vendor/etc/display/backlight_calib_r66451_amoled_cmd_mode_dsi_visionox_panel_with_DSC.xml
-vendor/etc/display/backlight_calib_r66451_amoled_video_mode_dsi_visionox_panel_with_DSC.xml
-vendor/etc/display/backlight_calib_vtdr6130_amoled_cmd_mode_dsi_visionox_panel_with_DSC.xml
-vendor/etc/display/backlight_calib_vtdr6130_amoled_qsync_cmd_mode_dsi_visionox_panel_with_DSC.xml
-vendor/etc/display/backlight_calib_vtdr6130_amoled_qsync_video_mode_dsi_visionox_panel_with_DSC.xml
-vendor/etc/display/backlight_calib_vtdr6130_amoled_video_mode_dsi_visionox_panel_with_DSC.xml
-vendor/etc/display/qdcm_calib_data_Sharp_2k_cmd_mode_qsync_dsi_panel.json
-vendor/etc/display/qdcm_calib_data_Sharp_2k_video_mode_qsync_dsi_panel.json
-vendor/etc/display/qdcm_calib_data_Sharp_4k_cmd_mode_dsc_dsi_panel.json
-vendor/etc/display/qdcm_calib_data_Sharp_4k_video_mode_dsc_dsi_panel.json
-vendor/etc/display/qdcm_calib_data_Sharp_qhd_cmd_mode_dsi_panel.json
-vendor/etc/display/qdcm_calib_data_nt36672e_lcd_video_mode_dsi_novatek_panel_with_DSC.json
-vendor/etc/display/qdcm_calib_data_nt36672e_lcd_video_mode_dsi_novatek_panel_without_DSC.json
-vendor/etc/display/qdcm_calib_data_r66451_amoled_cmd_mode_dsi_visionox_panel_with_DSC.json
-vendor/etc/display/qdcm_calib_data_r66451_amoled_cmd_mode_dsi_visionox_panel_without_DSC.json
-vendor/etc/display/qdcm_calib_data_r66451_amoled_video_mode_dsi_visionox_panel_with_DSC.json
-vendor/etc/display/qdcm_calib_data_r66451_amoled_video_mode_dsi_visionox_panel_without_DSC.json
-vendor/etc/display/qdcm_calib_data_sharp_1080p_cmd_mode_dsi_panel.json
-vendor/etc/display/qdcm_calib_data_vtdr6130_amoled_cmd_mode_dsi_visionox_panel_with_DSC.json
-vendor/etc/display/qdcm_calib_data_vtdr6130_amoled_qsync_cmd_mode_dsi_visionox_panel_with_DSC.json
-vendor/etc/display/qdcm_calib_data_vtdr6130_amoled_qsync_video_mode_dsi_visionox_panel_with_DSC.json
-vendor/etc/display/qdcm_calib_data_vtdr6130_amoled_video_mode_dsi_visionox_panel_with_DSC.json
+# vendor/etc/display/backlight_calib_r66451_amoled_cmd_mode_dsi_visionox_panel_with_DSC.xml (Duplicate in myron-specific list)
+# vendor/etc/display/backlight_calib_r66451_amoled_video_mode_dsi_visionox_panel_with_DSC.xml (Duplicate in myron-specific list)
+# vendor/etc/display/backlight_calib_vtdr6130_amoled_cmd_mode_dsi_visionox_panel_with_DSC.xml (Duplicate in myron-specific list)
+# vendor/etc/display/backlight_calib_vtdr6130_amoled_qsync_cmd_mode_dsi_visionox_panel_with_DSC.xml (Duplicate in myron-specific list)
+# vendor/etc/display/backlight_calib_vtdr6130_amoled_qsync_video_mode_dsi_visionox_panel_with_DSC.xml (Duplicate in myron-specific list)
+# vendor/etc/display/backlight_calib_vtdr6130_amoled_video_mode_dsi_visionox_panel_with_DSC.xml (Duplicate in myron-specific list)
+# vendor/etc/display/qdcm_calib_data_Sharp_2k_cmd_mode_qsync_dsi_panel.json (Duplicate in myron-specific list)
+# vendor/etc/display/qdcm_calib_data_Sharp_2k_video_mode_qsync_dsi_panel.json (Duplicate in myron-specific list)
+# vendor/etc/display/qdcm_calib_data_Sharp_4k_cmd_mode_dsc_dsi_panel.json (Duplicate in myron-specific list)
+# vendor/etc/display/qdcm_calib_data_Sharp_4k_video_mode_dsc_dsi_panel.json (Duplicate in myron-specific list)
+# vendor/etc/display/qdcm_calib_data_Sharp_qhd_cmd_mode_dsi_panel.json (Duplicate in myron-specific list)
+# vendor/etc/display/qdcm_calib_data_nt36672e_lcd_video_mode_dsi_novatek_panel_with_DSC.json (Duplicate in myron-specific list)
+# vendor/etc/display/qdcm_calib_data_nt36672e_lcd_video_mode_dsi_novatek_panel_without_DSC.json (Duplicate in myron-specific list)
+# vendor/etc/display/qdcm_calib_data_r66451_amoled_cmd_mode_dsi_visionox_panel_with_DSC.json (Duplicate in myron-specific list)
+# vendor/etc/display/qdcm_calib_data_r66451_amoled_cmd_mode_dsi_visionox_panel_without_DSC.json (Duplicate in myron-specific list)
+# vendor/etc/display/qdcm_calib_data_r66451_amoled_video_mode_dsi_visionox_panel_with_DSC.json (Duplicate in myron-specific list)
+# vendor/etc/display/qdcm_calib_data_r66451_amoled_video_mode_dsi_visionox_panel_without_DSC.json (Duplicate in myron-specific list)
+# vendor/etc/display/qdcm_calib_data_sharp_1080p_cmd_mode_dsi_panel.json (Duplicate in myron-specific list)
+# vendor/etc/display/qdcm_calib_data_vtdr6130_amoled_cmd_mode_dsi_visionox_panel_with_DSC.json (Duplicate in myron-specific list)
+# vendor/etc/display/qdcm_calib_data_vtdr6130_amoled_qsync_cmd_mode_dsi_visionox_panel_with_DSC.json (Duplicate in myron-specific list)
+# vendor/etc/display/qdcm_calib_data_vtdr6130_amoled_qsync_video_mode_dsi_visionox_panel_with_DSC.json (Duplicate in myron-specific list)
+# vendor/etc/display/qdcm_calib_data_vtdr6130_amoled_video_mode_dsi_visionox_panel_with_DSC.json (Duplicate in myron-specific list)
 
 # Display postprocessing
 vendor/bin/hw/vendor.display.color@1.0-service
@@ -377,7 +377,7 @@ vendor/lib64/vendor.display.postproc@1.0.so
 vendor/bin/hw/dolbycodec2
 vendor/bin/hw/vendor.dolby.hardware.dms@2.0-service
 vendor/bin/hw/vendor.dolby.media.c2@1.0-service
-vendor/etc/dolby/dax-default.xml
+# vendor/etc/dolby/dax-default.xml (Duplicate in myron-specific list)
 vendor/etc/init/dolbycodec2.rc
 vendor/etc/init/vendor.dolby.hardware.dms@2.0-service.rc
 vendor/etc/init/vendor.dolby.media.c2@1.0-service.rc
@@ -496,11 +496,11 @@ vendor/etc/seccomp_policy/gnss@2.0-xtra-daemon.policy
 vendor/etc/seccomp_policy/qsap_voiceui.policy
 vendor/etc/apdr.conf
 vendor/etc/batching.conf
-vendor/etc/gps.conf
-vendor/etc/lowi.conf
-vendor/etc/sap.conf
-vendor/etc/sec_config
-vendor/etc/xtwifi.conf
+# vendor/etc/gps.conf (Duplicate in myron-specific list)
+# vendor/etc/lowi.conf (Duplicate in myron-specific list)
+# vendor/etc/sap.conf (Duplicate in myron-specific list)
+# vendor/etc/sec_config (Duplicate in myron-specific list)
+# vendor/etc/xtwifi.conf (Duplicate in myron-specific list)
 vendor/lib64/hw/android.hardware.gnss-aidl-impl-qti.so
 vendor/lib64/libMiVDR.so
 vendor/lib64/libbatching.so
@@ -660,8 +660,8 @@ vendor/bin/imsdaemon
 # vendor/etc/seccomp_policy/imsrtp.policy (Duplicate in myron-specific list)
 # vendor/etc/vintf/manifest/imsdcservice-saidl.xml (Duplicate in myron-specific list)
 # vendor/etc/vintf/manifest/vendor.qti.hardware.radio.ims.xml (Duplicate in myron-specific list)
-vendor/etc/xiaomi_ecc_list.xml
-vendor/etc/xiaomi_ecc_list_preference.xml
+# vendor/etc/xiaomi_ecc_list.xml (Duplicate in myron-specific list)
+# vendor/etc/xiaomi_ecc_list_preference.xml (Duplicate in myron-specific list)
 vendor/lib64/com.qualcomm.qti.imscmservice@1.0.so
 vendor/lib64/com.qualcomm.qti.imscmservice@2.0.so
 vendor/lib64/com.qualcomm.qti.imscmservice@2.1.so
@@ -862,7 +862,7 @@ vendor/bin/minidump64
 vendor/bin/poweroffm64
 vendor/etc/init/general_service.rc
 vendor/etc/init/minidump.rc
-vendor/etc/tzlog.dict
+# vendor/etc/tzlog.dict (Duplicate in myron-specific list)
 
 # NFC
 odm/bin/hw/android.hardware.nfc@1.2-service-st
@@ -876,16 +876,16 @@ odm/etc/libnfc-nxp_RF.conf
 odm/lib64/libstnfc-auth.so
 odm/lib64/nfc_nci.nqx.default.hw.so
 odm/lib64/nfc_nci.st21nfc.st.so
-vendor/etc/libnfc-SN220_19_2MHZ.conf
-vendor/etc/libnfc-SN220_38_4MHZ.conf
+# vendor/etc/libnfc-SN220_19_2MHZ.conf (Duplicate in myron-specific list)
+# vendor/etc/libnfc-SN220_38_4MHZ.conf (Duplicate in myron-specific list)
 vendor/etc/libnfc-hal-st-519_mtp.conf
 vendor/etc/libnfc-hal-st-ishtar.conf
 vendor/etc/libnfc-hal-st.conf
-vendor/etc/libnfc-mtp-SN100.conf
-vendor/etc/libnfc-mtp-SN100_38_4MHZ.conf
-vendor/etc/libnfc-nxp-pnscr.conf
-vendor/etc/libnfc-qrd-SN100.conf
-vendor/etc/libnfc-qrd-SN100_38_4MHZ.conf
+# vendor/etc/libnfc-mtp-SN100.conf (Duplicate in myron-specific list)
+# vendor/etc/libnfc-mtp-SN100_38_4MHZ.conf (Duplicate in myron-specific list)
+# vendor/etc/libnfc-nxp-pnscr.conf (Duplicate in myron-specific list)
+# vendor/etc/libnfc-qrd-SN100.conf (Duplicate in myron-specific list)
+# vendor/etc/libnfc-qrd-SN100_38_4MHZ.conf (Duplicate in myron-specific list)
 vendor/etc/st54j_conf.txt
 vendor/etc/st54k_conf_38.4MHz.txt
 vendor/firmware/st54j_fw.bin
@@ -924,25 +924,25 @@ vendor/bin/hw/vendor.qti.hardware.perf-hal-service
 vendor/bin/poweropt-service
 # vendor/etc/init/poweropt-service.rc (Duplicate in myron-specific list)
 vendor/etc/init/vendor.qti.hardware.perf-hal-service.rc
-vendor/etc/perf/avcsysnodesconfigs.xml
-vendor/etc/perf/commonresourceconfigs.xml
-vendor/etc/perf/commonsysnodesconfigs.xml
-vendor/etc/perf/perfboostsconfig.xml
-vendor/etc/perf/perfboostselection.xml
-vendor/etc/perf/perfconfigstore.xml
+# vendor/etc/perf/avcsysnodesconfigs.xml (Duplicate in myron-specific list)
+# vendor/etc/perf/commonresourceconfigs.xml (Duplicate in myron-specific list)
+# vendor/etc/perf/commonsysnodesconfigs.xml (Duplicate in myron-specific list)
+# vendor/etc/perf/perfboostsconfig.xml (Duplicate in myron-specific list)
+# vendor/etc/perf/perfboostselection.xml (Duplicate in myron-specific list)
+# vendor/etc/perf/perfconfigstore.xml (Duplicate in myron-specific list)
 vendor/etc/perf/targetavcsysnodesconfigs.xml
-vendor/etc/perf/targetconfig.xml
-vendor/etc/perf/targetresourceconfigs.xml
-vendor/etc/perf/targetsysnodesconfigs.xml
-vendor/etc/perf/testcommonresourceconfigs.xml
+# vendor/etc/perf/targetconfig.xml (Duplicate in myron-specific list)
+# vendor/etc/perf/targetresourceconfigs.xml (Duplicate in myron-specific list)
+# vendor/etc/perf/targetsysnodesconfigs.xml (Duplicate in myron-specific list)
+# vendor/etc/perf/testcommonresourceconfigs.xml (Duplicate in myron-specific list)
 vendor/etc/perf/testtargetresourceconfigs.xml
 vendor/etc/perf/thermal-boost.conf
-vendor/etc/perf/thermalbreakboostconfig.xml
+# vendor/etc/perf/thermalbreakboostconfig.xml (Duplicate in myron-specific list)
 vendor/etc/pwr/AODPowerOptFeature.xml
-vendor/etc/pwr/PSMPowerOptFeature.xml
-vendor/etc/pwr/PowerFeatureConfig.xml
+# vendor/etc/pwr/PSMPowerOptFeature.xml (Duplicate in myron-specific list)
+# vendor/etc/pwr/PowerFeatureConfig.xml (Duplicate in myron-specific list)
 vendor/etc/pwr/StandbyFeature.xml
-vendor/etc/pwr/VideoPowerOptFeature.xml
+# vendor/etc/pwr/VideoPowerOptFeature.xml (Duplicate in myron-specific list)
 vendor/etc/vintf/manifest/vendor.qti.hardware.perf.xml
 # vendor/etc/vintf/manifest/vendor.qti.hardware.power.powermodule.xml (Duplicate in myron-specific list)
 vendor/lib64/libaodoptfeature.so
@@ -1053,7 +1053,7 @@ vendor/bin/hw/vendor.qti.hardware.qseecom@1.0-service
 vendor/bin/qseecomd
 # vendor/etc/init/qseecomd.rc (Duplicate in myron-specific list)
 vendor/etc/init/vendor.qti.hardware.qseecom@1.0-service.rc
-vendor/etc/gpfspath_oem_config.xml
+# vendor/etc/gpfspath_oem_config.xml (Duplicate in myron-specific list)
 vendor/lib64/hw/vendor.qti.hardware.qseecom@1.0-impl.so
 vendor/lib64/libGPreqcancel.so
 vendor/lib64/libGPreqcancel_svc.so
@@ -1087,13 +1087,13 @@ vendor/bin/qtisetprop
 # vendor/etc/init/libxiaomi_qcril.rc (Duplicate in myron-specific list)
 # vendor/etc/init/qcrilNrd.rc (Duplicate in myron-specific list)
 # vendor/etc/init/qms.rc (Duplicate in myron-specific list)
-vendor/etc/modem/Diag.cfg
-vendor/etc/modem/Diag_data.cfg
-vendor/etc/modem/Diag_default.cfg
-vendor/etc/modem/Diag_global.cfg
-vendor/etc/modem/Diag_ims.cfg
-vendor/etc/modem/network_scan_config.cfg
-vendor/etc/modem/power.cfg
+# vendor/etc/modem/Diag.cfg (Duplicate in myron-specific list)
+# vendor/etc/modem/Diag_data.cfg (Duplicate in myron-specific list)
+# vendor/etc/modem/Diag_default.cfg (Duplicate in myron-specific list)
+# vendor/etc/modem/Diag_global.cfg (Duplicate in myron-specific list)
+# vendor/etc/modem/Diag_ims.cfg (Duplicate in myron-specific list)
+# vendor/etc/modem/network_scan_config.cfg (Duplicate in myron-specific list)
+# vendor/etc/modem/power.cfg (Duplicate in myron-specific list)
 # vendor/etc/permissions/noRil/apq_excluded_telephony_features.xml (Duplicate in myron-specific list)
 vendor/etc/qcril_database/upgrade/config/10.0_config.sql;FILEGROUP=proprietary_rildb_config_sql_files
 vendor/etc/qcril_database/upgrade/config/11.0_config.sql;FILEGROUP=proprietary_rildb_config_sql_files
@@ -1133,7 +1133,7 @@ vendor/etc/qcril_database/upgrade/other/9_version_update_ecc_table.sql;FILEGROUP
 # vendor/etc/vintf/manifest/qtiradio-saidl.xml (Duplicate in myron-specific list)
 # vendor/etc/vintf/manifest/vendor.qti.hardware.radio.am.xml (Duplicate in myron-specific list)
 # vendor/etc/vintf/manifest/vendor.qti.hardware.radio.qtiradioconfig.xml (Duplicate in myron-specific list)
-vendor/etc/telephony_packages.xml
+# vendor/etc/telephony_packages.xml (Duplicate in myron-specific list)
 vendor/lib64/deviceInfoServiceModuleNr.so
 vendor/lib64/lib-qhcpservice.so
 vendor/lib64/libQtiRilLoadable.so
@@ -1238,7 +1238,7 @@ vendor/lib64/libscveObjectTracker.so
 vendor/lib64/libscveObjectTracker_stub.so
 
 # SMC Invoke
-vendor/etc/ssg/ta_config.json
+# vendor/etc/ssg/ta_config.json (Duplicate in myron-specific list)
 vendor/lib64/libminkdescriptor.so
 vendor/lib64/libminksocket_vendor.so
 vendor/lib64/libqcbor.so
@@ -1263,7 +1263,7 @@ vendor/etc/init/vendor.qti.hardware.sensorscalibrate@1.0-service.rc
 vendor/etc/init/vendor.sensors.qti.rc
 # vendor/etc/init/vendor.sensors.sscrpcd.rc (Duplicate in myron-specific list)
 vendor/etc/permissions/vendor-qti-hardware-sensorscalibrate.xml
-vendor/etc/sensors/hals.conf
+# vendor/etc/sensors/hals.conf (Duplicate in myron-specific list)
 vendor/lib64/hw/vendor.qti.hardware.sensorscalibrate@1.0-impl.so
 vendor/lib64/libSensorsInterface.so
 vendor/lib64/libsensorcal.so
@@ -1313,7 +1313,7 @@ vendor/etc/init/hw/init.mi_thermald.rc
 # Thermal engine
 vendor/bin/thermal-engine-v2
 # vendor/etc/init/init_thermal-engine-v2.rc (Duplicate in myron-specific list)
-vendor/etc/thermal-engine.conf
+# vendor/etc/thermal-engine.conf (Duplicate in myron-specific list)
 vendor/lib64/liblmthermallistner.so
 vendor/lib64/libthermalclient.so
 
@@ -1360,7 +1360,7 @@ vendor/lib64/vendor.qti.hardware.tui_comm@1.0.so
 
 # Uevent
 odm/etc/ueventd.rc
-vendor/etc/ueventd.rc
+# vendor/etc/ueventd.rc (Duplicate in myron-specific list)
 
 # VPP
 vendor/bin/vppservice
@@ -1397,13 +1397,13 @@ vendor/lib64/libvideoutils.so
 vendor/bin/cnss-daemon
 # vendor/etc/init/init.vendor.wlan.rc (Duplicate in myron-specific list)
 vendor/etc/wifi/kiwi/WCNSS_qcom_cfg.ini
-vendor/etc/wifi/kiwi_v2/WCNSS_qcom_cfg.ini
+# vendor/etc/wifi/kiwi_v2/WCNSS_qcom_cfg.ini (Duplicate in myron-specific list)
 vendor/etc/wifi/qca6490/WCNSS_qcom_cfg.ini
 vendor/etc/wifi/icm.conf
-vendor/etc/wifi/p2p_supplicant_overlay.conf
+# vendor/etc/wifi/p2p_supplicant_overlay.conf (Duplicate in myron-specific list)
 vendor/etc/wifi/passpointProfile.conf
-vendor/etc/wifi/vendor_cmd.xml
-vendor/etc/wifi/wpa_supplicant_overlay.conf
+# vendor/etc/wifi/vendor_cmd.xml (Duplicate in myron-specific list)
+# vendor/etc/wifi/wpa_supplicant_overlay.conf (Duplicate in myron-specific list)
 
 # WiFi Display
 vendor/bin/wfdhdcphalservice
@@ -1416,7 +1416,7 @@ vendor/bin/wifidisplayhalservice
 # vendor/etc/seccomp_policy/wfdvndservice.policy (Duplicate in myron-specific list)
 # vendor/etc/seccomp_policy/wifidisplayhalservice.policy (Duplicate in myron-specific list)
 # vendor/etc/vintf/manifest/vendor.qti.hardware.wifidisplaysession-service.xml (Duplicate in myron-specific list)
-vendor/etc/wfdconfig.xml
+# vendor/etc/wfdconfig.xml (Duplicate in myron-specific list)
 vendor/lib64/libFileMux_proprietary.so
 vendor/lib64/libmmrtpdecoder_vendor.so
 vendor/lib64/libmmrtpencoder_vendor.so

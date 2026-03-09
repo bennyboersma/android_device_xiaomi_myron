@@ -128,3 +128,29 @@ Total pruned exact-duplicate paths: `70`
 | seccomp | `vendor/etc/seccomp_policy/wifidisplayhalservice.policy` | yes |
 
 Updated total pruned exact-duplicate paths: `94`
+
+## Additional config/data duplicates pruned from common
+
+These were exact duplicate destination paths kept in `myron` and commented out in `sm8850-common`.
+
+| Group | Count | Decision |
+|---|---:|---|
+| display config/calibration | 25 | keep in myron |
+| perf config | 11 | keep in myron |
+| wifi/wfd config | 6 | keep in myron |
+
+Updated total pruned exact-duplicate paths: `136`
+
+## Additional vendor/etc config/data duplicates pruned from common
+
+These were exact duplicate destination paths kept in `myron` and commented out in `sm8850-common`.
+
+| Group | Count | Decision |
+|---|---:|---|
+| cne / wqe client configs | 31 | keep in myron |
+| modem / telephony / GPS configs | 15 | keep in myron |
+| nfc / secure element configs | 7 | keep in myron |
+| power / thermal / sensor configs | 9 | keep in myron |
+| misc vendor/etc config/data | 7 | keep in myron |
+
+Updated total pruned exact-duplicate paths: `205`

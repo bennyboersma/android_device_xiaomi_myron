@@ -146,7 +146,7 @@ Keep the phone on the proven intermediate install path while host-side userspace
   - `vendor/etc/vintf/manifest/dumpstate-xiaomi.xml`
 - Common-vs-device blob overlap audit completed:
   - current exact common-vs-myron overlap baseline:
-    - `622` destination paths
+    - `2` destination paths
     - enforced by:
       - `tools/check_blob_overlap.sh`
       - `tools/blob_overlap_allowlist.txt`
@@ -157,11 +157,21 @@ Keep the phone on the proven intermediate install path while host-side userspace
     - `seccomp`: `19`
     - `power-perf`: `17`
     - `radio-ims`: `11`
-  - this remains a documented likely packaging-risk class, not an unknown
+  - after syncing the canonical remote `myron` blob list locally, the active exact-overlap risk is now minimal
 - Exact-duplicate high-risk overlap pruning completed:
-  - `94` exact destination-path duplicates across `init`, `vintf`, `seccomp_policy`, and `permissions/default-permissions` were commented out of `device/xiaomi/sm8850-common/proprietary-files.txt`
+  - `205` exact duplicate destination paths have now been commented out of `device/xiaomi/sm8850-common/proprietary-files.txt`
+  - covered classes now include:
+    - `init`
+    - `vintf`
+    - `seccomp_policy`
+    - `permissions/default-permissions`
+    - `display` config/calibration
+    - `perf` config
+    - `wifi/wfd` config
+    - additional `vendor/etc` config/data duplicates
   - matrix:
     - `tools/runbooks/common_device_overlap_matrix.md`
+  - this is now primarily historical cleanup record, not the active overlap baseline
 - Blob overlap regression gate added:
   - new overlap growth now fails through:
     - `tools/check_blob_overlap.sh`

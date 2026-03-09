@@ -211,14 +211,14 @@ Those paths were already explored and are not the current fastest route.
 - remote rollback dry-run for userspace restore is already verified
 - imported Qualcomm fallback vendor sepolicy is now explicitly included from `device/xiaomi/sm8850-common/BoardConfigCommon.mk`
 - local vendor policy was cleaned up to stop referencing stale nonexistent `vendor_sysfs_*` labels
-- active common-vs-device blob overlap remains the most likely late packaging-risk class once the current userspace build reaches image assembly
+- active exact common-vs-device blob overlap is now minimal after syncing the canonical remote `myron` blob list
 - the current exact overlap regression baseline is:
-  - `622` destination paths
+  - `2` destination paths
   - enforced by:
     - `tools/check_blob_overlap.sh`
     - `tools/blob_overlap_allowlist.txt`
 - exact high-risk overlap pruning then expanded that set:
-  - `94` exact destination-path duplicates across `init`, `vintf`, `seccomp_policy`, and `permissions/default-permissions` were commented out of `device/xiaomi/sm8850-common/proprietary-files.txt`
+  - `205` exact duplicate destination paths have now been commented out of `device/xiaomi/sm8850-common/proprietary-files.txt`
   - keep-policy is documented in:
     - `tools/runbooks/common_device_overlap_matrix.md`
 - overlap growth is now gated:
@@ -226,7 +226,7 @@ Those paths were already explored and are not the current fastest route.
   - baseline allowlist:
     - `tools/blob_overlap_allowlist.txt`
   - current known exact common-vs-myron overlap baseline:
-    - `622` destination paths
+    - `2` destination paths
   - `tools/surgical_blob_policy_check.sh` now fails if new exact overlap destinations are introduced
 - three high-confidence common-tree overlap entries were already pruned locally and synced remotely:
   - `vendor/etc/init/hw/init.qcom.rc`

@@ -77,7 +77,7 @@ The more immediate host-side structural risk is not the naming debt. It is the a
 Current overlap framing:
 
 - current exact common-vs-myron destination overlap baseline:
-  - `622` destination paths
+  - `2` destination paths
   - enforced by:
     - `tools/check_blob_overlap.sh`
     - `tools/blob_overlap_allowlist.txt`
@@ -89,4 +89,4 @@ Current overlap framing:
   - `power-perf`: `17`
   - `radio-ims`: `11`
 
-That overlap remains the next likely packaging-collision class once the full userspace build reaches image assembly, but the live regression gate is now the `622`-path exact overlap baseline.
+That exact-overlap class is now largely collapsed. Remaining packaging risk is more likely to come from non-exact ownership collisions or late image assembly issues than from broad common-vs-myron exact duplicate destinations.
