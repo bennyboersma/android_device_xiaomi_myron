@@ -59,6 +59,15 @@ if [[ "${CHECK_ROLLBACK}" == "1" ]]; then
   rm -f /tmp/rollback_userspace_readiness.$$
 fi
 
+echo "[boot-critical] probing built vendor service stack"
+if ! bash "${SCRIPT_DIR}/check_retry_boot_critical_vendor_stack.sh" "${TOP_DIR}" "${PRODUCT}" >/tmp/boot_critical_vendor_readiness.$$ 2>&1; then
+  cat /tmp/boot_critical_vendor_readiness.$$
+  missing=$((missing + 1))
+else
+  cat /tmp/boot_critical_vendor_readiness.$$
+fi
+rm -f /tmp/boot_critical_vendor_readiness.$$
+
 if [[ "${REQUIRE_DEVICE}" == "1" ]]; then
   need_cmd fastboot
   product="$(fastboot getvar product 2>&1 | awk -F': ' '/product:/{print $2}' | tail -n 1)"

@@ -21,6 +21,9 @@ CHECK_ROLLBACK=1 REQUIRE_DEVICE=0 bash "${TOP_DIR}/tools/check_userspace_flash_r
 step "partition sanity"
 bash "${TOP_DIR}/tools/check_partition_package_sanity.sh" "${TOP_DIR}" "${PRODUCT}" || true
 
+step "boot-critical vendor stack"
+bash "${TOP_DIR}/tools/check_retry_boot_critical_vendor_stack.sh" "${TOP_DIR}" "${PRODUCT}" || true
+
 step "artifacts"
 while read -r kind image; do
   [[ -n "${kind}" ]] || continue

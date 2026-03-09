@@ -49,9 +49,13 @@ if [[ "${REQUIRE_DEVICE}" == "1" ]]; then
   need_cmd fastboot
 fi
 
+has_fastboot_device() {
+  fastboot devices | awk 'NF {print $1}' | grep -q .
+}
+
 wait_for_fastboot() {
   local tries=0
-  until fastboot devices | awk 'NF {print $1}' | grep -q .; do
+  until has_fastboot_device; do
     tries=$((tries + 1))
     if [[ ${tries} -ge 30 ]]; then
       echo "Timed out waiting for fastboot" >&2
@@ -76,7 +80,7 @@ wait_for_fastbootd() {
 }
 
 enter_fastbootd() {
-  if fastboot getvar is-userspace 2>&1 | grep -q 'yes'; then
+  if has_fastboot_device && fastboot getvar is-userspace 2>&1 | grep -q 'yes'; then
     return 0
   fi
 
@@ -87,7 +91,7 @@ enter_fastbootd() {
     return 0
   fi
 
-  if fastboot devices | awk 'NF {print $1}' | grep -q .; then
+  if has_fastboot_device; then
     fastboot reboot fastboot >/dev/null 2>&1 || true
     wait_for_fastboot
     wait_for_fastbootd
@@ -132,7 +136,7 @@ echo "stock_super_img=${STOCK_SUPER_IMG}"
 echo "stock_vbmeta_system_img=${STOCK_VBMETA_SYSTEM_IMG}"
 echo "fastboot flash super ${STOCK_SUPER_IMG}"
 if [[ "${FLASH_VBMETA_SYSTEM}" == "1" ]]; then
-  echo "fastboot flash vbmeta_system_ab ${STOCK_VBMETA_SYSTEM_IMG}"
+  echo "fastboot flash vbmeta_system_${slot} ${STOCK_VBMETA_SYSTEM_IMG}"
 fi
 
 echo "Note: this preserves the current boot/init_boot/vendor_boot path."
@@ -144,5 +148,5 @@ fi
 
 fastboot flash super "${STOCK_SUPER_IMG}"
 if [[ "${FLASH_VBMETA_SYSTEM}" == "1" ]]; then
-  fastboot flash vbmeta_system_ab "${STOCK_VBMETA_SYSTEM_IMG}"
+  fastboot flash "vbmeta_system_${slot}" "${STOCK_VBMETA_SYSTEM_IMG}"
 fi

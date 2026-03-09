@@ -7,9 +7,13 @@ Purpose: classify the first custom-userspace boot result into concrete blocker b
 Do not use this matrix until the device is on:
 - stock `boot`
 - stock `vendor_boot`
-- custom `init_boot`
+- stock `init_boot`
 
 The next unknown is custom userspace, not top-level boot trust.
+
+Current real blocker after the first attempt:
+- the first split-image userspace flash bootlooped before `adb`
+- see `tools/runbooks/first_userspace_attempt_postmortem_20260309.md`
 
 ## Fast gate order
 
@@ -66,3 +70,25 @@ If any of those fail, stop subsystem triage and debug the base boot/userspace pa
 - `firstboot.camera_log_grep.txt`
 - `firstboot.audio_log_grep.txt`
 - `firstboot.nfc_log_grep.txt`
+
+
+## First retry blocker refinement (2026-03-09 postmortem)
+
+Highest-confidence blockers before a second userspace flash:
+
+1. Missing vendor init/VINTF ownership for:
+   - gatekeeper
+   - health
+   - wifi
+   - display composer / allocator / color
+   - qseecomd
+   - secureprocessor
+2. Rollback path correctness under real failure:
+   - slot-specific `vbmeta_system_${slot}`
+   - wrapper argument handling
+3. Early-failure evidence gap:
+   - next attempt must capture slot metadata and failure state when `adb` never appears
+
+Explicitly deprioritized after comparison:
+- NXP keymint/weaver packaging, because those services are present in the built output under `vendor/`
+- NFC, because its service remains present and it is not the earliest boot blocker

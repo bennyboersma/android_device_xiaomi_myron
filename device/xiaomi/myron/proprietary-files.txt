@@ -1,238 +1,251 @@
 # Auto-generated from extracted partition trees (vendor/odm/vendor_dlkm)
 # Source: OTA payload + extracted images
 odm/bin/hw/android.hardware.nqnfc-service.nxp
-odm/bin/hw/android.hardware.security.keymint3-service.strongbox.nxp;MAKE_COPY_RULE_ONLY
-odm/bin/hw/android.hardware.weaver-service.nxp-qti;MAKE_COPY_RULE_ONLY
-odm/bin/hw/dvs-aidl-service;MAKE_COPY_RULE_ONLY
-odm/bin/hw/mfp-daemon;MAKE_COPY_RULE_ONLY
-odm/bin/hw/miaon_frame;MAKE_COPY_RULE_ONLY
-odm/bin/hw/mifaced;SYMLINK=vendor/bin/hw/mifaced;MAKE_COPY_RULE_ONLY
-odm/bin/hw/misensor_camera;MAKE_COPY_RULE_ONLY
-odm/bin/hw/vendor.novatek.hardware.visdisplaysrv-service;MAKE_COPY_RULE_ONLY
-odm/bin/hw/vendor.xiaomi.hardware.authsecretd;MAKE_COPY_RULE_ONLY
-odm/bin/hw/vendor.xiaomi.hardware.mediaeventgatherservice-service;MAKE_COPY_RULE_ONLY
-odm/bin/hw/vendor.xiaomi.hardware.seaaudio-service;MAKE_COPY_RULE_ONLY
-odm/bin/hw/vendor.xiaomi.hardware.vibratorfeature.service;MAKE_COPY_RULE_ONLY
-odm/bin/hw/vendor.xiaomi.hw.touchfeature-service;MAKE_COPY_RULE_ONLY
-odm/bin/hw/vendor.xiaomi.sensor.citsensorservice.aidl;MAKE_COPY_RULE_ONLY
-odm/bin/fidoca;MAKE_COPY_RULE_ONLY
-odm/bin/idmanager;MAKE_COPY_RULE_ONLY
-odm/bin/micrtkd;MAKE_COPY_RULE_ONLY
-odm/bin/midevauthd;MAKE_COPY_RULE_ONLY
-odm/bin/misecmedia;MAKE_COPY_RULE_ONLY
+# Use source NXP KM300 keymint stack
+# odm/bin/hw/android.hardware.security.keymint3-service.strongbox.nxp
+# Use source NXP AIDL weaver service
+# odm/bin/hw/android.hardware.weaver-service.nxp-qti
+odm/bin/hw/dvs-aidl-service
+# Deferred for first userspace build: biometrics/touch/haptics extension stack incomplete
+# odm/bin/hw/mfp-daemon
+# Deferred for first userspace build: Xiaomi display/sensor/secure-media extension stack incomplete
+# odm/bin/hw/miaon_frame
+# Deferred until libmiface.so is recovered from stock
+# odm/bin/hw/mifaced;SYMLINK=vendor/bin/hw/mifaced
+# odm/bin/hw/misensor_camera
+odm/bin/hw/vendor.novatek.hardware.visdisplaysrv-service
+# Deferred for first userspace build: missing miauthsecretd/authsecret blobs
+# odm/bin/hw/vendor.xiaomi.hardware.authsecretd
+# Deferred for first userspace build: missing Xiaomi private service deps
+# odm/bin/hw/vendor.xiaomi.hardware.mediaeventgatherservice-service
+# odm/bin/hw/vendor.xiaomi.hardware.seaaudio-service
+# odm/bin/hw/vendor.xiaomi.hardware.vibratorfeature.service
+# odm/bin/hw/vendor.xiaomi.hw.touchfeature-service
+# Deferred for first userspace build: Xiaomi trust/sensor/ZSL stack incomplete
+# odm/bin/hw/vendor.xiaomi.sensor.citsensorservice.aidl
+# Deferred for first userspace build: missing Xiaomi private service deps
+# odm/bin/fidoca
+# Deferred for first userspace build: missing Xiaomi private service deps
+# odm/bin/idmanager
+# odm/bin/micrtkd
+# odm/bin/midevauthd
+# odm/bin/misecmedia
 odm/bin/miteelog
-odm/bin/mlipayd;MAKE_COPY_RULE_ONLY
-odm/bin/mrmd;MAKE_COPY_RULE_ONLY
-odm/bin/mseccam;MAKE_COPY_RULE_ONLY
-odm/bin/mtd;MAKE_COPY_RULE_ONLY
-odm/bin/tee-supplicant;MAKE_COPY_RULE_ONLY
-odm/bin/tidad;MAKE_COPY_RULE_ONLY
-odm/bin/toucheventcheck;MAKE_COPY_RULE_ONLY
-odm/bin/vendor.xiaomi.hardware.mikeybag-service;MAKE_COPY_RULE_ONLY
-odm/bin/vendor.xiaomi.hardware.mitrustedui-service;MAKE_COPY_RULE_ONLY
-odm/bin/vendor.xiaomi.hardware.otrpagent@2.0-service;MAKE_COPY_RULE_ONLY
-odm/bin/vsimd;MAKE_COPY_RULE_ONLY
+# odm/bin/mlipayd
+# odm/bin/mrmd
+# odm/bin/mseccam
+# odm/bin/mtd
+# odm/bin/tee-supplicant
+# odm/bin/tidad
+# odm/bin/toucheventcheck
+# odm/bin/vendor.xiaomi.hardware.mikeybag-service
+# odm/bin/vendor.xiaomi.hardware.mitrustedui-service
+# odm/bin/vendor.xiaomi.hardware.otrpagent@2.0-service
+# odm/bin/vsimd
 odm/etc/init/android.hardware.contexthub-service.qmi.rc
-odm/etc/init/android.hardware.security.keymint3-service.strongbox.nxp.rc
-odm/etc/init/android.hardware.weaver-service.nxp.rc
+# odm/etc/init/android.hardware.security.keymint3-service.strongbox.nxp.rc
+# odm/etc/init/android.hardware.weaver-service.nxp.rc
 odm/etc/init/dvs-aidl-service.rc
 odm/etc/init/init.boled.lightsensor.rc
 odm/etc/init/init.cirrus.rc
-odm/etc/init/init.mfp-daemon.aidl.rc
+# odm/etc/init/init.mfp-daemon.aidl.rc
 odm/etc/init/init.tfa.rc
 odm/etc/init/init.ti.rc
-odm/etc/init/miaon_frame.rc
+# odm/etc/init/miaon_frame.rc
 odm/etc/init/micrtk.rc
-odm/etc/init/miface.rc
-odm/etc/init/miface_start_wait_mitee_boot_completed.rc
-odm/etc/init/misecmedia.rc
-odm/etc/init/misensor_camera.rc
+# odm/etc/init/miface.rc
+# odm/etc/init/miface_start_wait_mitee_boot_completed.rc
+# odm/etc/init/misecmedia.rc
+# odm/etc/init/misensor_camera.rc
 odm/etc/init/miteelog.rc
 odm/etc/init/mrm.rc
-odm/etc/init/mseccam.rc
+# odm/etc/init/mseccam.rc
 odm/etc/init/nfc2-service-nxp.rc
-odm/etc/init/tee-supplicant.rc
+# odm/etc/init/tee-supplicant.rc
 odm/etc/init/vendor.novatek.hardware.visdisplaysrv-service.rc
-odm/etc/init/vendor.xiaomi.hardware.aidl.midevauth@1.0-service.rc
-odm/etc/init/vendor.xiaomi.hardware.aidl.mtdservice-service.rc
-odm/etc/init/vendor.xiaomi.hardware.aidl.tidaservice-service.rc
-odm/etc/init/vendor.xiaomi.hardware.authsecretd.rc
-odm/etc/init/vendor.xiaomi.hardware.idmanager.rc
-odm/etc/init/vendor.xiaomi.hardware.mediaeventgatherservice.rc
-odm/etc/init/vendor.xiaomi.hardware.mfidoca-service.rc
-odm/etc/init/vendor.xiaomi.hardware.mikeybag.rc
-odm/etc/init/vendor.xiaomi.hardware.mitrustedui.rc
-odm/etc/init/vendor.xiaomi.hardware.mlipay-service.rc
-odm/etc/init/vendor.xiaomi.hardware.otrpagent@2.0-service.rc
-odm/etc/init/vendor.xiaomi.hardware.seaaudio.rc
-odm/etc/init/vendor.xiaomi.hardware.vibratorfeature.service.rc
-odm/etc/init/vendor.xiaomi.hardware.vsimapp-service.rc
-odm/etc/init/vendor.xiaomi.hw.touchfeature-service.rc
-odm/etc/init/vendor.xiaomi.sensor.citsensorservice.aidl.rc
+# odm/etc/init/vendor.xiaomi.hardware.aidl.midevauth@1.0-service.rc
+# odm/etc/init/vendor.xiaomi.hardware.aidl.mtdservice-service.rc
+# odm/etc/init/vendor.xiaomi.hardware.aidl.tidaservice-service.rc
+# odm/etc/init/vendor.xiaomi.hardware.authsecretd.rc
+# odm/etc/init/vendor.xiaomi.hardware.idmanager.rc
+# odm/etc/init/vendor.xiaomi.hardware.mediaeventgatherservice.rc
+# odm/etc/init/vendor.xiaomi.hardware.mfidoca-service.rc
+# odm/etc/init/vendor.xiaomi.hardware.mikeybag.rc
+# odm/etc/init/vendor.xiaomi.hardware.mitrustedui.rc
+# odm/etc/init/vendor.xiaomi.hardware.mlipay-service.rc
+# odm/etc/init/vendor.xiaomi.hardware.otrpagent@2.0-service.rc
+# odm/etc/init/vendor.xiaomi.hardware.seaaudio.rc
+# odm/etc/init/vendor.xiaomi.hardware.vibratorfeature.service.rc
+# odm/etc/init/vendor.xiaomi.hardware.vsimapp-service.rc
+# odm/etc/init/vendor.xiaomi.hw.touchfeature-service.rc
+# odm/etc/init/vendor.xiaomi.sensor.citsensorservice.aidl.rc
 # odm/etc/vintf/manifest.xml (Source-provided)
 odm/etc/vintf/manifest/AHBF-V3-service.xml
 odm/etc/vintf/manifest/android.hardware.biometrics.face-v4.xml
-odm/etc/vintf/manifest/android.hardware.security.keymint3-service.strongbox.nxp.xml
-odm/etc/vintf/manifest/android.hardware.security.sharedsecret3-service.strongbox.nxp.xml
-odm/etc/vintf/manifest/android.hardware.weaver-service.nxp.xml
+# odm/etc/vintf/manifest/android.hardware.security.keymint3-service.strongbox.nxp.xml
+# odm/etc/vintf/manifest/android.hardware.security.sharedsecret3-service.strongbox.nxp.xml
+# odm/etc/vintf/manifest/android.hardware.weaver-service.nxp.xml
 odm/etc/vintf/manifest/dvs-aidl-service.xml
 odm/etc/vintf/manifest/fod-aidl.xml
-odm/etc/vintf/manifest/manifest_vendor.xiaomi.hardware.aidl.midevauth.xml
-odm/etc/vintf/manifest/manifest_vendor.xiaomi.hardware.aidl.mtdservice.xml
-odm/etc/vintf/manifest/manifest_vendor.xiaomi.hardware.aidl.tidaservice.xml
-odm/etc/vintf/manifest/manifest_vendor.xiaomi.hardware.mfidoca.xml
-odm/etc/vintf/manifest/manifest_vendor.xiaomi.hardware.mlipay.xml
-odm/etc/vintf/manifest/manifest_vendor.xiaomi.hardware.otrpagent@2.0.xml
-odm/etc/vintf/manifest/manifest_vendor.xiaomi.hardware.vsimapp.xml
-odm/etc/vintf/manifest/miaon_frame.xml
+# odm/etc/vintf/manifest/manifest_vendor.xiaomi.hardware.aidl.midevauth.xml
+# odm/etc/vintf/manifest/manifest_vendor.xiaomi.hardware.aidl.mtdservice.xml
+# odm/etc/vintf/manifest/manifest_vendor.xiaomi.hardware.aidl.tidaservice.xml
+# odm/etc/vintf/manifest/manifest_vendor.xiaomi.hardware.mfidoca.xml
+# odm/etc/vintf/manifest/manifest_vendor.xiaomi.hardware.mlipay.xml
+# odm/etc/vintf/manifest/manifest_vendor.xiaomi.hardware.otrpagent@2.0.xml
+# odm/etc/vintf/manifest/manifest_vendor.xiaomi.hardware.vsimapp.xml
+# odm/etc/vintf/manifest/miaon_frame.xml
 odm/etc/vintf/manifest/micrtk.xml
-odm/etc/vintf/manifest/misecmedia.xml
-odm/etc/vintf/manifest/misensor_camera.xml
+# odm/etc/vintf/manifest/misecmedia.xml
+# odm/etc/vintf/manifest/misensor_camera.xml
 odm/etc/vintf/manifest/mrm.xml
-odm/etc/vintf/manifest/mseccam.xml
+# odm/etc/vintf/manifest/mseccam.xml
 odm/etc/vintf/manifest/nfc2-service-nxp.xml
 odm/etc/vintf/manifest/vendor.novatek.hardware.visdisplaysrv.xml
 odm/etc/vintf/manifest/vendor.xiaomi.hardware.aon.auth.xml
-odm/etc/vintf/manifest/vendor.xiaomi.hardware.authsecretd.xml
+# odm/etc/vintf/manifest/vendor.xiaomi.hardware.authsecretd.xml
 odm/etc/vintf/manifest/vendor.xiaomi.hardware.framemaster_aidl-service.xml
-odm/etc/vintf/manifest/vendor.xiaomi.hardware.idmanager.xml
-odm/etc/vintf/manifest/vendor.xiaomi.hardware.mediaeventgatherservice.xml
-odm/etc/vintf/manifest/vendor.xiaomi.hardware.mikeybag.xml
-odm/etc/vintf/manifest/vendor.xiaomi.hardware.mitrustedui.xml
-odm/etc/vintf/manifest/vendor.xiaomi.hardware.seaaudio.xml
-odm/etc/vintf/manifest/vendor.xiaomi.hardware.vibratorfeature.service.xml
-odm/etc/vintf/manifest/vendor.xiaomi.hw.touchfeature-service.xml
-odm/etc/vintf/manifest/vendor.xiaomi.sensor.citsensorservice.aidl.xml
-odm/lib64/camera/com.qti.actuator.myron_aac_ovx9500_ak7316_wide_ii_actuator.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/com.qti.actuator.myron_aac_s5kjn5_ak7316_tele_ii_actuator.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/com.qti.actuator.myron_semco_s5kjn5_ak7316_tele_i_actuator.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/com.qti.actuator.myron_sunny_ovx9500_ak7316_wide_i_actuator.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/com.qti.eeprom.myron_aac_ov50m_p24u64b_ultra_i_eeprom.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/com.qti.eeprom.myron_aac_ovx9500_p24u128b_wide_ii_eeprom.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/com.qti.eeprom.myron_aac_s5kjn5_p24u128b_tele_ii_eeprom.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/com.qti.eeprom.myron_ofilm_ov32d40_p24u64b_front_i_eeprom.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/com.qti.eeprom.myron_semco_s5kjn5_p24u128b_tele_i_eeprom.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/com.qti.eeprom.myron_sunny_ovx9500_p24u128b_wide_i_eeprom.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/com.qti.sensor.myron_aac_ov50m_ultra_i.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/com.qti.sensor.myron_aac_ovx9500_wide_ii.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/com.qti.sensor.myron_aac_s5kjn5_tele_ii.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/com.qti.sensor.myron_ofilm_ov32d40_front_i.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/com.qti.sensor.myron_semco_s5kjn5_tele_i.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/com.qti.sensor.myron_sunny_ovx9500_wide_i.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/components/com.mi.node.videonight.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/components/com.qti.node.ldc.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/components/com.xiaomi.node.alpha_blending.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/components/com.xiaomi.stats.aec.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/components/com.xiaomi.stats.af.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/components/com.xiaomi.stats.awb.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/components/com.xiaomi.stats.pdlib.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/components/libawbcore.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/components/libmiaec.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/components/libstats.afalgo.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/components/libstats.aipdlib.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/components/libstats.pdlib.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/dynamicplugins/com.xiaomi.plugin.GestureEffects.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/dynamicplugins/com.xiaomi.plugin.arcsoftAP.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/dynamicplugins/com.xiaomi.plugin.arcsoftPT.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/dynamicplugins/com.xiaomi.plugin.arcsoftSSSH.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/dynamicplugins/com.xiaomi.plugin.capbokeh.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/dynamicplugins/com.xiaomi.plugin.capdepth.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/dynamicplugins/com.xiaomi.plugin.capdepthrefine.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/dynamicplugins/com.xiaomi.plugin.frontbokeh.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/dynamicplugins/com.xiaomi.plugin.ldc.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/dynamicplugins/com.xiaomi.plugin.mialgoallinone.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/dynamicplugins/com.xiaomi.plugin.midualcamallinone.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/dynamicplugins/com.xiaomi.plugin.misrdehaze.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/dynamicplugins/com.xiaomi.plugin.sdsr.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/libchxlogicalcameratable.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/plugins/com.xiaomi.plugin.anchor.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/plugins/com.xiaomi.plugin.arcbeautydeformation.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/plugins/com.xiaomi.plugin.arcskinbeautifier.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/plugins/com.xiaomi.plugin.arcskinbeautifierpreview.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/plugins/com.xiaomi.plugin.arcsoftvideobokeh.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/plugins/com.xiaomi.plugin.depurple.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/plugins/com.xiaomi.plugin.dsac.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/plugins/com.xiaomi.plugin.ecdsnapshotdet.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/plugins/com.xiaomi.plugin.edof.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/plugins/com.xiaomi.plugin.filter.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/plugins/com.xiaomi.plugin.fusion.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/plugins/com.xiaomi.plugin.gainmap.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/plugins/com.xiaomi.plugin.gainmapPostProc.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/plugins/com.xiaomi.plugin.gpu.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/plugins/com.xiaomi.plugin.heifedit.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/plugins/com.xiaomi.plugin.jpegrAggr.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/plugins/com.xiaomi.plugin.losslessjpeg.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/plugins/com.xiaomi.plugin.memcpyCustomization.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/plugins/com.xiaomi.plugin.mialgoanchor.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/plugins/com.xiaomi.plugin.mialgooptics.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/plugins/com.xiaomi.plugin.misv2.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/plugins/com.xiaomi.plugin.misv3.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/plugins/com.xiaomi.plugin.movieeffect.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/plugins/com.xiaomi.plugin.pack2unpack.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/plugins/com.xiaomi.plugin.pixman.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/plugins/com.xiaomi.plugin.portraitrepair.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/plugins/com.xiaomi.plugin.psmetasplit.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/plugins/com.xiaomi.plugin.remosaic.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/plugins/com.xiaomi.plugin.singlebokehpreview.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/plugins/com.xiaomi.plugin.spc.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/plugins/com.xiaomi.plugin.supermoon.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/plugins/com.xiaomi.plugin.swflip.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/plugins/com.xiaomi.plugin.swjpegencode.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/plugins/com.xiaomi.plugin.videofilter.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/plugins/com.xiaomi.plugin.watermark.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/plugins/com.xiaomi.plugin.yuv2Heic.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/plugins/com.xiaomi.plugin.yuvresize.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/preloadplugins/com.xiaomi.plugin.asd.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/preloadplugins/com.xiaomi.plugin.memcpy.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/preloadplugins/com.xiaomi.plugin.offcamb2y.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/preloadplugins/com.xiaomi.plugin.offcamformatconvertor.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/preloadplugins/com.xiaomi.plugin.offcamheic.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/preloadplugins/com.xiaomi.plugin.offcamjpeg.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/preloadplugins/com.xiaomi.plugin.offcammfnr.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/preloadplugins/com.xiaomi.plugin.offcammlawb.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/preloadplugins/com.xiaomi.plugin.offcamyuveis.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/preloadplugins/com.xiaomi.plugin.offcamyuvreprocess.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/preloadplugins/com.xiaomi.plugin.offcamyuvsplit.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/preloadplugins/com.xiaomi.plugin.offlineawbideal.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/preloadplugins/com.xiaomi.plugin.offlineb2y.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/preloadplugins/com.xiaomi.plugin.offlineehdr.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/preloadplugins/com.xiaomi.plugin.offlineformatconvertor.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/preloadplugins/com.xiaomi.plugin.offlinehdrraw2y.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/preloadplugins/com.xiaomi.plugin.offlineheic.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/preloadplugins/com.xiaomi.plugin.offlinei2y.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/preloadplugins/com.xiaomi.plugin.offlinejpeg.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/preloadplugins/com.xiaomi.plugin.offlinemfnr.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/preloadplugins/com.xiaomi.plugin.offlinemlawb.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/preloadplugins/com.xiaomi.plugin.offlinetintless.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/preloadplugins/com.xiaomi.plugin.offlinetintlesshdr.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/preloadplugins/com.xiaomi.plugin.offlineyuveis.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/preloadplugins/com.xiaomi.plugin.offlineyuvreprocess.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/preloadplugins/com.xiaomi.plugin.offlineyuvsplit.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/preloadplugins/com.xiaomi.plugin.offlineyuvwarp.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/preloadplugins/com.xiaomi.plugin.previewldc.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/zsl/com.xiaomi.zsl.ainr.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/zsl/com.xiaomi.zsl.bokehsmartae.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/zsl/com.xiaomi.zsl.default.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/zsl/com.xiaomi.zsl.ecd.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/zsl/com.xiaomi.zsl.ell.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/zsl/com.xiaomi.zsl.fusion.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/zsl/com.xiaomi.zsl.hdr.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/zsl/com.xiaomi.zsl.leica.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/zsl/com.xiaomi.zsl.mfnr.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/zsl/com.xiaomi.zsl.nightmotion.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/zsl/com.xiaomi.zsl.single.so;MAKE_COPY_RULE_ONLY
-odm/lib64/camera/zsl/com.xiaomi.zsl.sr.so;MAKE_COPY_RULE_ONLY
-odm/lib64/hw/displayfeature.default.so;MAKE_COPY_RULE_ONLY
-odm/lib64/hw/fingerprint.goodix_us2.so;MAKE_COPY_RULE_ONLY
-odm/lib64/libdisplaycount.so;MAKE_COPY_RULE_ONLY
-odm/lib64/libdisplaylog.so;MAKE_COPY_RULE_ONLY
-odm/lib64/libjc_keymint3.nxp.so;MAKE_COPY_RULE_ONLY
-odm/lib64/libjc_keymint_transport_nxp.so;MAKE_COPY_RULE_ONLY
-odm/lib64/libkeymint_empty-nxp.so;MAKE_COPY_RULE_ONLY
-odm/lib64/libkeymint_empty-thales.so;MAKE_COPY_RULE_ONLY
-odm/lib64/vendor.hardware.vibratorCL.impl.so;MAKE_COPY_RULE_ONLY
-odm/lib64/vendor.novatek.hardware.visdisplaysrv-V1-ndk.so;MAKE_COPY_RULE_ONLY
-odm/lib64/vendor.xiaomi.hardware.seaaudio-V1-ndk.so;MAKE_COPY_RULE_ONLY
+# odm/etc/vintf/manifest/vendor.xiaomi.hardware.idmanager.xml
+# odm/etc/vintf/manifest/vendor.xiaomi.hardware.mediaeventgatherservice.xml
+# odm/etc/vintf/manifest/vendor.xiaomi.hardware.mikeybag.xml
+# odm/etc/vintf/manifest/vendor.xiaomi.hardware.mitrustedui.xml
+# odm/etc/vintf/manifest/vendor.xiaomi.hardware.seaaudio.xml
+# odm/etc/vintf/manifest/vendor.xiaomi.hardware.vibratorfeature.service.xml
+# odm/etc/vintf/manifest/vendor.xiaomi.hw.touchfeature-service.xml
+# odm/etc/vintf/manifest/vendor.xiaomi.sensor.citsensorservice.aidl.xml
+# odm/lib64/camera/com.qti.actuator.myron_aac_ovx9500_ak7316_wide_ii_actuator.so
+# odm/lib64/camera/com.qti.actuator.myron_aac_s5kjn5_ak7316_tele_ii_actuator.so
+# odm/lib64/camera/com.qti.actuator.myron_semco_s5kjn5_ak7316_tele_i_actuator.so
+# odm/lib64/camera/com.qti.actuator.myron_sunny_ovx9500_ak7316_wide_i_actuator.so
+# odm/lib64/camera/com.qti.eeprom.myron_aac_ov50m_p24u64b_ultra_i_eeprom.so
+# odm/lib64/camera/com.qti.eeprom.myron_aac_ovx9500_p24u128b_wide_ii_eeprom.so
+# odm/lib64/camera/com.qti.eeprom.myron_aac_s5kjn5_p24u128b_tele_ii_eeprom.so
+# odm/lib64/camera/com.qti.eeprom.myron_ofilm_ov32d40_p24u64b_front_i_eeprom.so
+# odm/lib64/camera/com.qti.eeprom.myron_semco_s5kjn5_p24u128b_tele_i_eeprom.so
+# odm/lib64/camera/com.qti.eeprom.myron_sunny_ovx9500_p24u128b_wide_i_eeprom.so
+# odm/lib64/camera/com.qti.sensor.myron_aac_ov50m_ultra_i.so
+# odm/lib64/camera/com.qti.sensor.myron_aac_ovx9500_wide_ii.so
+# odm/lib64/camera/com.qti.sensor.myron_aac_s5kjn5_tele_ii.so
+# odm/lib64/camera/com.qti.sensor.myron_ofilm_ov32d40_front_i.so
+# odm/lib64/camera/com.qti.sensor.myron_semco_s5kjn5_tele_i.so
+# odm/lib64/camera/com.qti.sensor.myron_sunny_ovx9500_wide_i.so
+# odm/lib64/camera/components/com.mi.node.videonight.so
+# odm/lib64/camera/components/com.qti.node.ldc.so
+# Deferred for first userspace build: Xiaomi camera component support stack incomplete
+# odm/lib64/camera/components/com.xiaomi.node.alpha_blending.so
+# odm/lib64/camera/components/com.xiaomi.stats.aec.so
+# odm/lib64/camera/components/com.xiaomi.stats.af.so
+# odm/lib64/camera/components/com.xiaomi.stats.awb.so
+# odm/lib64/camera/components/com.xiaomi.stats.pdlib.so
+# Deferred for first userspace build: missing mituning/OpenCL libc++ vendor module graph
+# odm/lib64/camera/components/libawbcore.so
+# odm/lib64/camera/components/libmiaec.so
+# odm/lib64/camera/components/libstats.afalgo.so
+# odm/lib64/camera/components/libstats.aipdlib.so
+# odm/lib64/camera/components/libstats.pdlib.so
+# odm/lib64/camera/dynamicplugins/com.xiaomi.plugin.GestureEffects.so
+# odm/lib64/camera/dynamicplugins/com.xiaomi.plugin.arcsoftAP.so
+# odm/lib64/camera/dynamicplugins/com.xiaomi.plugin.arcsoftPT.so
+# odm/lib64/camera/dynamicplugins/com.xiaomi.plugin.arcsoftSSSH.so
+# odm/lib64/camera/dynamicplugins/com.xiaomi.plugin.capbokeh.so
+# odm/lib64/camera/dynamicplugins/com.xiaomi.plugin.capdepth.so
+# odm/lib64/camera/dynamicplugins/com.xiaomi.plugin.capdepthrefine.so
+# odm/lib64/camera/dynamicplugins/com.xiaomi.plugin.frontbokeh.so
+# odm/lib64/camera/dynamicplugins/com.xiaomi.plugin.ldc.so
+# odm/lib64/camera/dynamicplugins/com.xiaomi.plugin.mialgoallinone.so
+# odm/lib64/camera/dynamicplugins/com.xiaomi.plugin.midualcamallinone.so
+# odm/lib64/camera/dynamicplugins/com.xiaomi.plugin.misrdehaze.so
+# odm/lib64/camera/dynamicplugins/com.xiaomi.plugin.sdsr.so
+# odm/lib64/camera/libchxlogicalcameratable.so
+# odm/lib64/camera/plugins/com.xiaomi.plugin.anchor.so
+# odm/lib64/camera/plugins/com.xiaomi.plugin.arcbeautydeformation.so
+# odm/lib64/camera/plugins/com.xiaomi.plugin.arcskinbeautifier.so
+# odm/lib64/camera/plugins/com.xiaomi.plugin.arcskinbeautifierpreview.so
+# odm/lib64/camera/plugins/com.xiaomi.plugin.arcsoftvideobokeh.so
+# odm/lib64/camera/plugins/com.xiaomi.plugin.depurple.so
+# odm/lib64/camera/plugins/com.xiaomi.plugin.dsac.so
+# odm/lib64/camera/plugins/com.xiaomi.plugin.ecdsnapshotdet.so
+# odm/lib64/camera/plugins/com.xiaomi.plugin.edof.so
+# odm/lib64/camera/plugins/com.xiaomi.plugin.filter.so
+# odm/lib64/camera/plugins/com.xiaomi.plugin.fusion.so
+# odm/lib64/camera/plugins/com.xiaomi.plugin.gainmap.so
+# odm/lib64/camera/plugins/com.xiaomi.plugin.gainmapPostProc.so
+# odm/lib64/camera/plugins/com.xiaomi.plugin.gpu.so
+# odm/lib64/camera/plugins/com.xiaomi.plugin.heifedit.so
+# odm/lib64/camera/plugins/com.xiaomi.plugin.jpegrAggr.so
+# odm/lib64/camera/plugins/com.xiaomi.plugin.losslessjpeg.so
+# odm/lib64/camera/plugins/com.xiaomi.plugin.memcpyCustomization.so
+# odm/lib64/camera/plugins/com.xiaomi.plugin.mialgoanchor.so
+# odm/lib64/camera/plugins/com.xiaomi.plugin.mialgooptics.so
+# odm/lib64/camera/plugins/com.xiaomi.plugin.misv2.so
+# odm/lib64/camera/plugins/com.xiaomi.plugin.misv3.so
+# odm/lib64/camera/plugins/com.xiaomi.plugin.movieeffect.so
+# odm/lib64/camera/plugins/com.xiaomi.plugin.pack2unpack.so
+# odm/lib64/camera/plugins/com.xiaomi.plugin.pixman.so
+# odm/lib64/camera/plugins/com.xiaomi.plugin.portraitrepair.so
+# odm/lib64/camera/plugins/com.xiaomi.plugin.psmetasplit.so
+# odm/lib64/camera/plugins/com.xiaomi.plugin.remosaic.so
+# odm/lib64/camera/plugins/com.xiaomi.plugin.singlebokehpreview.so
+# odm/lib64/camera/plugins/com.xiaomi.plugin.spc.so
+# odm/lib64/camera/plugins/com.xiaomi.plugin.supermoon.so
+# odm/lib64/camera/plugins/com.xiaomi.plugin.swflip.so
+# odm/lib64/camera/plugins/com.xiaomi.plugin.swjpegencode.so
+# odm/lib64/camera/plugins/com.xiaomi.plugin.videofilter.so
+# odm/lib64/camera/plugins/com.xiaomi.plugin.watermark.so
+# odm/lib64/camera/plugins/com.xiaomi.plugin.yuv2Heic.so
+# odm/lib64/camera/plugins/com.xiaomi.plugin.yuvresize.so
+# odm/lib64/camera/preloadplugins/com.xiaomi.plugin.asd.so
+# odm/lib64/camera/preloadplugins/com.xiaomi.plugin.memcpy.so
+# odm/lib64/camera/preloadplugins/com.xiaomi.plugin.offcamb2y.so
+# odm/lib64/camera/preloadplugins/com.xiaomi.plugin.offcamformatconvertor.so
+# odm/lib64/camera/preloadplugins/com.xiaomi.plugin.offcamheic.so
+# odm/lib64/camera/preloadplugins/com.xiaomi.plugin.offcamjpeg.so
+# odm/lib64/camera/preloadplugins/com.xiaomi.plugin.offcammfnr.so
+# odm/lib64/camera/preloadplugins/com.xiaomi.plugin.offcammlawb.so
+# odm/lib64/camera/preloadplugins/com.xiaomi.plugin.offcamyuveis.so
+# odm/lib64/camera/preloadplugins/com.xiaomi.plugin.offcamyuvreprocess.so
+# odm/lib64/camera/preloadplugins/com.xiaomi.plugin.offcamyuvsplit.so
+# odm/lib64/camera/preloadplugins/com.xiaomi.plugin.offlineawbideal.so
+# odm/lib64/camera/preloadplugins/com.xiaomi.plugin.offlineb2y.so
+# odm/lib64/camera/preloadplugins/com.xiaomi.plugin.offlineehdr.so
+# odm/lib64/camera/preloadplugins/com.xiaomi.plugin.offlineformatconvertor.so
+# odm/lib64/camera/preloadplugins/com.xiaomi.plugin.offlinehdrraw2y.so
+# odm/lib64/camera/preloadplugins/com.xiaomi.plugin.offlineheic.so
+# odm/lib64/camera/preloadplugins/com.xiaomi.plugin.offlinei2y.so
+# odm/lib64/camera/preloadplugins/com.xiaomi.plugin.offlinejpeg.so
+# odm/lib64/camera/preloadplugins/com.xiaomi.plugin.offlinemfnr.so
+# odm/lib64/camera/preloadplugins/com.xiaomi.plugin.offlinemlawb.so
+# odm/lib64/camera/preloadplugins/com.xiaomi.plugin.offlinetintless.so
+# odm/lib64/camera/preloadplugins/com.xiaomi.plugin.offlinetintlesshdr.so
+# odm/lib64/camera/preloadplugins/com.xiaomi.plugin.offlineyuveis.so
+# odm/lib64/camera/preloadplugins/com.xiaomi.plugin.offlineyuvreprocess.so
+# odm/lib64/camera/preloadplugins/com.xiaomi.plugin.offlineyuvsplit.so
+# odm/lib64/camera/preloadplugins/com.xiaomi.plugin.offlineyuvwarp.so
+# odm/lib64/camera/preloadplugins/com.xiaomi.plugin.previewldc.so
+# odm/lib64/camera/zsl/com.xiaomi.zsl.ainr.so
+# odm/lib64/camera/zsl/com.xiaomi.zsl.bokehsmartae.so
+# odm/lib64/camera/zsl/com.xiaomi.zsl.default.so
+# odm/lib64/camera/zsl/com.xiaomi.zsl.ecd.so
+# odm/lib64/camera/zsl/com.xiaomi.zsl.ell.so
+# odm/lib64/camera/zsl/com.xiaomi.zsl.fusion.so
+# odm/lib64/camera/zsl/com.xiaomi.zsl.hdr.so
+# odm/lib64/camera/zsl/com.xiaomi.zsl.leica.so
+# odm/lib64/camera/zsl/com.xiaomi.zsl.mfnr.so
+# odm/lib64/camera/zsl/com.xiaomi.zsl.nightmotion.so
+# odm/lib64/camera/zsl/com.xiaomi.zsl.single.so
+# odm/lib64/camera/zsl/com.xiaomi.zsl.sr.so
+# odm/lib64/hw/displayfeature.default.so
+# Deferred for first userspace build: fingerprint userspace HAL stack incomplete
+# odm/lib64/hw/fingerprint.goodix_us2.so
+odm/lib64/libdisplaycount.so
+odm/lib64/libdisplaylog.so
+# odm/lib64/libjc_keymint3.nxp.so
+# odm/lib64/libjc_keymint_transport_nxp.so
+odm/lib64/libkeymint_empty-nxp.so
+odm/lib64/libkeymint_empty-thales.so
+# odm/lib64/vendor.hardware.vibratorCL.impl.so
+odm/lib64/vendor.novatek.hardware.visdisplaysrv-V1-ndk.so
+odm/lib64/vendor.xiaomi.hardware.seaaudio-V1-ndk.so
 # vendor/apex/ (Conflicting with system apex)
 # vendor/apex/com.android.hardware.cas.apex
 # vendor/apex/com.google.android.widevine.nonupdatable.apex
@@ -360,6 +373,8 @@ odm/lib64/vendor.xiaomi.hardware.seaaudio-V1-ndk.so;MAKE_COPY_RULE_ONLY
 # vendor/lib64/libbinder.so (AOSP core - Source-built)
 # vendor/lib64/libc++.so (AOSP core - Source-built)
 # AOSP Core Libs (Source-built preferred)
+vendor/lib64/libdolbyottcameracontrol.so
+vendor/lib64/libsensorndkbridge.so
 # vendor/lib64/libcrypto.so;MAKE_COPY_RULE_ONLY
 # vendor/lib64/libprotobuf-cpp-full-21.12.so;MAKE_COPY_RULE_ONLY
 # vendor/lib64/libprotobuf-cpp-lite-21.12.so;MAKE_COPY_RULE_ONLY

@@ -21,6 +21,8 @@ $(call inherit-product-if-exists, vendor/xiaomi/myron/myron-symlinks.mk)
 # A/B
 $(call inherit-product, $(SRC_TARGET_DIR)/product/virtual_ab_ota.mk)
 PRODUCT_PACKAGES += \
+    android.hardware.weaver-service.nxp \
+    android.hardware.security.keymint3-service.strongbox.nxp \
     checkpoint_gc \
     otapreopt_script \
     update_engine \

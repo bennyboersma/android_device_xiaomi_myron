@@ -26,9 +26,13 @@ need_cmd() {
 need_cmd fastboot
 need_cmd awk
 
+has_fastboot_device() {
+  fastboot devices | awk 'NF {print $1}' | grep -q .
+}
+
 wait_for_fastboot() {
   local tries=0
-  until fastboot devices | awk 'NF {print $1}' | grep -q .; do
+  until has_fastboot_device; do
     tries=$((tries + 1))
     if [[ ${tries} -ge 30 ]]; then
       echo "Timed out waiting for fastboot" >&2
@@ -53,7 +57,7 @@ wait_for_fastbootd() {
 }
 
 enter_fastbootd() {
-  if fastboot getvar is-userspace 2>&1 | grep -q 'yes'; then
+  if has_fastboot_device && fastboot getvar is-userspace 2>&1 | grep -q 'yes'; then
     return 0
   fi
 
@@ -64,7 +68,7 @@ enter_fastbootd() {
     return 0
   fi
 
-  if fastboot devices | awk 'NF {print $1}' | grep -q .; then
+  if has_fastboot_device; then
     fastboot reboot fastboot >/dev/null 2>&1 || true
     wait_for_fastboot
     wait_for_fastbootd
@@ -123,7 +127,7 @@ else
   [[ "${FLASH_SYSTEM_DLKM}" == "0" ]] || flash_cmds+=("fastboot flash system_dlkm_${slot} ${OUT_DIR}/system_dlkm.img")
 fi
 if [[ "${FLASH_VBMETA_SYSTEM}" == "1" ]]; then
-  flash_cmds+=("fastboot flash vbmeta_system_ab ${OUT_DIR}/vbmeta_system.img")
+  flash_cmds+=("fastboot flash vbmeta_system_${slot} ${OUT_DIR}/vbmeta_system.img")
 fi
 
 echo "target_product=${product}"

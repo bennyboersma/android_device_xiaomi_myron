@@ -7,8 +7,8 @@ Prove that persistent flashing of the smallest possible boot chain behaves like 
 This stage produced the key install-path insight:
 
 - custom persistent `boot.img` is not the preferred path for this device in the current phase
-- stock `boot` plus mutable `init_boot` is the correct intermediate strategy
-- `vendor_boot` remains stock during the first userspace phase unless a later blocker proves otherwise
+- stock `boot`, stock `vendor_boot`, and stock `init_boot` are the current safe baseline for the first userspace phase
+- mutable `init_boot` is deferred until the generated ramdisk regression is understood
 
 ## Current status (2026-03-08)
 - One combined flash of `boot/init_boot/vendor_boot` on slot `_b` was attempted.
@@ -72,7 +72,7 @@ Accept only if all are true:
 - no new boot-critical AVC class
 
 Current result for the first `init_boot`-only test:
-- PASS for persistent boot-chain equivalence on `stock boot + stock vendor_boot + custom init_boot`
+- historical PASS existed for `stock boot + stock vendor_boot + custom init_boot`, but that path is no longer treated as safe after the latest generated `init_boot` regression
 - known residual miss unchanged: `android.hardware.nfc.INfc/default`
 
 Do not escalate this runbook back to `boot + init_boot + vendor_boot` by default.

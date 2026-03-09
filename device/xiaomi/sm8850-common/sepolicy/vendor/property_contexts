@@ -17,7 +17,6 @@ persist.vendor.rcs. u:object_r:vendor_persist_rcs_prop:s0
 
 # DPM
 persist.vendor.dpm. u:object_r:vendor_persist_dpm_prop:s0
-persist.dpm.feature u:object_r:vendor_persist_dpm_prop:s0
 persist.vendor.tcmd. u:object_r:vendor_persist_tcm_prop:s0
 vendor.perf.workloadclassifier.enable u:object_r:vendor_wlc_prop:s0
 persist.vendor.build.date.utc u:object_r:vendor_wlc_prop:s0

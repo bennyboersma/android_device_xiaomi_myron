@@ -1,0 +1,14 @@
+# kind relative_output_path
+init vendor/etc/init/android.hardware.health-service.qti.rc
+bin vendor/bin/hw/android.hardware.health-service.qti
+vintf vendor/etc/vintf/manifest/android.hardware.health-service.qti.xml
+init vendor/etc/init/android.hardware.wifi-service.rc
+bin vendor/bin/hw/android.hardware.wifi-service
+vintf vendor/etc/vintf/manifest/android.hardware.wifi-service.xml
+init vendor/etc/init/vendor.qti.hardware.display.composer-service.rc
+bin vendor/bin/hw/vendor.qti.hardware.display.composer-service
+vintf vendor/etc/vintf/manifest/vendor.qti.hardware.display.composer-service.xml
+init vendor/etc/init/vendor.qti.hardware.display.allocator-service.rc
+bin vendor/bin/hw/vendor.qti.hardware.display.allocator-service
+vintf vendor/etc/vintf/manifest/vendor.qti.hardware.display.allocator-service.xml
+bin vendor/bin/qseecomd

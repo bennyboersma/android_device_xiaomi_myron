@@ -67,6 +67,7 @@ status=0
 check_file_churn "$TREE_DIR/device/xiaomi/myron" "proprietary-files.txt" || status=1
 check_file_churn "$TREE_DIR/device/xiaomi/sm8850-common" "proprietary-files.txt" || status=1
 bash "$SCRIPT_DIR/check_blob_overlap.sh" "$TREE_DIR" || status=1
+bash "$SCRIPT_DIR/check_copyfile_blob_collisions.sh" "$TREE_DIR" || status=1
 
 if (( status != 0 )); then
   echo "[policy] FAIL (set ALLOW_BROAD_BLOB_EDITS=1 only for intentional wide edits)"

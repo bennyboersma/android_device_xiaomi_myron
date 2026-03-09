@@ -56,5 +56,5 @@ In order:
 
 - stock `boot`
 - stock `vendor_boot`
-- custom `init_boot`
-- temporary boot and persistent `init_boot` path already proven on hardware
+- stock `init_boot`
+- recovered stock userspace on slot `a`

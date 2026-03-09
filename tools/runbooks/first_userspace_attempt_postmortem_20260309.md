@@ -1,0 +1,174 @@
+# Myron First Userspace Attempt Postmortem (2026-03-09)
+
+## Outcome
+
+The first split-image userspace flash reached `fastbootd`, flashed all intended logical partitions on slot `b`, and rebooted, but the device bootlooped before `adb` came up. The attempt is therefore classified as:
+
+- userspace flash transport: PASS
+- first custom userspace boot: FAIL
+- immediate verdict: ROLLBACK
+
+## What was flashed
+
+Flashed successfully on slot `b`:
+
+- `system_b`
+- `system_ext_b`
+- `product_b`
+- `vendor_b`
+- `odm_b`
+- `vendor_dlkm_b`
+- `system_dlkm_b`
+
+Not flashed:
+
+- `boot`
+- `vendor_boot`
+- `init_boot`
+- top-level `vbmeta`
+
+## Recovery that was required
+
+The device did not recover from a simple reboot. Recovery required:
+
+1. stock `super`
+2. stock `vbmeta_system_b`
+3. stock slot-`b` boot-chain restore
+   - `boot_b`
+   - `init_boot_b`
+   - `vendor_boot_b`
+   - `vbmeta_b`
+   - `dtbo_b`
+4. stock slot-`a` verification/boot-chain alignment
+   - `boot_a`
+   - `init_boot_a`
+   - `vendor_boot_a`
+   - `vbmeta_a`
+   - `dtbo_a`
+   - `vbmeta_system_a`
+5. `fastboot set_active a`
+
+Recovered state:
+
+- Android boots
+- `sys.boot_completed=1`
+- build `OS3.0.7.0.WPMEUXM`
+- active slot `_a`
+- `ro.boot.bootreason=reboot,fastboot`
+
+## Concrete blockers before any retry
+
+### 1. Userspace boot blocker is real and early
+
+- The custom userspace set does not reach `adb`.
+- No first-userspace capture/verdict bundle was produced from the flashed state.
+- The next iteration must produce earlier evidence, or it will remain guesswork.
+
+Required fix before retry:
+
+- add an early failure capture path for the next userspace attempt:
+  - immediate `fastboot getvar current-slot`
+  - `fastboot getvar is-userspace`
+  - `adb wait-for-device` timeout handling
+  - automatic branch to `fastboot`/`recovery` detection when `adb` never appears
+
+### 2. Current generated `init_boot` remains unsafe
+
+- Earlier on the same date, generated `out/target/product/myron/init_boot.img` caused a persistent boot regression.
+- `device/xiaomi/myron/prebuilt/init_boot.img` is byte-identical to stock.
+- First userspace retries must continue to use stock `init_boot`.
+
+Required fix before retry:
+
+- keep `MYRON_USE_PREBUILT_INIT_BOOT_IMAGE := true`
+- do not reintroduce generated `init_boot` into the userspace test path
+
+### 3. Rollback tooling had two defects
+
+- `tools/run_userspace_rollback.sh` was invoked incorrectly in practice and could not recover the phone as-is.
+- `tools/rollback_userspace_images.sh` assumed `vbmeta_system_ab`, but the device actually exposes:
+  - `vbmeta_system_a`
+  - `vbmeta_system_b`
+
+Required fix before retry:
+
+- rollback helper must use `vbmeta_system_${slot}`
+- rollback wrapper must be verified in a full dry-run against the current device
+
+### 4. Slot health became inconsistent during recovery
+
+Observed metadata before final recovery:
+
+- slot `b`: `slot-unbootable:yes`, `slot-successful:no`
+- slot `a`: `slot-successful:yes`
+
+Required fix before retry:
+
+- record slot metadata before flash and after failure
+- if testing on slot `b`, make the rollback plan explicitly restore and, if needed, reactivate the known-good slot
+
+### 5. The current userspace set is not yet safe to reflash unchanged
+
+The build artifacts passed host-side readiness and partition sanity, but runtime boot still failed. That means the next blocker is inside the flashed userspace content, not image transport.
+
+High-probability next investigation areas:
+
+1. `vendor`/`odm` bring-up regressions on the reduced first-boot graph
+2. critical service ownership or init sequencing after deferring Xiaomi-private stacks
+3. trust/storage path regressions that occur before `adb`
+4. missing must-have vendor runtime pieces that were over-pruned for first boot
+
+
+## First concrete boot-critical findings after recovery
+
+Stock-vs-built comparison on the recovered device and remote output tree narrows the next likely blocker set.
+
+Confirmed present in the built output:
+- NXP keymint strongbox service and manifest are present in `vendor/`, not `odm/`
+- NXP weaver service and manifest are present in `vendor/`, not `odm/`
+- NFC NXP service and manifest remain present
+- camera provider init rc remains present
+- power-service init rc remains present
+
+Confirmed missing from the built output as currently staged:
+- `vendor/etc/init/android.hardware.gatekeeper-service-qti.rc`
+- `vendor/etc/init/android.hardware.health-service.qti.rc`
+- `vendor/etc/init/android.hardware.wifi-service.rc`
+- `vendor/etc/init/vendor.qti.hardware.display.composer-service.rc`
+- `vendor/etc/init/vendor.qti.hardware.display.allocator-service.rc`
+- `vendor/etc/init/vendor.qti.hardware.display.color-service.rc`
+- `vendor/etc/init/qseecomd.rc`
+- `vendor/etc/init/vendor.qti.hardware.secureprocessor.rc`
+- matching VINTF fragments for those same families are also missing from the built output
+
+Interpretation:
+- keymint/weaver were a path-ownership mismatch in the comparison and are not the leading retry blocker
+- the next likely retry blocker is the missing vendor service-ownership cluster around gatekeeper, health, wifi, display, qseecomd, and secureprocessor
+- that cluster is more likely to explain an early userspace boot failure before `adb` than the already-deferred Xiaomi extension services
+
+Hard retry gate added:
+- `tools/check_retry_boot_critical_vendor_stack.sh` must pass before any second userspace attempt
+- current measured result on the staged output: `FAIL missing_boot_critical_vendor_outputs=13`
+
+## Recommended next debugging path
+
+1. Do not reflash immediately.
+2. Freeze current recovery-safe baseline:
+   - slot `a`
+   - stock userspace
+   - stock boot chain
+3. Add early-failure automation to the userspace attempt wrapper.
+4. Compare the flashed userspace set against stock partition contents for boot-critical services:
+   - init rc ownership
+   - VINTF fragments
+   - keymint/gatekeeper/TEE stack
+   - decryption/vold/fscrypt path
+   - display startup path
+5. Only after that, attempt a second userspace flash, ideally on the non-current slot with explicit slot-state checkpoints.
+
+
+## Naming correction from narrow module checks
+
+- `android.hardware.gatekeeper-service-qti` is not a valid build target name in this tree.
+- Stock ships the vendor init rc `android.hardware.gatekeeper-service-qti.rc`, but that rc launches `android.hardware.gatekeeper-rust-service-qti`.
+- Future retry analysis must distinguish stock rc filenames from actual source module names before treating a service as missing from source.

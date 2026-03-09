@@ -1,7 +1,7 @@
 # Myron Full Userspace Validation
 
 ## Goal
-Move from the proven `stock boot + stock vendor_boot + custom init_boot` path to the first custom userspace test with the smallest reasonable flash scope.
+Move from the proven fully stock boot-chain path to the first custom userspace test with the smallest reasonable flash scope.
 
 Fastest staged entrypoint:
 
@@ -10,12 +10,13 @@ DRY_RUN=1 bash tools/run_first_userspace_attempt.sh ~/android/lineage myron
 ```
 
 ## Current status
-- This is the active next-step runbook.
-- The safe baseline before this run is:
+- This runbook is temporarily blocked pending userspace bootloop root-cause fixes.
+- The current safe baseline before any retry is:
   - stock `boot`
   - stock `vendor_boot`
-  - custom `init_boot`
+  - stock `init_boot`
 - Do not use this runbook until `tools/check_userspace_flash_readiness.sh` passes.
+- Do not use this runbook until `tools/check_retry_boot_critical_vendor_stack.sh` passes.
 - `vendor_sepolicy.cil.raw` already passes on the remote host.
 - The active host-side work is the resumed full userspace image build and its next real compile, packaging, or image-generation blocker.
 
@@ -24,7 +25,7 @@ DRY_RUN=1 bash tools/run_first_userspace_attempt.sh ~/android/lineage myron
 - Phone currently boots on the stable path:
   - stock `boot`
   - stock `vendor_boot`
-  - custom `init_boot`
+  - stock `init_boot`
 - `bash tools/preflight_myron.sh` passes.
 - Full image artifacts exist under `out/target/product/myron/`.
 - Stock rollback userspace assets are staged:
@@ -44,6 +45,7 @@ Preferred first userspace test flashes only the logical partitions for the curre
 
 Do not change `boot` in this stage.
 Do not change `vendor_boot` in this stage.
+Do not change `init_boot` in this stage.
 Do not change firmware partitions.
 Do not change `vbmeta` unless the first userspace boot shows an explicit vbmeta-system verification blocker.
 
@@ -53,6 +55,7 @@ First verify the full userspace artifacts and rollback assets are present:
 ```bash
 CHECK_ROLLBACK=1 REQUIRE_DEVICE=0 \
   bash tools/check_userspace_flash_readiness.sh ~/android/lineage myron
+bash tools/check_retry_boot_critical_vendor_stack.sh ~/android/lineage myron
 bash tools/check_partition_package_sanity.sh ~/android/lineage myron
 bash tools/audit_userspace_outputs.sh ~/android/lineage myron
 ```
@@ -68,8 +71,8 @@ DRY_RUN=1 REBOOT_TO_FASTBOOTD=1 USE_SUPER=0 FLASH_VBMETA_SYSTEM=0 \
 
 Why this is the right next step:
 - temporary boot already proved early boot viability
-- `init_boot`-only persistent boot already proved the safe mutable boot-chain partition
-- the next unknown is custom userspace behavior, not top-level boot trust
+- the current generated `init_boot` regressed and stock `init_boot` restore recovered the device
+- the next unknown is custom userspace behavior on the recovered stock boot chain, not top-level boot trust
 
 Equivalent one-command wrapper:
 
@@ -121,7 +124,7 @@ Accept the first custom userspace test only if all are true:
 - `sys.boot_completed` remains `1` after dwell
 - stable `adb`
 - no catastrophic crash loop in `init`, `system_server`, `vendor_init`, `vold`, `surfaceflinger`, `audioserver`, `tee`, or `qseecomd`
-- no major service-surface regression versus the stable `stock boot + stock vendor_boot + custom init_boot` baseline
+- no major service-surface regression versus the stable fully stock boot-chain baseline
 - no unexpected slot switch
 
 ## 5) Immediate rollback trigger
@@ -150,3 +153,16 @@ STOCK_SUPER_IMG=/path/to/stock/super.img \
 STOCK_VBMETA_SYSTEM_IMG=/path/to/stock/vbmeta_system.img \
 DRY_RUN=0 bash tools/rollback_userspace_images.sh myron
 ```
+
+## Current blocker note
+
+
+Current highest-confidence retry blockers after stock-vs-built comparison:
+- missing built vendor service ownership for gatekeeper, health, wifi, display (composer/allocator/color), qseecomd, and secureprocessor
+- these services exist in source but are not present in the currently staged built userspace output
+- keymint/weaver are present in the built output under `vendor/` and are no longer the leading blocker in this phase
+- the hard pre-retry gate for this class is `tools/check_retry_boot_critical_vendor_stack.sh`
+
+- The first split-image userspace flash on slot `b` completed successfully but the device bootlooped before `adb` ever appeared.
+- Recovery required restoring stock userspace plus slot-specific stock boot-chain and verification images and finally switching back to slot `a`.
+- Do not re-run this userspace flash path until the blocker list in `tools/runbooks/first_userspace_attempt_postmortem_20260309.md` is addressed.

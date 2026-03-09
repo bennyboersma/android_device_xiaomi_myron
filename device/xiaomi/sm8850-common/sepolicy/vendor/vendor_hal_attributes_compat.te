@@ -564,62 +564,12 @@ expandattribute vendor_wifidisplayhalservice_client true;
 attribute vendor_wifidisplayhalservice_server;
 expandattribute vendor_wifidisplayhalservice_server false;
 
-neverallow { vendor_hal_alarm_qti_server -halserverdomain } domain:process fork;
-neverallow { vendor_hal_atfwd_server -halserverdomain } domain:process fork;
-neverallow { vendor_hal_c2pa_server -halserverdomain } domain:process fork;
-neverallow { vendor_hal_cacert_qti_server -halserverdomain } domain:process fork;
-neverallow { vendor_hal_capabilityconfigstore_qti_server -halserverdomain } domain:process fork;
-neverallow { vendor_hal_datafactory_qti_server -halserverdomain } domain:process fork;
-neverallow { vendor_hal_dcservice_qti_server -halserverdomain } domain:process fork;
-neverallow { vendor_hal_display_aiqe_server -halserverdomain } domain:process fork;
-neverallow { vendor_hal_display_color_server -halserverdomain } domain:process fork;
-neverallow { vendor_hal_dspmanager_server -halserverdomain } domain:process fork;
-neverallow { vendor_hal_embmssl_server -halserverdomain } domain:process fork;
-neverallow { vendor_hal_imsfactory_server -halserverdomain } domain:process fork;
-neverallow { vendor_hal_imsrtphal_server -halserverdomain } domain:process fork;
-neverallow { vendor_hal_limits_server -halserverdomain } domain:process fork;
-neverallow { vendor_hal_mstatservice_qti_server -halserverdomain } domain:process fork;
-neverallow { vendor_hal_qdutils_disp_server -halserverdomain } domain:process fork;
-neverallow { vendor_hal_trustedui_server -halserverdomain } domain:process fork;
-neverallow { vendor_hal_iwlanservice_qti_server -halserverdomain } domain:process fork;
-
-build_test_only(`
-neverallow { vendor_hal_alarm_qti_server -vendor_hal_alarm_qti } domain:process fork;
-neverallow { vendor_hal_alarm_qti_client -halclientdomain } domain:process fork;
-neverallow { vendor_hal_atfwd_server -vendor_hal_atfwd } domain:process fork;
-neverallow { vendor_hal_atfwd_client -halclientdomain } domain:process fork;
-neverallow { vendor_hal_c2pa_server -vendor_hal_c2pa } domain:process fork;
-neverallow { vendor_hal_c2pa_client -halclientdomain } domain:process fork;
-neverallow { vendor_hal_cacert_qti_server -vendor_hal_cacert_qti } domain:process fork;
-neverallow { vendor_hal_cacert_qti_client -halclientdomain } domain:process fork;
-neverallow { vendor_hal_capabilityconfigstore_qti_server -vendor_hal_capabilityconfigstore_qti } domain:process fork;
-neverallow { vendor_hal_capabilityconfigstore_qti_client -halclientdomain } domain:process fork;
-neverallow { vendor_hal_datafactory_qti_server -vendor_hal_datafactory_qti } domain:process fork;
-neverallow { vendor_hal_datafactory_qti_client -halclientdomain } domain:process fork;
-neverallow { vendor_hal_dcservice_qti_server -vendor_hal_dcservice_qti } domain:process fork;
-neverallow { vendor_hal_dcservice_qti_client -halclientdomain } domain:process fork;
-neverallow { vendor_hal_display_aiqe_server -vendor_hal_display_aiqe } domain:process fork;
-neverallow { vendor_hal_display_aiqe_client -halclientdomain } domain:process fork;
-neverallow { vendor_hal_display_color_server -vendor_hal_display_color } domain:process fork;
-neverallow { vendor_hal_display_color_client -halclientdomain } domain:process fork;
-neverallow { vendor_hal_dspmanager_server -vendor_hal_dspmanager } domain:process fork;
-neverallow { vendor_hal_dspmanager_client -halclientdomain } domain:process fork;
-neverallow { vendor_hal_embmssl_server -vendor_hal_embmssl } domain:process fork;
-neverallow { vendor_hal_embmssl_client -halclientdomain } domain:process fork;
-neverallow { vendor_hal_imsfactory_server -vendor_hal_imsfactory } domain:process fork;
-neverallow { vendor_hal_imsfactory_client -halclientdomain } domain:process fork;
-neverallow { vendor_hal_imsrtphal_server -vendor_hal_imsrtphal } domain:process fork;
-neverallow { vendor_hal_imsrtphal_client -halclientdomain } domain:process fork;
-neverallow { vendor_hal_limits_server -vendor_hal_limits } domain:process fork;
-neverallow { vendor_hal_limits_client -halclientdomain } domain:process fork;
-neverallow { vendor_hal_mstatservice_qti_server -vendor_hal_mstatservice_qti } domain:process fork;
-neverallow { vendor_hal_mstatservice_qti_client -halclientdomain } domain:process fork;
-neverallow { vendor_hal_qdutils_disp_server -vendor_hal_qdutils_disp } domain:process fork;
-neverallow { vendor_hal_qdutils_disp_client -halclientdomain } domain:process fork;
-neverallow { vendor_hal_trustedui_server -vendor_hal_trustedui } domain:process fork;
-neverallow { vendor_hal_trustedui_client -halclientdomain } domain:process fork;
-neverallow { vendor_hal_iwlanservice_qti_server -vendor_hal_iwlanservice_qti } domain:process fork;
-neverallow { vendor_hal_iwlanservice_qti_client -halclientdomain } domain:process fork;
-')
+#
+# This file is a compatibility shim for missing Qualcomm vendor HAL attribute
+# families while the tree still relies on fallback imported sepolicy sources.
+# Keep it limited to attribute declarations. The canonical neverallow policy for
+# these domains lives in the upstream Qualcomm policy sources that define the
+# real HAL macros, and copying those neverallows here breaks on the bypass-style
+# domains used by the fallback policy set.
 
 type vendor_hal_atfwd_hwservice, hwservice_manager_type, protected_hwservice;

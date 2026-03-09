@@ -124,6 +124,10 @@ PRODUCT_PACKAGES += \
     vendor.qti.hardware.display.allocator-service \
     vendor.qti.hardware.display.composer-service
 
+# First-userspace bring-up uses the Qualcomm NEO display path to compile out
+# AIQE kernel header dependencies that are not present in the current tree.
+SOONG_CONFIG_qtidisplay_neo := true
+
 # DRM
 PRODUCT_PACKAGES += \
     android.hardware.drm-service.clearkey

@@ -1,8 +1,21 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-TOP_DIR="${1:-$PWD}"
-PRODUCT="${2:-myron}"
+if [[ $# -eq 0 ]]; then
+  TOP_DIR="$PWD"
+  PRODUCT="myron"
+elif [[ $# -eq 1 ]]; then
+  if [[ -d "$1/tools" ]]; then
+    TOP_DIR="$1"
+    PRODUCT="myron"
+  else
+    TOP_DIR="$PWD"
+    PRODUCT="$1"
+  fi
+else
+  TOP_DIR="$1"
+  PRODUCT="$2"
+fi
 DRY_RUN="${DRY_RUN:-1}"
 FLASH_VBMETA_SYSTEM="${FLASH_VBMETA_SYSTEM:-1}"
 REBOOT_TO_FASTBOOTD="${REBOOT_TO_FASTBOOTD:-1}"
@@ -31,4 +44,3 @@ echo "Run these next:"
 echo "adb shell getprop sys.boot_completed"
 echo "adb shell getprop ro.build.display.id"
 echo "adb shell getprop ro.boot.slot_suffix"
-
