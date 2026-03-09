@@ -27,8 +27,9 @@ while read -r kind relpath; do
   [[ -n "${kind}" ]] || continue
   [[ "${kind}" =~ ^# ]] && continue
   path="${OUT_DIR}/${relpath}"
-  if [[ -e "${path}" ]]; then
-    printf '[ok:%s] %s\n' "${kind}" "${path}"
+  if compgen -G "${path}" >/dev/null; then
+    match="$(compgen -G "${path}" | head -n1)"
+    printf '[ok:%s] %s\n' "${kind}" "${match}"
   else
     printf '[missing:%s] %s\n' "${kind}" "${path}" >&2
     missing=$((missing + 1))

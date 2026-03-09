@@ -90,7 +90,8 @@ Current work is no longer “flash the first userspace build.” Current work is
 2. Fix rollback-tool defects discovered during the failed first attempt.
 3. Add earlier failure capture to the next userspace attempt path.
 4. Compare the flashed reduced userspace set against stock for early boot-critical regressions.
-5. Only then retry split-image userspace flashing.
+5. Make Gate 1 clean and Gate 2 pass before any retry flash.
+6. Only then retry split-image userspace flashing on slot `b`.
 
 ## Safe Boundaries
 
@@ -175,6 +176,12 @@ Current highest-confidence retry blockers after stock-vs-built comparison:
 - second userspace attempt is blocked until both:
   - `m nothing -j10` is clean on the retry-prep tree
   - `tools/check_retry_boot_critical_vendor_stack.sh` passes on rebuilt outputs
+- retry-prep policy is now codified in:
+  - `tools/retry_prep_keep_modules.txt`
+  - `tools/retry_prep_drop_modules.txt`
+  - `tools/retry_prep_drop_prefixes.txt`
+  - `tools/run_retry_prep_gate1.sh`
+  - `tools/run_retry_prep_gate2.sh`
 - last measured retry gate result on the staged output before current retry-prep changes: `missing_boot_critical_vendor_outputs=13`
 
 1. Early userspace boot blocker before `adb`
@@ -185,6 +192,35 @@ Current highest-confidence retry blockers after stock-vs-built comparison:
 
 Current state:
 1. Phone remains on the recovered stock-safe baseline and is not being touched.
-2. Host-side retry prep is still blocked on generated vendor prebuilt collisions in `vendor/xiaomi/myron/Android.bp`.
-3. An automated `m nothing` cleanup loop is active on the remote host, removing exact stale prebuilt collisions and re-running until the blocker class changes or `m nothing` passes.
-4. The remote full display tree is patched so `qtidisplay_neo` is enabled for `kaanapali`, which is the queued display-side fix once the Soong graph is clean.
+2. Host-side retry prep Gate 1 (`m nothing -j10`) passes successfully using an aggressive keep/drop list.
+3. Gate 2 no longer fails for the original 13-path cluster; it is now narrowed to display plus `qseecomd`.
+4. The display stack was silently excluded because the Qualcomm display config did not recognize Android 16 (`Baklava`) and defaulted to the stub/headless path.
+5. The remote `kaanapali` display tree is now patched for:
+   - Android 16 (`Baklava`) `composer_version := v3_3`
+   - `neo` Soong export into the display HAL
+   - commonsys display header namespace selection
+   - kaanapali gralloc handle flags (`reserved_size`, `custom_content_md_reserved_size`, `ubwcp_format`)
+6. `qseecomd` is restored as a source-owned prebuilt and can now be installed into `vendor/bin/qseecomd` on the remote output tree.
+7. Current remaining retry-prep work is inside the Qualcomm display stack:
+   - `drm_panel_feature_mgr.cpp` needed a `neo` compatibility shim for missing DRM blob types
+   - display-side `libvmmem` had to be rebound from an empty CAF placeholder to the restored proprietary prebuilt
+   - the local Gate 2 checker now accepts versioned composer VINTF filenames such as `vendor.qti.hardware.display.composer-service3_v3.xml`
+
+## Latest Retry-Prep Status
+
+As of the latest remote session on `john@192.168.200.33`:
+
+- Gate 1: PASS
+- Gate 2: improved substantially, but not fully green yet
+- `qseecomd` path:
+  - prebuilt ownership is fixed
+  - direct final install to `vendor/bin/qseecomd` works when the build is invoked with an absolute `OUT_DIR`
+- display path:
+  - namespace and gralloc-shape blockers are fixed
+  - current failures are later Qualcomm display link/build issues, not the original missing-module problem
+
+Next remote step:
+- finish the `libvmmem`-backed display link path
+- rebuild `vendor.qti.hardware.display.composer-service`
+- rebuild `vendor.qti.hardware.display.allocator-service`
+- rerun `tools/run_retry_prep_gate2.sh`

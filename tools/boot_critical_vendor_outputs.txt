@@ -7,7 +7,7 @@ bin vendor/bin/hw/android.hardware.wifi-service
 vintf vendor/etc/vintf/manifest/android.hardware.wifi-service.xml
 init vendor/etc/init/vendor.qti.hardware.display.composer-service.rc
 bin vendor/bin/hw/vendor.qti.hardware.display.composer-service
-vintf vendor/etc/vintf/manifest/vendor.qti.hardware.display.composer-service.xml
+vintf vendor/etc/vintf/manifest/vendor.qti.hardware.display.composer-service*.xml
 init vendor/etc/init/vendor.qti.hardware.display.allocator-service.rc
 bin vendor/bin/hw/vendor.qti.hardware.display.allocator-service
 vintf vendor/etc/vintf/manifest/vendor.qti.hardware.display.allocator-service.xml

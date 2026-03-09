@@ -150,6 +150,12 @@ Hard retry gate added:
 - `tools/check_retry_boot_critical_vendor_stack.sh` must pass before any second userspace attempt
 - current measured result on the staged output: `FAIL missing_boot_critical_vendor_outputs=13`
 
+Follow-up progress after this postmortem:
+- Gate 1 on the remote retry-prep tree is now clean.
+- The boot-critical failure set was reduced substantially from the original 13-path miss list.
+- `qseecomd` ownership has been restored as a source-backed prebuilt.
+- The display stack is no longer missing because of Android 16 config misdetection; the remaining blockers are later Qualcomm display source/build issues.
+
 ## Recommended next debugging path
 
 1. Do not reflash immediately.

@@ -162,8 +162,9 @@ Current work focus:
 
 1. freeze and document the recovered slot-`a` stock baseline
 2. fix rollback tooling defects discovered during recovery
-3. compare the flashed userspace set against stock for early boot-critical regressions
-4. only then retry split-image userspace flashing
+3. make Gate 1 (`m nothing -j10`) clean on the retry-prep tree
+4. make Gate 2 (`tools/check_retry_boot_critical_vendor_stack.sh`) pass on rebuilt outputs
+5. only then retry split-image userspace flashing on slot `b`
 
 ## Latest Progress (2026-03-09)
 
@@ -171,9 +172,13 @@ Current work focus:
   - `mka vendor_sepolicy.cil.raw -j6` PASS
   - `mka precompiled_sepolicy -j6` PASS
 - The current retry-prep tree does not have a clean `m nothing -j10` yet.
-- The active blocker is now narrower and mechanical:
-  - generated vendor prebuilts in `vendor/xiaomi/myron/Android.bp` still shadow real `system` / `system_ext` modules
-  - an automated cleanup loop on the remote host is pruning exact `partition is different` offenders and rerunning `m nothing`
+- The active blocker was narrowed into retry-prep graph ownership and boot-critical output verification:
+  - proactive keep/drop policy is now codified in:
+    - `tools/retry_prep_keep_modules.txt`
+    - `tools/retry_prep_drop_modules.txt`
+    - `tools/retry_prep_drop_prefixes.txt`
+    - `tools/run_retry_prep_gate1.sh`
+    - `tools/run_retry_prep_gate2.sh`
 - Split userspace images are built and host-side ready.
 - Generated `init_boot` is explicitly not part of the safe first-userspace path:
   - `device/xiaomi/myron/prebuilt/init_boot.img` is byte-identical to stock
@@ -190,6 +195,11 @@ Current work focus:
   - final recovery succeeded only after slot `a` was made fully consistent and reactivated
 - The current retry blockers are documented in:
   - `tools/runbooks/first_userspace_attempt_postmortem_20260309.md`
+- Retry-prep progressed materially after the first postmortem pass:
+  - Gate 1 (`m nothing -j10`) is now clean on the remote retry-prep tree
+  - `qseecomd` has been restored as a source-owned prebuilt and can land in `vendor/bin/`
+  - the Qualcomm display stack is no longer missing because of Baklava misdetection
+  - the remaining display blocker is now deeper in kaanapali source/build compatibility, not silent module exclusion
 - Active exact common-vs-myron overlap baseline remains minimal:
   - `2` destination paths
   - enforced by:
@@ -211,6 +221,24 @@ Current highest-confidence retry blockers after stock-vs-built comparison:
 - second userspace attempt is blocked until both:
   - `m nothing -j10` is clean on the retry-prep tree
   - `tools/check_retry_boot_critical_vendor_stack.sh` passes on rebuilt outputs
+- retry scope is intentionally reduced to boot-to-stable-`adb` on sacrificial slot `b`
+
+### Retry-Prep Delta After Initial Postmortem
+
+- Gate 1 is now passing on the remote retry-prep tree.
+- Gate 2 was reduced from the original broad missing-service cluster to the remaining display/qseecomd path.
+- The local Gate 2 checker now accepts versioned composer VINTF filenames:
+  - `vendor.qti.hardware.display.composer-service*.xml`
+- The Qualcomm display fixes already applied on the remote tree include:
+  - Android 16 (`Baklava`) composer version mapping
+  - `neo` export into the display HAL
+  - commonsys display header namespace selection
+  - kaanapali gralloc handle layout flags
+- The remaining active display work is now:
+  - `drm_panel_feature_mgr.cpp` compatibility for the target kernel headers
+  - rebinding display `libvmmem` consumers to the restored proprietary prebuilt
+  - final emission of the composer and allocator service binaries
+- slot `a` remains the stock-safe baseline and must stay untouched until both gates pass
 - last measured retry gate result on the staged output before current retry-prep changes: `missing_boot_critical_vendor_outputs=13`
 
 1. The flashed userspace set bootloops before `adb`, so early failure evidence is still missing.
@@ -225,6 +253,6 @@ Use this postmortem as the starting point before any retry:
 
 Current state:
 1. Phone remains on the recovered stock-safe baseline and is not being touched.
-2. Host-side retry prep is still blocked on generated vendor prebuilt collisions in `vendor/xiaomi/myron/Android.bp`.
-3. An automated `m nothing` cleanup loop is active on the remote host, removing exact stale prebuilt collisions and re-running until the blocker class changes or `m nothing` passes.
-4. The remote full display tree is patched so `qtidisplay_neo` is enabled for `kaanapali`, which is the queued display-side fix once the Soong graph is clean.
+2. Host-side retry prep Gate 1 (`m nothing -j10`) passes successfully using an aggressive keep/drop list.
+3. The display stack (composer and allocator) was silently excluded due to the `composer_version` Soong config not supporting Android 16 (`Baklava`) in `display-product.mk`.
+4. The remote full display tree is now patched for Android 16 (`Baklava`), and we are currently verifying if Gate 2 (`tools/check_retry_boot_critical_vendor_stack.sh`) passes with the source-owned services built correctly.
