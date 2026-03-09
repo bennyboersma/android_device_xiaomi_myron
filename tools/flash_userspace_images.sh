@@ -17,6 +17,7 @@ FLASH_VENDOR_DLKM="${FLASH_VENDOR_DLKM:-1}"
 FLASH_SYSTEM_DLKM="${FLASH_SYSTEM_DLKM:-1}"
 TARGET_SLOT="${TARGET_SLOT:-}"
 ALLOW_ACTIVE_SLOT_FLASH="${ALLOW_ACTIVE_SLOT_FLASH:-0}"
+SET_ACTIVE_TARGET_SLOT="${SET_ACTIVE_TARGET_SLOT:-1}"
 
 need_cmd() {
   command -v "$1" >/dev/null 2>&1 || {
@@ -161,7 +162,11 @@ echo "is_userspace_fastboot=${userspace:-unknown}"
 echo "use_super=${USE_SUPER}"
 echo "flash_vbmeta_system=${FLASH_VBMETA_SYSTEM}"
 echo "allow_active_slot_flash=${ALLOW_ACTIVE_SLOT_FLASH}"
+echo "set_active_target_slot=${SET_ACTIVE_TARGET_SLOT}"
 printf '%s\n' "${flash_cmds[@]}"
+if [[ "${SET_ACTIVE_TARGET_SLOT}" == "1" ]]; then
+  echo "fastboot set_active ${TARGET_SLOT}"
+fi
 
 if [[ "${DRY_RUN}" == "1" ]]; then
   echo "DRY_RUN=1, no flashing performed"
@@ -171,3 +176,7 @@ fi
 for cmd in "${flash_cmds[@]}"; do
   eval "${cmd}"
 done
+
+if [[ "${SET_ACTIVE_TARGET_SLOT}" == "1" ]]; then
+  fastboot set_active "${TARGET_SLOT}"
+fi
