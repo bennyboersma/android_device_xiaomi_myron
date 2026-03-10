@@ -1,6 +1,34 @@
 # Poco F8 Ultra (myron) Bring-up Status
 
-Last updated: 2026-03-09
+Last updated: 2026-03-10
+
+## Current Status
+
+As of 2026-03-10, the phone itself is back on a verified stock-safe baseline on slot `a`, and the active blocker is now remote userspace build repair rather than recovery or basic device access.
+
+Current reality:
+
+- verified safe phone state:
+  - `ro.boot.slot_suffix=_a`
+  - `ro.build.version.incremental=OS3.0.7.0.WPMEUXM`
+- there is still no confirmed successful custom userspace boot
+- the current workstream is making the remote userspace image set buildable and internally coherent before another flash attempt
+- `vendor/xiaomi/myron/myron-vendor.mk` has already been reduced to a minimal boot-oriented package set
+- proactive cleanup on the remote tree has already removed:
+  - duplicate WLAN symlink ownership
+  - duplicate GNSS seccomp-policy ownership
+  - duplicate `tee-supplicant.rc` ownership
+  - 187 dead `sm8850-common` copy rules pointing at blobs not present on the remote host
+
+Practical implication:
+
+- the project is not currently waiting on `fastbootd`
+- the next milestone is a clean targeted build of:
+  - `vendorimage`
+  - `productimage`
+  - `systemextimage`
+  - `odmimage`
+- only after that should another userspace flash be planned
 
 LineageOS bring-up workspace for Poco F8 Ultra (`myron`) on Qualcomm SM8850.
 
@@ -18,17 +46,27 @@ This repository intentionally does not contain:
 
 ## Getting Started
 
-1. `HANDOFF.md` (Current Focus)
-2. `README.md` (Project History)
-3. `tools/runbooks/full_userspace_validation.md` (Proven Flash Sequence)
+If you are continuing work from scratch, read in this order:
 
-## Current Objective
+1. `HANDOFF.md`
+2. `README.md`
+3. `tools/runbooks/first_userspace_attempt_postmortem_20260309.md`
+4. `tools/runbooks/full_userspace_validation.md`
 
-1.  **Resolve Userspace Rollback**: Identify why slot `b` failed to boot even with AVB disabled.
-2.  **Verify AVB Bypass**: Audit `vbmeta` status and kernel-side verification.
-3.  **Correct Logical Mapping**: Ensure `init` in recovery can see the partitions mapped to slot `b`.
+Current device handling rule:
 
-Detailed plan available in the `Phase History` section below.
+1. keep the verified stock baseline on slot `a`
+2. do not use partial stock bundles as a recovery baseline
+3. do not resume userspace testing until retry-prep gates and flash dry-runs are revalidated
+
+Current next milestone:
+
+1. freeze the restored official stock baseline
+2. re-establish a reliable entry path into `fastbootd` or an equivalent low-level flashing mode on the current device state
+3. reconfirm retry-prep Gate 1 and Gate 2 from the current reproducible state
+4. analyze why the first split userspace flash bootlooped before `adb`
+5. fix the remaining userspace blocker set before any reflash
+6. only then retry split-image userspace flash
 
 ## Repository Layout
 
@@ -159,22 +197,26 @@ Fastest AI handoff:
 - Gate 1 (`m nothing`) and Gate 2 (boot-critical vendor stack) are green.
 - Slot-safe dry-runs and failsafe log capture tool (`tools/capture_failsafe_logs.sh`) are ready.
 
-### Phase 10: Userspace bring-up attempt (blocked/failed)
+### Phase 10: Repeated userspace / fastbootd attempts (blocked)
 
-- **Attempt 1 (Failed)**: Bootloop detected. Recovery analysis identified AVB verification and logical partition mapping failures.
-- **Attempt 2 (Failed)**: Silent rollback to slot `a`. Properties suggested partial property-merge but slot remained stock.
-- **Verdict**: Phase 1 is still the active blocker.
+- **Attempt 1 (Failed)**: Bootloop detected. Recovery analysis identified AVB verification and logical partition mapping failures as root causes.
+- **Later attempts (multiple, user-confirmed >10 total)**:
+  - no confirmed successful custom userspace boot
+  - the last attempt did not boot into `fastbootd`
+  - no stable, repeatable path into `fastbootd` on the failing slot state
+  - prior documentation that claimed a successful boot should be treated as incorrect
+- **Verdict**: bring-up is still blocked on device-side flashing / early-log access.
 
 ## Current Objective
 
-The initial bring-up (booting to Android with basic hardware services) is complete.
+The initial host-side bring-up is complete, but device-side userspace bring-up is not.
 
-1.  **Feature Bring-up**: Validate Camera, Audio, Bluetooth, and Fingerprint (UDFPS).
-2.  **Display Polish**: Finalize 120Hz/refresh-rate switching and color profiles.
-3.  **Stability**: Long-term dwell testing and power management audit.
+1.  **Unblock Fastbootd Access**: Establish a repeatable path into `fastbootd` from the current stock-restored state.
+2.  **Capture Early Boot Logs**: Get `dmesg` / `pstore` or equivalent first-failure evidence from slot `b`.
+3.  **Resume Userspace Bring-up**: Only after logs and flashing access are reliable.
 
-## Latest Progress (2026-03-09)
+## Latest Progress (2026-03-10)
 
-- **Gate 2 Resolution**: Confirmed that `gatekeeper`, `qseecomd`, and `secureprocessor` now correctly install into the `vendor` output.
-- **AVB Bypass**: Standardized the use of disabled `vbmeta` images for custom userspace development.
-- **Slot Strategy**: Validated that `fastboot set_active` in the bootloader is a prerequisite for a healthy `fastbootd` session on the target slot.
+- **Stock Recovery**: The device was restored to the official Xiaomi EEA baseline on slot `a`.
+- **Host Tooling**: Retry-prep tooling, slot-safe flash scripts, and failsafe capture helpers exist in the repo.
+- **Status Correction**: Previous repo text claiming a successful userspace boot on 2026-03-09 is not reliable and should not be used as project state.

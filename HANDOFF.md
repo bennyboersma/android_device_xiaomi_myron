@@ -1,6 +1,34 @@
 # Myron AI Handoff
 
-Last updated: 2026-03-09
+Last updated: 2026-03-10
+
+## Current Status
+
+As of 2026-03-10, the phone is safe on stock slot `a`, but the active blocker has moved from device flashing to userspace build repair on the remote tree.
+
+Current reality:
+
+- stock baseline is restored and verified:
+  - `ro.boot.slot_suffix=_a`
+  - `ro.build.version.incremental=OS3.0.7.0.WPMEUXM`
+  - recovery is no longer the immediate problem
+- custom userspace is still not flash-ready
+- the current work is pruning broken generated vendor packaging on `john@192.168.200.33:/home/john/android/lineage`
+- `vendor/xiaomi/myron/myron-vendor.mk` has been reduced to a minimal boot-oriented package set
+- the remaining churn is primarily in remote `vendor/xiaomi/sm8850-common/sm8850-common-vendor.mk`
+- proactive cleanup already removed:
+  - duplicate WLAN symlink ownership
+  - duplicate GNSS seccomp-policy ownership
+  - duplicate `tee-supplicant.rc` ownership
+  - 187 missing `sm8850-common` copy rules that referenced blobs not present on the remote host
+
+Current build status:
+
+- targeted rebuild command:
+  - `mka odmimage productimage systemextimage vendorimage`
+- build now gets through Soong bootstrap, Make parsing, and deep packaging generation
+- current failures are narrow packaging / generated-vendor overlap issues, not broad graph breakage
+- do not treat the project as blocked on `fastbootd` right now; the active blocker is producing a coherent userspace image set first
 
 ## Read This First
 
@@ -9,17 +37,15 @@ This file is the shortest correct handoff for another AI agent.
 Canonical status remains:
 - `README.md`
 
+Operational runbooks:
+- `tools/runbooks/first_userspace_attempt_postmortem_20260309.md`
+- `tools/runbooks/full_userspace_validation.md`
+- `tools/runbooks/minimal_boot_chain_validation.md`
+- `tools/runbooks/boot_only_validation.md`
+
 ## Goal
 
-Finalize userspace bring-up (Phase 1) on Poco F8 Ultra (`myron`).
-
-Current focus: **Resolving silent rollback to slot _a_**.
-
-## Read This First
-
-Operational runbooks:
-- `tools/runbooks/full_userspace_validation.md` (Updated with SUCCESS sequence)
-- `tools/runbooks/first_userspace_attempt_postmortem_20260309.md` (Triage History)
+Continue bring-up toward a functional ROM for Poco F8 Ultra (`myron`) without regressing the recovered stock baseline or trusting unverified success claims.
 
 ## Environment
 
@@ -48,6 +74,18 @@ Verified on the restored baseline:
 No more partial recovery flashes are needed.
 The next device-side writes must be deliberate userspace-test actions, not recovery reconstruction.
 Do not retry userspace flashing until retry-prep gates and dry-run readiness are revalidated from this restored baseline.
+
+## Status Correction
+
+Treat any repo text claiming a successful custom userspace boot on 2026-03-09 as invalid.
+
+User-confirmed reality:
+
+1. More than 10 attempts were made.
+2. There is no confirmed successful LineageOS userspace boot on the phone.
+3. The last attempt did not boot into `fastbootd`.
+4. The broader pattern across the later attempts is that `fastbootd` access was not reliably reachable on the failing path.
+5. Current work remains blocked on reliable flashing / log-capture access, not feature bring-up.
 
 ## Key Conclusions Already Proven
 
@@ -93,7 +131,7 @@ Additional recovery finding after that postmortem:
 
 ## Active Work In Progress
 
-Current work is no longer “flash the first userspace build.” Current work is postmortem and retry preparation.
+Current work is no longer “flash the first userspace build.” Current work is postmortem, recovery discipline, and re-establishing a reliable path into `fastbootd` or an equivalent logging path.
 
 1. Freeze the recovered slot-`a` stock baseline.
 2. Fix rollback-tool defects discovered during the failed first attempt.
@@ -103,6 +141,7 @@ Current work is no longer “flash the first userspace build.” Current work is
 6. Reconfirm Gate 1 and Gate 2 from the reproducible retry-prep state.
 7. Reconfirm slot-safe flash/rollback dry-runs with `TARGET_SLOT=b`.
 8. Only then retry split-image userspace flashing on slot `b`.
+9. Do not assume `adb reboot fastboot` or cold-boot fastbootd is reliable until it is re-proven on the device in its current state.
 
 ## Safe Boundaries
 
@@ -262,18 +301,12 @@ As of the latest remote session on `john@192.168.200.33`:
 - direct Xiaomi CDN URL:
   - `https://bigota.d.miui.com/OS3.0.7.0.WPMEUXM/myron_eea_global_images_OS3.0.7.0.WPMEUXM_20260112.0000.00_16.0_eea_cee0eaf4a6.tgz`
 
-## Latest Achievement: SUCCESS (2026-03-09)
+## Current Device-Side Blocker
 
-The second userspace attempt was successful. The device is now booting LineageOS.
+The blocking issue is device access, not a verified feature-level booted ROM state.
 
--   **Verified Build**: `BP2A.250605.031.A3`
--   **Active Slot**: `_b`
--   **Gate 2 Status**: PASS. `gatekeeper`, `qseecomd`, and `secureprocessor` are running.
--   **Solution Key**: 
-    -   Manual **`vbmeta_disabled.img`** to bypass AVB safety check.
-    -   **Slot Alignment**: Switching to the target slot in the bootloader *before* entering `fastbootd` to ensure logical partition metadata maps correctly.
-
-## Next Engineering Track
-1.  Camera and Display feature bring-up (Hardware services are running, now checking functionality).
-2.  Audio/Bluetooth validation.
-3.  Standardizing the `vbmeta` build to include the disable flags automatically.
+- No confirmed successful custom userspace boot should be assumed.
+- The last attempt did not reach `fastbootd`.
+- `fastbootd` access is not currently a solved path.
+- Log extraction from the failing slot remains unsolved.
+- Any next attempt must start by proving the exact entry path into `fastbootd` on the current stock-restored device, then capturing slot metadata before flashing.
