@@ -1,222 +1,171 @@
-# Poco F8 Ultra (myron) Bring-up Status
+# Poco F8 Ultra (`myron`) Bring-up Status
 
-Last updated: 2026-03-10
+Last updated: 2026-03-11
 
-## Current Status
+## Summary
 
-As of 2026-03-10, the phone itself is back on a verified stock-safe baseline on slot `a`, and the active blocker is now remote userspace build repair rather than recovery or basic device access.
+This repository is for LineageOS bring-up on Xiaomi Poco F8 Ultra (`myron` / SM8850 / kaanapali).
 
-Current reality:
+Current project state:
+- stock Android is safe and booting on slot `a`
+- there is still no confirmed custom userspace boot
+- custom `super.img` flashing works
+- the best custom result so far is a real bootloop before fallback to `fastboot`
+- the current blocker is early custom userspace abort, not flash transport
 
-- verified safe phone state:
-  - `ro.boot.slot_suffix=_a`
-  - `ro.build.version.incremental=OS3.0.7.0.WPMEUXM`
-- there is still no confirmed successful custom userspace boot
-- the current workstream is making the remote userspace image set buildable and internally coherent before another flash attempt
-- `vendor/xiaomi/myron/myron-vendor.mk` has already been reduced to a minimal boot-oriented package set
-- proactive cleanup on the remote tree has already removed:
-  - duplicate WLAN symlink ownership
-  - duplicate GNSS seccomp-policy ownership
-  - duplicate `tee-supplicant.rc` ownership
-  - 187 dead `sm8850-common` copy rules pointing at blobs not present on the remote host
+## What Is Proven
 
-Practical implication:
+### Device and recovery
 
-- the project is not currently waiting on `fastbootd`
-- the next milestone is a clean targeted build of:
-  - `vendorimage`
-  - `productimage`
-  - `systemextimage`
-  - `odmimage`
-- only after that should another userspace flash be planned
+- bootloader `fastboot` flashing works
+- custom `super.img` can be flashed cleanly
+- stock recovery works reliably with the full stock boot chain plus stock `super`
+- partial stock restore is not sufficient after these failures
 
-LineageOS bring-up workspace for Poco F8 Ultra (`myron`) on Qualcomm SM8850.
+Required stock recovery path:
+- `boot_a`
+- `vendor_boot_a`
+- `dtbo_a`
+- `init_boot_a`
+- `vbmeta_a`
+- `vbmeta_system_a`
+- stock `super`
+- `fastboot set_active a`
+- reboot
 
-This repository intentionally contains:
-- device tree sources and common-tree integration
-- vendor makefiles and extraction workflow glue
-- bring-up tooling, flash helpers, capture scripts, and runbooks
-- status and handoff documentation
+### Build and image side
 
-This repository intentionally does not contain:
-- stock firmware archives
-- extracted stock image payloads
-- local build outputs or checkpoints
-- proprietary blob payload directories
+- stock-layout `super` repacking works
+- artifact freshness gating works
+- stale-image flashes were a real issue and are now blocked
+- the earlier `system_a` size/layout problem was fixed by repacking from a live trimmed `system` tree
 
-## Getting Started
+## What Has Already Been Eliminated
 
-If you are continuing work from scratch, read in this order:
+These are no longer the main blockers:
+- `fastbootd`
+- AVB experiments
+- duplicate `service_contexts` warnings
+- `super` geometry mismatch
+- stale duplicate power HAL RC registration
+- secure-element / strongbox / NXP/eSE package and VINTF exposure in the final repacked image
 
-1. `HANDOFF.md`
-2. `README.md`
-3. `tools/runbooks/first_userspace_attempt_postmortem_20260309.md`
-4. `tools/runbooks/full_userspace_validation.md`
+## Current Failure Shape
 
-Current device handling rule:
+Latest clean bundle:
+- [/home/john/android/lineage/_checkpoints/postfailure_myron_20260311_200750](/home/john/android/lineage/_checkpoints/postfailure_myron_20260311_200750)
 
-1. keep the verified stock baseline on slot `a`
-2. do not use partial stock bundles as a recovery baseline
-3. do not resume userspace testing until retry-prep gates and flash dry-runs are revalidated
+Compared to the previous clean bootloop attempt:
+- `classification=sideways`
+- stage score stayed `4 -> 4`
 
-Current next milestone:
+Observed custom behavior:
+- flashes cleanly
+- reboots into a real bootloop
+- never reaches `adb`
+- eventually falls back to `fastboot`
 
-1. freeze the restored official stock baseline
-2. re-establish a reliable entry path into `fastbootd` or an equivalent low-level flashing mode on the current device state
-3. reconfirm retry-prep Gate 1 and Gate 2 from the current reproducible state
-4. analyze why the first split userspace flash bootlooped before `adb`
-5. fix the remaining userspace blocker set before any reflash
-6. only then retry split-image userspace flash
+## Current Best Signals
 
-## Repository Layout
+The earliest custom-only failures in the clean failed-boot segment are still:
+- `linkerconfig` warning:
+  - `failed to find generated linker configuration from "/linkerconfig/ld.config.txt"`
+- `vendor_init` AVCs on:
+  - `ro.adb.secure`
+  - `persist.vendor.bt.a2dp_offload_cap`
+  - `nfc.fw.is_downloading`
+  - reads of `default_prop`
 
-- `device/xiaomi/myron`
-  - device-specific tree
-- `device/xiaomi/sm8850-common`
-  - common tree shared by the current bring-up
-- `vendor/xiaomi/*`
-  - generated vendor makefiles and symlink packaging glue
-- `tools/`
-  - bring-up tooling, flash helpers, validation scripts, runbooks, issue templates
-- `HANDOFF.md`
-  - shortest current-state summary for another AI or engineer
-- `README.md`
-  - canonical status and phase history
+Later signals still present, but not earliest:
+- `mi_ext` AVCs
+- `tee/qseecomd` AVCs
+- old perf/HIDL client spam
 
-## Single Source Of Truth
+Important ordering:
+- `init` aborts with `SIGABRT`
+- the `mi_ext` AVCs show up after that abort point in the corrected clean slice
 
-This file is the canonical project status and phase history.
+## Current Fix Direction
 
-Fastest AI handoff:
-- `HANDOFF.md`
+The active work is focused on the real property producers still surviving in the merged graph:
 
-## Environment
+### `ro.adb.secure`
 
-- Build host: `john@192.168.200.33`
-- Tree: `~/android/lineage`
-- Target: `lineage_myron-trunk_staging-userdebug`
-- Local coordination workspace: `/Users/benny/Homelab/ROM`
-- Phone stock firmware baseline confirmed: `3.0.7.0.WPMEUXM` (EU)
+Still came from:
+- `vendor/lineage/config/common.mk`
+- merged into `PRODUCT_SYSTEM_EXT_PROPERTIES`
 
-## Phase History
+### `persist.vendor.bt.a2dp_offload_cap`
 
-### Phase 1: Tree and blob workflow stabilization (done)
+Still came from:
+- `hardware/qcom-caf/kaanapali/audio/primary-hal/configs/qssi/qssi.mk`
+- via `PRODUCT_PROPERTY_OVERRIDES`
 
-- Migrated to extract-utils generated flow (`setup-makefiles.sh`).
-- Made blob packaging symlink-aware.
-- Pruned stale local overrides superseded by stock vendor/odm.
-- Standardized blob edits to `proprietary-files.txt` + regeneration.
+That means earlier local filtering was not hitting the real graph producers.
 
-### Phase 2: Duplicate install conflict cleanup (done, iterative)
+## Current Rebuild In Progress
 
-- Cleared broad classes of `PRODUCT_COPY_FILES` collisions against source/generated artifacts.
-- Removed many collision-prone blob classes (`vendor/etc/aconfig`, large `vendor/etc/selinux`, duplicated service rc/xml ownership, legacy apex/hidl overlaps).
-- Reduced repeated Kati duplicate rule blockers across multiple rounds.
+Remote host:
+- `john@192.168.200.33`
 
-### Phase 3: Platform mapping correction to SM8850 (done)
+Active builder session:
+- `83427`
 
-- Updated active device/common references from SM8550 naming to SM8850 where applicable.
-- Updated:
-  - `device/xiaomi/sm8850-common/common.mk`
-  - `device/xiaomi/sm8850-common/udfps/UdfpsHandler.cpp`
-  - `device/xiaomi/sm8850-common/lineage.dependencies`
-  - init file rename `init.sm8550.rc -> init.sm8850.rc`
+Targets:
+- `systemextimage`
+- `vendorimage`
+- `odmimage`
+- `productimage`
 
-### Phase 4: Build gate progression (done)
+Current source changes:
+- [device/xiaomi/myron/device.mk](/Users/benny/Homelab/ROM/device/xiaomi/myron/device.mk)
+  - filters `persist.vendor.bt.a2dp_offload_cap` from both:
+    - `PRODUCT_VENDOR_PROPERTIES`
+    - `PRODUCT_PROPERTY_OVERRIDES`
+- remote `vendor/lineage/config/common.mk`
+  - no longer forces `ro.adb.secure=1` for non-`eng` bring-up builds
 
-- Passed: `m nothing -j1`
-- Passed: `m checkvintf -j1`
-- Passed: `m host_init_verifier -j1`
-- Fixed blocker: missing `dtb.img` requirement for current GKI path by disabling `BOARD_INCLUDE_DTB_IN_BOOTIMG` in `device/xiaomi/sm8850-common/BoardConfigCommon.mk`
-- Boot-critical host gates are green via `tools/preflight_myron.sh` (8/8 pass)
+## Current Tooling
 
-### Phase 5: Boot-only validation (done)
+Main bring-up tooling:
+- [tools/run_myron_userspace_iteration.sh](/Users/benny/Homelab/ROM/tools/run_myron_userspace_iteration.sh)
+- [tools/prepare_myron_log_capture.sh](/Users/benny/Homelab/ROM/tools/prepare_myron_log_capture.sh)
+- [tools/capture_myron_postfailure_bundle.sh](/Users/benny/Homelab/ROM/tools/capture_myron_postfailure_bundle.sh)
+- [tools/compare_myron_failure_bundles.sh](/Users/benny/Homelab/ROM/tools/compare_myron_failure_bundles.sh)
+- [tools/verify_myron_userspace_artifacts.sh](/Users/benny/Homelab/ROM/tools/verify_myron_userspace_artifacts.sh)
+- [tools/repack_super_stock_layout_myron.sh](/Users/benny/Homelab/ROM/tools/repack_super_stock_layout_myron.sh)
 
-- Bootloader unlocked and remote-host fastboot path validated on `john@192.168.200.33`
-- Temporary boot of `out/target/product/myron/boot.img` succeeded on device
-- Device reached full Android userspace:
-  - `sys.boot_completed=1`
-  - stable `adb`
-  - `uname -a` reported Android 16 `6.12.23-android16-5-...`
-- Runtime capture completed:
-  - `_checkpoints/firstboot_20260308_160952`
-  - `_checkpoints/parity_20260308_160953`
-- Must-have runtime gate passed:
-  - `must_have_missing_count=0`
-  - parity status `PASS`
+These now support:
+- log clearing and marker-based capture
+- actual image freshness checks
+- stock-layout `super` repack
+- consistent stock recovery after failure
 
-### Phase 6: First split userspace image build (done)
+## GSI Diagnostic Path
 
-- Split userspace images were built successfully on the remote host:
-  - `system.img`
-  - `system_ext.img`
-  - `product.img`
-  - `vendor.img`
-  - `odm.img`
-  - `vendor_dlkm.img`
-  - `system_dlkm.img`
-- Host checks passed:
-  - `tools/check_userspace_flash_readiness.sh`
-  - `tools/check_retry_boot_critical_vendor_stack.sh`
-  - `tools/check_partition_package_sanity.sh`
-  - `tools/audit_userspace_outputs.sh`
+A diagnostic-only GSI flow is prepared but not active:
+- [tools/prepare_myron_gsi_super.sh](/Users/benny/Homelab/ROM/tools/prepare_myron_gsi_super.sh)
+- [tools/runbooks/myron_gsi_diagnostic.md](/Users/benny/Homelab/ROM/tools/runbooks/myron_gsi_diagnostic.md)
 
-### Phase 7: First split userspace flash attempt (failed)
+This is for isolating `system` vs vendor/odm problems later, not the current primary path.
 
-- First split userspace flash was executed on slot `b` using logical partitions only.
-- Flash transport succeeded.
-- Device bootlooped before `adb` appeared.
-- Recovery required restoring stock userspace and stock slot-specific verification/boot-chain state, then switching back to slot `a`.
-- Follow-up recovery work proved the original staged stock fragments were incomplete for a trustworthy baseline restore.
-- The device should currently be treated as requiring a full official stock fastboot restore before any additional bring-up testing.
+## Next Steps
 
-### Phase 8: Recovery baseline correction (done)
+1. Let session `83427` finish.
+2. Verify the merged graph no longer carries:
+   - `ro.adb.secure=1`
+   - `persist.vendor.bt.a2dp_offload_cap=...`
+3. Repack a fresh stock-layout `super.img`.
+4. Run one more marker-based custom flash iteration.
+5. If it still fails, inspect the next clean first-failure slice for:
+   - whether the earliest `vendor_init` AVCs changed
+   - whether `linkerconfig` is still the first custom-only warning
+   - the first real service/process failure before `init` abort
 
-- We proved the post-flash failure is not only a Lineage userspace packaging issue:
-  - slot `b` failed before `adb` even after flashing matched stock-style sets
-  - later, slot `a` also stopped booting reliably after repeated partial restore work
-- Root cause is now considered incomplete stock recovery inputs rather than a valid stock-vs-Lineage comparison.
-- The staged remote recovery bundle did not contain the full Xiaomi `images/` set required by Xiaomi `flash_all*.sh`.
-- Missing boot-critical payloads included:
-  - `vm-bootsys.img`
-  - `qtvm-dtbo.img`
-  - `recovery.img`
-  - multiple firmware / bootloader images (`xbl`, `uefi`, `tz`, `aop`, and related files)
-- The correct recovery artifact is the full official Xiaomi EEA fastboot package:
-  - `myron_eea_global_images_OS3.0.7.0.WPMEUXM_20260112.0000.00_16.0_eea_cee0eaf4a6.tgz`
-  - MD5 `cee0eaf4a66294c29ae709a22073e670`
-- That package was copied to the remote host, verified again by MD5, extracted, and restored with Xiaomi `flash_all_except_storage.sh`.
-- Stock boot was then reconfirmed:
-  - `ro.boot.slot_suffix=_a`
-  - `ro.build.version.incremental=OS3.0.7.0.WPMEUXM`
-  - `sys.boot_completed=1`
+## Repo Pointers
 
-### Phase 9: Retry-prep from verified stock baseline (done)
-
-- Recovery baseline uncertainty is now closed (full Xiaomi fastboot EEA restore confirmed).
-- Gate 1 (`m nothing`) and Gate 2 (boot-critical vendor stack) are green.
-- Slot-safe dry-runs and failsafe log capture tool (`tools/capture_failsafe_logs.sh`) are ready.
-
-### Phase 10: Repeated userspace / fastbootd attempts (blocked)
-
-- **Attempt 1 (Failed)**: Bootloop detected. Recovery analysis identified AVB verification and logical partition mapping failures as root causes.
-- **Later attempts (multiple, user-confirmed >10 total)**:
-  - no confirmed successful custom userspace boot
-  - the last attempt did not boot into `fastbootd`
-  - no stable, repeatable path into `fastbootd` on the failing slot state
-  - prior documentation that claimed a successful boot should be treated as incorrect
-- **Verdict**: bring-up is still blocked on device-side flashing / early-log access.
-
-## Current Objective
-
-The initial host-side bring-up is complete, but device-side userspace bring-up is not.
-
-1.  **Unblock Fastbootd Access**: Establish a repeatable path into `fastbootd` from the current stock-restored state.
-2.  **Capture Early Boot Logs**: Get `dmesg` / `pstore` or equivalent first-failure evidence from slot `b`.
-3.  **Resume Userspace Bring-up**: Only after logs and flashing access are reliable.
-
-## Latest Progress (2026-03-10)
-
-- **Stock Recovery**: The device was restored to the official Xiaomi EEA baseline on slot `a`.
-- **Host Tooling**: Retry-prep tooling, slot-safe flash scripts, and failsafe capture helpers exist in the repo.
-- **Status Correction**: Previous repo text claiming a successful userspace boot on 2026-03-09 is not reliable and should not be used as project state.
+- Handoff summary: [HANDOFF.md](/Users/benny/Homelab/ROM/HANDOFF.md)
+- Device tree: [device/xiaomi/myron](/Users/benny/Homelab/ROM/device/xiaomi/myron)
+- Common tree: [device/xiaomi/sm8850-common](/Users/benny/Homelab/ROM/device/xiaomi/sm8850-common)
+- Vendor packaging: [vendor/xiaomi/myron](/Users/benny/Homelab/ROM/vendor/xiaomi/myron)
+- Runbooks: [tools/runbooks](/Users/benny/Homelab/ROM/tools/runbooks)
