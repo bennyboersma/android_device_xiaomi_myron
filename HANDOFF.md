@@ -11,28 +11,29 @@ Current verified state:
 - stock recovery works with the full stock boot chain plus stock `super`
 - there is still no confirmed custom userspace boot
 - the best custom result is a real bootloop before fallback to `fastboot`
+- strategy is now pivoting to stock-vendor-first
 
 ## Most Important New Result
 
-The strongest control test now also fails:
-- stock `system_a`
-- stock `product_a`
-- stock `system_ext_a`
+The pivot image changed the failure shape:
+- stock `vendor_a`
+- stock `odm_a`
+- stock `vendor_dlkm_a`
 - stock `mi_ext_a`
-- custom `vendor_a`
-- custom `odm_a`
-- custom `vendor_dlkm_a`
+- custom `system_a`
+- custom `system_ext_a`
+- custom `product_a`
 - custom `system_dlkm_a`
 
-That image was built as:
-- [/home/john/android/lineage/out/target/product/myron/super_stock_core.img](/home/john/android/lineage/out/target/product/myron/super_stock_core.img)
+Built as:
+- [/home/john/android/lineage/out/target/product/myron/super_stock_vendor.img](/home/john/android/lineage/out/target/product/myron/super_stock_vendor.img)
 
-It still bootlooped and fell back to `fastboot`.
+Observed result:
+- stable POCO-logo stall instead of the earlier quick bootloop-to-`fastboot` path
 
 Practical conclusion:
-- custom `product` / `system_ext` / `mi_ext` were real mismatches
-- but they are not sufficient to explain the boot failure
-- the strongest remaining suspect is now custom `vendor` / `odm` runtime behavior
+- stock lower partitions materially change behavior
+- the new default strategy should be stock-vendor-first, not continued custom-vendor reconstruction
 
 ## What Is No Longer The Main Blocker
 
@@ -46,6 +47,7 @@ These have already been tested or eliminated as primary blockers:
 - stale duplicate power HAL RC registration
 - missing stock `mi_ext` mount lines alone
 - custom `product` / `system_ext` surface by itself
+- the custom-vendor-first strategy as the main path
 
 ## Current Failure Shape
 
@@ -62,58 +64,62 @@ What the logs now show:
 
 This is later and more useful than the earlier early-init theories.
 
-## Strongest Current Lead
+## Strategy History
 
-Stock `system` carries framework surface that custom `system` does not, including MIUI/QTI/Xiaomi jars and permissions.
+Important completed control tests:
 
-Important stock-only examples:
-- `QPerformance.jar`
-- `QXPerformance.jar`
-- `UxPerformance.jar`
-- `WfdCommon.jar`
-- `framework-nfc.jar`
-- `telephony-ext.jar`
-- `vendor.qti.hardware.data.connectionaidl-V1-java.jar`
-- MIUI/QTI permissions XMLs such as:
-  - `privapp-permissions-miui-system.xml`
-  - `privapp-permissions-qti.xml`
-  - `signature-permissions-miui-system.xml`
+1. Stock-framework control:
+- stock `product_a`
+- stock `system_ext_a`
+- stock `mi_ext_a`
+- custom `system` / `vendor` / `odm`
+- failed
 
-But the stock-core control still failed, so the current best interpretation is:
-- custom `vendor` / `odm` are still violating a framework/runtime contract
-- the next work should focus there, not on `system/bin/init`
+2. Stock-core control:
+- stock `system_a`
+- stock `product_a`
+- stock `system_ext_a`
+- stock `mi_ext_a`
+- custom `vendor_a`
+- custom `odm_a`
+- custom `vendor_dlkm_a`
+- custom `system_dlkm_a`
+- image:
+  - [/home/john/android/lineage/out/target/product/myron/super_stock_core.img](/home/john/android/lineage/out/target/product/myron/super_stock_core.img)
+- failed
+
+3. Custom-vendor reconstruction path:
+- restored multiple Qualcomm/Xiaomi service batches
+- fixed concrete RC/VINTF mismatches:
+  - `vendor.qti.hardware.perf2.IPerf/default`
+  - `vendor.qti.qhcp.IQHDC/default`
+  - Xiaomi ODM AIDL interface declarations
+- logs evolved, but no boot
+
+4. Stock-vendor-first pivot:
+- image:
+  - [/home/john/android/lineage/out/target/product/myron/super_stock_vendor.img](/home/john/android/lineage/out/target/product/myron/super_stock_vendor.img)
+- this is now the preferred baseline for the next stage of bring-up
 
 ## What To Do Next
 
-1. Keep `system/bin/init` instrumentation deprioritized.
-2. Continue vendor/odm contract restoration, not framework trimming.
-3. Current concrete state:
-   - the first minimal vendor contract batch is in the payload and live at runtime:
-     - `qconfigservice`
-     - `qesdk-manager`
-     - `qesdk-secmanager`
-     - `qguard`
-     - `qms`
-     - `poweropt-service`
-     - `vendor.qti.syshealthmon-service`
-     - `vendor.qti.hardware.perf2-hal-service`
-4. Current strongest gap:
-   - `odm/etc/init` contains many Xiaomi service RCs
-   - `odm/etc/vintf/manifest` is missing most matching XMLs in the built image
-5. Active builder task:
-   - fix ODM manifest packaging through `ODM_MANIFEST_FILES`
-   - rebuild `odmimage`
-   - repack `super.img`
-   - retest once against a fresh marker
+1. Stop treating custom `vendor` / `odm` reconstruction as the default path.
+2. Use stock-vendor-first images as the new control baseline.
+3. Compare stock-vendor-first failure bundles against the old custom-vendor bundles.
+4. Only reintroduce custom lower-stack pieces when a specific runtime contract is understood.
+5. Keep `system/bin/init` instrumentation and broad property experiments deprioritized.
 
 ## Latest Useful Bundle
 
-- [/home/john/android/lineage/_checkpoints/postfailure_myron_20260312_143332](/home/john/android/lineage/_checkpoints/postfailure_myron_20260312_143332)
+- [/home/john/android/lineage/_checkpoints/postfailure_myron_20260312_102812](/home/john/android/lineage/_checkpoints/postfailure_myron_20260312_102812)
 
-What it proves:
-- restored vendor contract services are actually running
-- the boot still fails later
-- `qconfigpresets.json` and `liblocation_qesdk.so` warnings were exposed, but stock does not ship either path, so they are not decisive blockers by themselves
+Useful current comparison targets:
+- stock-core image:
+  - [/home/john/android/lineage/out/target/product/myron/super_stock_core.img](/home/john/android/lineage/out/target/product/myron/super_stock_core.img)
+- stock-framework image:
+  - [/home/john/android/lineage/out/target/product/myron/super_stock_framework.img](/home/john/android/lineage/out/target/product/myron/super_stock_framework.img)
+- stock-vendor pivot image:
+  - [/home/john/android/lineage/out/target/product/myron/super_stock_vendor.img](/home/john/android/lineage/out/target/product/myron/super_stock_vendor.img)
 
 ## Recovery Path
 
@@ -136,3 +142,5 @@ Reliable stock recovery path:
   - [/home/john/android/lineage/out/target/product/myron/super_stock_core.img](/home/john/android/lineage/out/target/product/myron/super_stock_core.img)
 - Stock-framework control image:
   - [/home/john/android/lineage/out/target/product/myron/super_stock_framework.img](/home/john/android/lineage/out/target/product/myron/super_stock_framework.img)
+- Stock-vendor pivot image:
+  - [/home/john/android/lineage/out/target/product/myron/super_stock_vendor.img](/home/john/android/lineage/out/target/product/myron/super_stock_vendor.img)
