@@ -1,171 +1,118 @@
 # Poco F8 Ultra (`myron`) Bring-up Status
 
-Last updated: 2026-03-11
+Last updated: 2026-03-12
 
 ## Summary
 
-This repository is for LineageOS bring-up on Xiaomi Poco F8 Ultra (`myron` / SM8850 / kaanapali).
+This repository is for LineageOS bring-up on Xiaomi Poco F8 Ultra (`myron` / SM8850 / `canoe` / `kaanapali`).
 
 Current project state:
 - stock Android is safe and booting on slot `a`
 - there is still no confirmed custom userspace boot
 - custom `super.img` flashing works
-- the best custom result so far is a real bootloop before fallback to `fastboot`
-- the current blocker is early custom userspace abort, not flash transport
+- failed custom boots are recoverable with the full stock boot chain plus stock `super`
 
 ## What Is Proven
 
-### Device and recovery
+### Flash and recovery
 
 - bootloader `fastboot` flashing works
 - custom `super.img` can be flashed cleanly
-- stock recovery works reliably with the full stock boot chain plus stock `super`
-- partial stock restore is not sufficient after these failures
+- stock recovery works reliably with:
+  - `boot_a`
+  - `vendor_boot_a`
+  - `dtbo_a`
+  - `init_boot_a`
+  - `vbmeta_a`
+  - `vbmeta_system_a`
+  - stock `super`
 
-Required stock recovery path:
-- `boot_a`
-- `vendor_boot_a`
-- `dtbo_a`
-- `init_boot_a`
-- `vbmeta_a`
-- `vbmeta_system_a`
-- stock `super`
-- `fastboot set_active a`
-- reboot
-
-### Build and image side
+### Image side
 
 - stock-layout `super` repacking works
 - artifact freshness gating works
 - stale-image flashes were a real issue and are now blocked
-- the earlier `system_a` size/layout problem was fixed by repacking from a live trimmed `system` tree
+- stock `mi_ext_a` can be embedded successfully
 
-## What Has Already Been Eliminated
+## What Has Been Eliminated As The Main Blocker
 
-These are no longer the main blockers:
+These are no longer the primary problem:
 - `fastbootd`
-- AVB experiments
-- duplicate `service_contexts` warnings
+- AVB experimentation
 - `super` geometry mismatch
+- duplicate `service_contexts` warnings
 - stale duplicate power HAL RC registration
-- secure-element / strongbox / NXP/eSE package and VINTF exposure in the final repacked image
+- secure-element / strongbox / eSE exposure
+- missing stock `mi_ext` lines alone
+- custom `product/system_ext` surface by itself
+
+## Strongest Current Result
+
+The strongest control image still fails:
+- stock `system_a`
+- stock `product_a`
+- stock `system_ext_a`
+- stock `mi_ext_a`
+- custom `vendor_a`
+- custom `odm_a`
+- custom `vendor_dlkm_a`
+- custom `system_dlkm_a`
+
+Built as:
+- [/home/john/android/lineage/out/target/product/myron/super_stock_core.img](/home/john/android/lineage/out/target/product/myron/super_stock_core.img)
+
+That image still bootloops and falls back to `fastboot`.
+
+Meaning:
+- missing stock `product/system_ext` apps and overlays were real mismatches
+- but they were not sufficient to make the device boot
+- the best remaining suspect is now custom `vendor` / `odm` runtime behavior
 
 ## Current Failure Shape
 
-Latest clean bundle:
-- [/home/john/android/lineage/_checkpoints/postfailure_myron_20260311_200750](/home/john/android/lineage/_checkpoints/postfailure_myron_20260311_200750)
+High-signal bundle:
+- [/home/john/android/lineage/_checkpoints/postfailure_myron_20260312_102812](/home/john/android/lineage/_checkpoints/postfailure_myron_20260312_102812)
 
-Compared to the previous clean bootloop attempt:
-- `classification=sideways`
-- stage score stayed `4 -> 4`
+Useful late-stage signals from that bundle:
+- `SystemServer: Entered the Android system server!`
+- then package / overlay / framework failure storm
+- later:
+  - `SystemServiceRegistry: Manager wrapper not available: security`
+  - `SystemServerI: reboot init app level`
+  - `SystemServerI: reboot init app anr level`
 
-Observed custom behavior:
-- flashes cleanly
-- reboots into a real bootloop
-- never reaches `adb`
-- eventually falls back to `fastboot`
+This means the current debugging surface is later than classic early-init bring-up.
 
-## Current Best Signals
+## Current Direction
 
-The earliest custom-only failures in the clean failed-boot segment are still:
-- `linkerconfig` warning:
-  - `failed to find generated linker configuration from "/linkerconfig/ld.config.txt"`
-- `vendor_init` AVCs on:
-  - `ro.adb.secure`
-  - `persist.vendor.bt.a2dp_offload_cap`
-  - `nfc.fw.is_downloading`
-  - reads of `default_prop`
+Focus has shifted from `init` and property experiments to runtime contract mismatches between:
+- custom `vendor` / `odm`
+- stock or near-stock framework surface
 
-Later signals still present, but not earliest:
-- `mi_ext` AVCs
-- `tee/qseecomd` AVCs
-- old perf/HIDL client spam
+Best next work:
+1. diff stock vs custom `vendor_a` / `odm_a`
+2. focus on:
+   - init rc
+   - VINTF manifests
+   - sysconfig / permissions XMLs
+   - package inventory XMLs
+   - MIUI/QTI security, telephony, and performance integrations
+3. only flash again after one concrete vendor/odm-side fix is identified
 
-Important ordering:
-- `init` aborts with `SIGABRT`
-- the `mi_ext` AVCs show up after that abort point in the corrected clean slice
+## Useful Tools
 
-## Current Fix Direction
-
-The active work is focused on the real property producers still surviving in the merged graph:
-
-### `ro.adb.secure`
-
-Still came from:
-- `vendor/lineage/config/common.mk`
-- merged into `PRODUCT_SYSTEM_EXT_PROPERTIES`
-
-### `persist.vendor.bt.a2dp_offload_cap`
-
-Still came from:
-- `hardware/qcom-caf/kaanapali/audio/primary-hal/configs/qssi/qssi.mk`
-- via `PRODUCT_PROPERTY_OVERRIDES`
-
-That means earlier local filtering was not hitting the real graph producers.
-
-## Current Rebuild In Progress
-
-Remote host:
-- `john@192.168.200.33`
-
-Active builder session:
-- `83427`
-
-Targets:
-- `systemextimage`
-- `vendorimage`
-- `odmimage`
-- `productimage`
-
-Current source changes:
-- [device/xiaomi/myron/device.mk](/Users/benny/Homelab/ROM/device/xiaomi/myron/device.mk)
-  - filters `persist.vendor.bt.a2dp_offload_cap` from both:
-    - `PRODUCT_VENDOR_PROPERTIES`
-    - `PRODUCT_PROPERTY_OVERRIDES`
-- remote `vendor/lineage/config/common.mk`
-  - no longer forces `ro.adb.secure=1` for non-`eng` bring-up builds
-
-## Current Tooling
-
-Main bring-up tooling:
-- [tools/run_myron_userspace_iteration.sh](/Users/benny/Homelab/ROM/tools/run_myron_userspace_iteration.sh)
 - [tools/prepare_myron_log_capture.sh](/Users/benny/Homelab/ROM/tools/prepare_myron_log_capture.sh)
+- [tools/run_myron_userspace_iteration.sh](/Users/benny/Homelab/ROM/tools/run_myron_userspace_iteration.sh)
 - [tools/capture_myron_postfailure_bundle.sh](/Users/benny/Homelab/ROM/tools/capture_myron_postfailure_bundle.sh)
 - [tools/compare_myron_failure_bundles.sh](/Users/benny/Homelab/ROM/tools/compare_myron_failure_bundles.sh)
 - [tools/verify_myron_userspace_artifacts.sh](/Users/benny/Homelab/ROM/tools/verify_myron_userspace_artifacts.sh)
 - [tools/repack_super_stock_layout_myron.sh](/Users/benny/Homelab/ROM/tools/repack_super_stock_layout_myron.sh)
+- [tools/prepare_myron_stock_framework_super.sh](/Users/benny/Homelab/ROM/tools/prepare_myron_stock_framework_super.sh)
+- [tools/prepare_myron_stock_core_super.sh](/Users/benny/Homelab/ROM/tools/prepare_myron_stock_core_super.sh)
 
-These now support:
-- log clearing and marker-based capture
-- actual image freshness checks
-- stock-layout `super` repack
-- consistent stock recovery after failure
+## Related Docs
 
-## GSI Diagnostic Path
-
-A diagnostic-only GSI flow is prepared but not active:
-- [tools/prepare_myron_gsi_super.sh](/Users/benny/Homelab/ROM/tools/prepare_myron_gsi_super.sh)
-- [tools/runbooks/myron_gsi_diagnostic.md](/Users/benny/Homelab/ROM/tools/runbooks/myron_gsi_diagnostic.md)
-
-This is for isolating `system` vs vendor/odm problems later, not the current primary path.
-
-## Next Steps
-
-1. Let session `83427` finish.
-2. Verify the merged graph no longer carries:
-   - `ro.adb.secure=1`
-   - `persist.vendor.bt.a2dp_offload_cap=...`
-3. Repack a fresh stock-layout `super.img`.
-4. Run one more marker-based custom flash iteration.
-5. If it still fails, inspect the next clean first-failure slice for:
-   - whether the earliest `vendor_init` AVCs changed
-   - whether `linkerconfig` is still the first custom-only warning
-   - the first real service/process failure before `init` abort
-
-## Repo Pointers
-
-- Handoff summary: [HANDOFF.md](/Users/benny/Homelab/ROM/HANDOFF.md)
-- Device tree: [device/xiaomi/myron](/Users/benny/Homelab/ROM/device/xiaomi/myron)
-- Common tree: [device/xiaomi/sm8850-common](/Users/benny/Homelab/ROM/device/xiaomi/sm8850-common)
-- Vendor packaging: [vendor/xiaomi/myron](/Users/benny/Homelab/ROM/vendor/xiaomi/myron)
-- Runbooks: [tools/runbooks](/Users/benny/Homelab/ROM/tools/runbooks)
+- [HANDOFF.md](/Users/benny/Homelab/ROM/HANDOFF.md)
+- [device/xiaomi/myron](/Users/benny/Homelab/ROM/device/xiaomi/myron)
+- [device/xiaomi/sm8850-common](/Users/benny/Homelab/ROM/device/xiaomi/sm8850-common)
+- [vendor/xiaomi/myron](/Users/benny/Homelab/ROM/vendor/xiaomi/myron)
