@@ -85,14 +85,35 @@ But the stock-core control still failed, so the current best interpretation is:
 
 ## What To Do Next
 
-1. Stop spending time on `system/bin/init` instrumentation.
-2. Diff stock vs custom `vendor_a` and `odm_a` semantically:
-   - init rc
-   - VINTF manifests
-   - sysconfig / permissions XMLs
-   - package inventory XMLs
-   - anything related to MIUI security / telephony / performance manager wrappers
-3. Only flash again after one concrete vendor/odm-side contract fix is identified.
+1. Keep `system/bin/init` instrumentation deprioritized.
+2. Continue vendor/odm contract restoration, not framework trimming.
+3. Current concrete state:
+   - the first minimal vendor contract batch is in the payload and live at runtime:
+     - `qconfigservice`
+     - `qesdk-manager`
+     - `qesdk-secmanager`
+     - `qguard`
+     - `qms`
+     - `poweropt-service`
+     - `vendor.qti.syshealthmon-service`
+     - `vendor.qti.hardware.perf2-hal-service`
+4. Current strongest gap:
+   - `odm/etc/init` contains many Xiaomi service RCs
+   - `odm/etc/vintf/manifest` is missing most matching XMLs in the built image
+5. Active builder task:
+   - fix ODM manifest packaging through `ODM_MANIFEST_FILES`
+   - rebuild `odmimage`
+   - repack `super.img`
+   - retest once against a fresh marker
+
+## Latest Useful Bundle
+
+- [/home/john/android/lineage/_checkpoints/postfailure_myron_20260312_143332](/home/john/android/lineage/_checkpoints/postfailure_myron_20260312_143332)
+
+What it proves:
+- restored vendor contract services are actually running
+- the boot still fails later
+- `qconfigpresets.json` and `liblocation_qesdk.so` warnings were exposed, but stock does not ship either path, so they are not decisive blockers by themselves
 
 ## Recovery Path
 

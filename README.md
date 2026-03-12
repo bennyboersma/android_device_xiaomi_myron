@@ -89,15 +89,35 @@ Focus has shifted from `init` and property experiments to runtime contract misma
 - custom `vendor` / `odm`
 - stock or near-stock framework surface
 
+The first minimal vendor contract restoration batch is now proven live in the failed boot:
+- `qconfigservice`
+- `qesdk-manager`
+- `qesdk-secmanager`
+- `qguard`
+- `qms`
+- `poweropt-service`
+- `vendor.qti.syshealthmon-service`
+- `vendor.qti.hardware.perf2-hal-service`
+
+What that exposed:
+- `QConfig : Error reading file: /vendor/etc/qconfigpresets.json`
+- `loading liblocation_qesdk failed!`
+
+Important correction:
+- stock Android itself does not ship `/vendor/etc/qconfigpresets.json`
+- stock Android itself does not ship `/vendor/lib64/liblocation_qesdk.so`
+- so those warnings are not enough by themselves to explain the boot failure
+
+Strongest remaining live gap:
+- built `odm/etc/init` contains many Xiaomi service RCs
+- built `odm/etc/vintf/manifest` contains almost none of the matching XMLs
+- current active builder work is fixing that ODM manifest packaging path
+
 Best next work:
-1. diff stock vs custom `vendor_a` / `odm_a`
-2. focus on:
-   - init rc
-   - VINTF manifests
-   - sysconfig / permissions XMLs
-   - package inventory XMLs
-   - MIUI/QTI security, telephony, and performance integrations
-3. only flash again after one concrete vendor/odm-side fix is identified
+1. land the missing ODM VINTF manifest batch cleanly
+2. rebuild `odmimage`
+3. repack a fresh `super.img`
+4. retest once against a fresh marker
 
 ## Useful Tools
 
