@@ -13,6 +13,7 @@ Current project state:
 - failed custom boots are recoverable with the full stock boot chain plus stock `super`
 - the project is now pivoting to a stock-vendor-first strategy
 - the newest control says custom `product` alone is enough to break boot
+- stock vs custom `product` diff points at missing MIUI `product` surface, not lower-stack regressions
 
 ## What Is Proven
 
@@ -128,6 +129,28 @@ These are the major bring-up strategies and what they taught us:
 - result: still failed
 - conclusion: custom `product` alone is already sufficient to break boot
 
+8. Product surface diff and targeted restore prep
+- compared stock `product_a` against custom `product.img`
+- result:
+  - stock `product` has `1613` files vs `521` in custom
+  - focused boot-relevant set (`framework`, `priv-app`, `app`, overlays, permissions, sysconfig) is `451` vs `157`
+- strongest missing stock paths:
+  - `pangu/system`
+  - `priv-app/MIUISecurityCenterGlobal`
+  - `priv-app/MISettings`
+  - `priv-app/MIServiceGlobal`
+  - `app/MIUIGlobalLayout`
+  - `app/MIUISecurityAdd`
+  - `app/MIUISystemUIPlugin`
+  - `overlay/MiuiFrameworkResOverlay.apk`
+  - `overlay/MiuiPermissionControllerOverlay.apk`
+  - `overlay/MiuiPowerInsightOverlay.apk`
+  - `overlay/MiuiServiceOverlay`
+  - `overlay/SafetyCenterMiuiConfigOverlay.apk`
+  - `overlay/SafetyCenterMiuiOverlay.apk`
+- conclusion:
+  - the custom `product` failure is likely driven by missing MIUI framework surface, not a generic custom-`system` problem
+
 ## What Has Been Eliminated As The Main Blocker
 
 These are no longer the primary problem:
@@ -153,6 +176,7 @@ The pivot result still matters:
 Meaning:
 - stock `vendor` / `odm` does matter materially
 - custom `product` is now the highest-confidence upper-layer blocker
+- Xiaomi's `product` content also feeds `/system` through overlay mounts, so this is not just an isolated app-packaging issue
 - the next work should be framed around a stock-vendor-first baseline with `product` isolation first, not continued custom-vendor reconstruction
 
 ## Current Failure Shape
@@ -181,6 +205,16 @@ Useful late-stage signals from that pivot bundle:
 
 This means the current debugging surface has shifted up into the upper framework / `product` layer, not the lower vendor stack.
 
+Why `product` can still break apparent `/system` services:
+- Xiaomi overlays `product` content back onto `/system` at boot through:
+  - [fstab.qcom](/Users/benny/Homelab/ROM/device/xiaomi/sm8850-common/init/fstab.qcom#L63)
+  - [fstab.qcom](/Users/benny/Homelab/ROM/device/xiaomi/sm8850-common/init/fstab.qcom#L64)
+  - [fstab.qcom](/Users/benny/Homelab/ROM/device/xiaomi/sm8850-common/init/fstab.qcom#L65)
+  - [fstab.qcom](/Users/benny/Homelab/ROM/device/xiaomi/sm8850-common/init/fstab.qcom#L67)
+- stock `product` contains `/product/pangu/system/*`
+- custom `product` currently has no `pangu/system` subtree
+- that gives a direct mechanism for `product`-only changes to break framework service bring-up
+
 ## Current Direction
 
 Focus has shifted from `init` and property experiments to a stock-vendor-first pivot:
@@ -194,12 +228,13 @@ Current baseline for the pivot:
 Current best next work:
 1. use the stock-vendor-first image as the new control baseline
 2. compare its failure bundles against the old custom-vendor bundles
-3. treat `product` as the first partition to isolate and diff
-4. compare stock vs custom `product` contents, overlays, priv-apps, and framework jars that feed:
+3. use the `product` diff result to restore the smallest stock MIUI surface first
+4. test a patched `product` that restores stock `pangu/system`, security-center privilege, MIUI settings/service apps, and key MIUI overlays
+5. compare stock vs custom `product` contents, overlays, priv-apps, and framework jars that feed:
    - `LocationPolicyManagerService`
    - `PowerConsumptionService`
    - MIUI security / wifi wrapper classes
-5. avoid further lower-stack restoration unless the pivot evidence points back downward
+6. avoid further lower-stack restoration unless the pivot evidence points back downward
 
 The older vendor/odm contract-restoration work is still useful history, but it is no longer the default strategy.
 
@@ -216,6 +251,7 @@ The older vendor/odm contract-restoration work is still useful history, but it i
 - [tools/prepare_myron_stock_vendor_super.sh](/Users/benny/Homelab/ROM/tools/prepare_myron_stock_vendor_super.sh)
 - [tools/prepare_myron_stock_vendor_miui_upper_super.sh](/Users/benny/Homelab/ROM/tools/prepare_myron_stock_vendor_miui_upper_super.sh)
 - [tools/prepare_myron_stock_except_product_super.sh](/Users/benny/Homelab/ROM/tools/prepare_myron_stock_except_product_super.sh)
+- [tools/prepare_myron_stock_product_miui_restore_super.sh](/Users/benny/Homelab/ROM/tools/prepare_myron_stock_product_miui_restore_super.sh)
 
 ## Related Docs
 

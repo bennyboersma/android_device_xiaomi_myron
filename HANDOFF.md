@@ -13,6 +13,7 @@ Current verified state:
 - the best custom result is a real bootloop before fallback to `fastboot`
 - strategy is now pivoting to stock-vendor-first
 - newest control says custom `product` alone is enough to break boot
+- current diff work says the missing MIUI `product` surface is the highest-confidence cause
 
 ## Most Important New Result
 
@@ -58,7 +59,7 @@ What it proves:
   - `SystemServerI: reboot init app level`
   - `SystemServerI: reboot init app anr level`
 
-So the current primary suspect is now custom `product`, more specifically the upper framework / MIUI-facing surface it carries, not the lower vendor stack.
+So the current primary suspect is now custom `product`, more specifically the MIUI-facing framework surface it carries and injects into `/system`, not the lower vendor stack.
 
 ## What Is No Longer The Main Blocker
 
@@ -132,14 +133,41 @@ Important completed control tests:
 - strongest new conclusion:
   - custom `product` alone is enough to break boot
 
+6. Focused stock-vs-custom `product` diff:
+- stock `product` file count: `1613`
+- custom `product` file count: `521`
+- focused boot-relevant surface (`framework`, `priv-app`, `app`, overlays, permissions, sysconfig):
+  - stock: `451`
+  - custom: `157`
+- strongest stock-only gaps:
+  - `pangu/system`
+  - `priv-app/MIUISecurityCenterGlobal`
+  - `priv-app/MISettings`
+  - `priv-app/MIServiceGlobal`
+  - `app/MIUIGlobalLayout`
+  - `app/MIUISecurityAdd`
+  - `app/MIUISystemUIPlugin`
+  - `overlay/MiuiFrameworkResOverlay.apk`
+  - `overlay/MiuiPermissionControllerOverlay.apk`
+  - `overlay/MiuiPowerInsightOverlay.apk`
+  - `overlay/MiuiServiceOverlay`
+  - `overlay/SafetyCenterMiuiConfigOverlay.apk`
+  - `overlay/SafetyCenterMiuiOverlay.apk`
+- highest-signal package mismatch:
+  - stock carries `MIUISecurityCenterGlobal` as `priv-app`
+  - custom currently carries it only as plain `app`
+- interpretation:
+  - this looks like a missing MIUI `product` contract, not a lower-stack vendor failure
+
 ## What To Do Next
 
 1. Stop treating custom `vendor` / `odm` reconstruction as the default path.
 2. Use stock-vendor-first images as the lower-stack baseline.
 3. Treat `product` as the first upper partition to isolate, diff, and selectively roll back.
-4. Compare stock vs custom `product` overlays, jars, priv-apps, and service providers tied to the missing wrapper classes.
-5. Only reintroduce custom lower-stack pieces when a specific runtime contract is understood.
-6. Keep `system/bin/init` instrumentation and broad property experiments deprioritized.
+4. Use the targeted restore helper to patch custom `product` with stock `pangu/system`, MIUI security/settings/service apps, and key MIUI overlays.
+5. Compare stock vs custom `product` overlays, jars, priv-apps, and service providers tied to the missing wrapper classes.
+6. Only reintroduce custom lower-stack pieces when a specific runtime contract is understood.
+7. Keep `system/bin/init` instrumentation and broad property experiments deprioritized.
 
 Current tighter control under test:
 - stock `vendor`
@@ -160,6 +188,14 @@ Newest narrower control:
 - interpretation:
   - custom `product` alone is sufficient to prevent boot
 
+Current targeted follow-up:
+- patch custom `product` with the highest-signal stock MIUI paths while keeping the rest of the control stock
+- helper:
+  - [tools/prepare_myron_stock_product_miui_restore_super.sh](/Users/benny/Homelab/ROM/tools/prepare_myron_stock_product_miui_restore_super.sh)
+- current mechanism behind the hypothesis:
+  - Xiaomi overlays `/product/pangu/system/*` back into `/system/*` through [fstab.qcom](/Users/benny/Homelab/ROM/device/xiaomi/sm8850-common/init/fstab.qcom#L63)
+  - stock `product` has that subtree; custom `product` does not
+
 ## Latest Useful Bundle
 
 - [/home/john/android/lineage/_checkpoints/postfailure_myron_20260312_102812](/home/john/android/lineage/_checkpoints/postfailure_myron_20260312_102812)
@@ -175,6 +211,8 @@ Useful current comparison targets:
   - [/home/john/android/lineage/out/target/product/myron/super_stock_vendor_miui_upper.img](/home/john/android/lineage/out/target/product/myron/super_stock_vendor_miui_upper.img)
 - stock-except-product control:
   - [/home/john/android/lineage/out/target/product/myron/super_stock_except_product.img](/home/john/android/lineage/out/target/product/myron/super_stock_except_product.img)
+- targeted stock-MIUI-product restore helper:
+  - [tools/prepare_myron_stock_product_miui_restore_super.sh](/Users/benny/Homelab/ROM/tools/prepare_myron_stock_product_miui_restore_super.sh)
 
 ## Recovery Path
 
@@ -201,3 +239,5 @@ Reliable stock recovery path:
   - [/home/john/android/lineage/out/target/product/myron/super_stock_vendor.img](/home/john/android/lineage/out/target/product/myron/super_stock_vendor.img)
 - Stock-except-product control image:
   - [/home/john/android/lineage/out/target/product/myron/super_stock_except_product.img](/home/john/android/lineage/out/target/product/myron/super_stock_except_product.img)
+- Next targeted control output:
+  - [/home/john/android/lineage/out/target/product/myron/super_stock_product_miui_restore.img](/home/john/android/lineage/out/target/product/myron/super_stock_product_miui_restore.img)
