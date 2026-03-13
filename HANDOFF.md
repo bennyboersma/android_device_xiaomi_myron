@@ -169,16 +169,17 @@ Important completed control tests:
 2. Treat the targeted issue classes below as complete and exhausted:
    - package-conflict cleanup
    - security privilege/layout restore
+   - `com.miui.cloudservice` / `com.xiaomi.finddevice` owner-family control
+   - `com.miui.securitycenter` / `com.miui.securityadd` / `com.mi.android.globalFileexplorer` owner-family control
 3. Stop creating broader stock-slice controls unless a later focused finding reopens that branch.
-4. Pivot to owner-conflict isolation:
-   - add `tools/inspect_myron_owner_conflicts.sh`
-   - report all visible owners for the surviving provider/permission conflicts
-   - identify the canonical stock owner
-   - recommend one owner-family control
-5. Use `/home/john/android/lineage/_checkpoints/postfailure_myron_product_security_contract_20260313_183049` as the new nearest baseline.
-6. Start with the `com.miui.cloudservice` vs `com.xiaomi.finddevice` owner-conflict family unless the new inspection disproves it.
-7. If that family is still sideways, move next to the `com.miui.securitycenter` / `com.miui.securityadd` owner-conflict family.
-8. Keep `system/bin/init` instrumentation and broad property experiments deprioritized.
+4. Stop creating more owner-family flash controls until the remaining external claimants are mapped statically.
+5. Use `/home/john/android/lineage/_checkpoints/postfailure_myron_product_security_owner_20260313_203158` as the new nearest baseline.
+6. Pivot to deeper static ownership/source analysis around:
+   - `com.miui.rom`
+   - `com.xiaomi.aicr`
+   - `com.miui.yellowpage`
+   - `com.xiaomi.scanner`
+7. Keep `system/bin/init` instrumentation and broad property experiments deprioritized.
 
 Completed targeted package-conflict control:
 - image:
@@ -219,21 +220,48 @@ Completed targeted security-contract restore control:
   - `Manager wrapper not available: security`
 
 Current default next issue class:
-- owner-conflict isolation for surviving provider/permission ownership
-- security-contract inspection report:
+- owner-conflict inspection report:
+  - `/home/john/android/lineage/_checkpoints/owner_conflicts_20260313_184219/summary.md`
+- first owner-family control:
+  - image: `/home/john/android/lineage/out/target/product/myron/super_product_cloudservice_owner.img`
+  - bundle: `/home/john/android/lineage/_checkpoints/postfailure_myron_product_cloudservice_owner_20260313_200712`
+  - comparison against `postfailure_myron_product_security_contract_20260313_183049`:
+    - `classification=sideways`
+    - stage score stayed `5 -> 5`
+  - unchanged target-family signatures:
+    - `Provider ComponentInfo{com.miui.cloudservice/androidx.core.content.FileProvider} already defined`
+    - `miui.cloud.finddevice.AccessFindDevice`
+    - `miui.cloud.finddevice.ManageFindDevice`
+- second owner-family control:
+  - image: `/home/john/android/lineage/out/target/product/myron/super_product_security_owner.img`
+  - bundle: `/home/john/android/lineage/_checkpoints/postfailure_myron_product_security_owner_20260313_203158`
+  - comparison against `postfailure_myron_product_cloudservice_owner_20260313_200712`:
+    - `classification=sideways`
+    - stage score stayed `5 -> 5`
+  - unchanged target-family signatures:
+    - `Missing permission state for package com.miui.securityadd`
+    - `Missing permission state for package com.mi.android.globalFileexplorer`
+    - `com.miui.securitycenter.permission.SYSTEM_PERMISSION_DECLARE`
+    - `com.miui.securitycenter.permission.CONTROL_VPN`
+    - `com.miui.securitycenter.POWER_CENTER_COMMON_PERMISSION`
+    - `Manager wrapper not available: security`
+
+Current default next issue class:
+- deeper static ownership/source analysis around the remaining external claimants
+- supporting reports:
+  - `/home/john/android/lineage/_checkpoints/owner_conflicts_20260313_184219/summary.md`
   - `/home/john/android/lineage/_checkpoints/security_contract_inspection_20260313_175857/summary.md`
 - new nearest baseline:
-  - `/home/john/android/lineage/_checkpoints/postfailure_myron_product_security_contract_20260313_183049`
-- first owner-conflict family to isolate:
-  - `com.miui.cloudservice` vs `com.xiaomi.finddevice`
-- second family if the first stays sideways:
-  - `com.miui.securitycenter` / `com.miui.securityadd`
-- next planned tooling:
-  - `tools/inspect_myron_owner_conflicts.sh`
-  - intended output:
-    - report all visible owners for the surviving provider/permission conflicts
-    - identify the canonical stock owner
-    - recommend one owner-family control
+  - `/home/john/android/lineage/_checkpoints/postfailure_myron_product_security_owner_20260313_203158`
+- remaining highest-signal external claimants:
+  - `com.miui.rom`
+  - `com.xiaomi.aicr`
+  - `com.miui.yellowpage`
+  - `com.xiaomi.scanner`
+- current supporting evidence:
+  - `com.miui.securitycenter.POWER_CENTER_COMMON_PERMISSION` is still already declared in `com.miui.rom`
+  - `hyperos.permission.READ_AIACTION` is still already declared in `com.xiaomi.aicr`
+  - `com.miui.securitycenter.permission.SYSTEM_PERMISSION_DECLARE` still collides via `com.miui.yellowpage`, `com.xiaomi.scanner`, and `com.mi.android.globalFileexplorer`
 
 Current mechanism that still matters:
 - Xiaomi overlays `/product/pangu/system/*` back into `/system/*` through [fstab.qcom](/Users/benny/Homelab/ROM/device/xiaomi/sm8850-common/init/fstab.qcom#L63)

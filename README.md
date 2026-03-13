@@ -225,18 +225,23 @@ Focus has shifted from broad rollback controls to stable-failure analysis:
 - stop building larger stock-slice `super` controls unless a later finding justifies reopening that branch
 - the first targeted package-conflict cleanup control is now complete and was **sideways**
 - the targeted security-contract restore control is now also complete and was **sideways**
-- the next targeted issue class is owner-conflict isolation, not more broad package restores
+- both owner-conflict family controls are now also complete and **sideways**
+- the next targeted issue class is deeper static ownership/source analysis around the remaining external claimants
 
 Current best next work:
 1. freeze the completed targeted issue classes:
    - package-conflict cleanup
    - security privilege/layout restore
-2. add `tools/inspect_myron_owner_conflicts.sh`
-3. use it to report all visible owners for the surviving provider/permission conflicts
-4. identify the canonical stock owner for each surviving conflict family
-5. build the next flash as one single-family owner-conflict control
-6. start with `com.miui.cloudservice` vs `com.xiaomi.finddevice` unless the owner-conflict inspection disproves it
-7. keep `com.miui.securitycenter` / `com.miui.securityadd` as the second family if the first owner-conflict control is sideways
+   - `com.miui.cloudservice` / `com.xiaomi.finddevice` owner-family control
+   - `com.miui.securitycenter` / `com.miui.securityadd` / `com.mi.android.globalFileexplorer` owner-family control
+2. stop building more owner-family flash controls until the remaining external claimants are mapped statically
+3. trace the surviving duplicate-permission graph back to the remaining external claimants:
+   - `com.miui.rom`
+   - `com.xiaomi.aicr`
+   - `com.miui.yellowpage`
+   - `com.xiaomi.scanner`
+4. identify where those packages live in effective mounted userspace and what exactly they declare
+5. only then choose the next single-family control, if any
 
 Completed targeted package-conflict control:
 - image:
@@ -278,22 +283,59 @@ The two targeted issue classes now exhausted:
 - package-conflict cleanup
 - security privilege/layout restore
 
+Completed owner-conflict tooling and controls:
+- owner-conflict inspection report:
+  - `/home/john/android/lineage/_checkpoints/owner_conflicts_20260313_184219/summary.md`
+- first owner-family control:
+  - image: `/home/john/android/lineage/out/target/product/myron/super_product_cloudservice_owner.img`
+  - bundle: `/home/john/android/lineage/_checkpoints/postfailure_myron_product_cloudservice_owner_20260313_200712`
+  - comparison against `postfailure_myron_product_security_contract_20260313_183049`:
+    - `classification=sideways`
+    - stage score stayed `5 -> 5`
+  - unchanged target-family signatures:
+    - `Provider ComponentInfo{com.miui.cloudservice/androidx.core.content.FileProvider} already defined`
+    - `miui.cloud.finddevice.AccessFindDevice`
+    - `miui.cloud.finddevice.ManageFindDevice`
+- second owner-family control:
+  - image: `/home/john/android/lineage/out/target/product/myron/super_product_security_owner.img`
+  - bundle: `/home/john/android/lineage/_checkpoints/postfailure_myron_product_security_owner_20260313_203158`
+  - comparison against `postfailure_myron_product_cloudservice_owner_20260313_200712`:
+    - `classification=sideways`
+    - stage score stayed `5 -> 5`
+  - unchanged target-family signatures:
+    - `Missing permission state for package com.miui.securityadd`
+    - `Missing permission state for package com.mi.android.globalFileexplorer`
+    - `com.miui.securitycenter.permission.SYSTEM_PERMISSION_DECLARE`
+    - `com.miui.securitycenter.permission.CONTROL_VPN`
+    - `com.miui.securitycenter.POWER_CENTER_COMMON_PERMISSION`
+    - `Manager wrapper not available: security`
+
+The owner-family controls now also exhausted:
+- `com.miui.cloudservice` / `com.xiaomi.finddevice`
+- `com.miui.securitycenter` / `com.miui.securityadd` / `com.mi.android.globalFileexplorer`
+
 Current default next issue class:
-- isolate surviving provider/permission owner conflicts
-- latest security-contract inspection report remains useful context:
+- deeper static ownership/source analysis around the remaining external claimants
+- latest owner-conflict and security-contract inspection reports remain useful context:
+  - `/home/john/android/lineage/_checkpoints/owner_conflicts_20260313_184219/summary.md`
   - `/home/john/android/lineage/_checkpoints/security_contract_inspection_20260313_175857/summary.md`
 - nearest new baseline bundle:
-  - `/home/john/android/lineage/_checkpoints/postfailure_myron_product_security_contract_20260313_183049`
-- first owner-conflict family to isolate:
-  - `com.miui.cloudservice` vs `com.xiaomi.finddevice`
-- second owner-conflict family if the first stays sideways:
-  - `com.miui.securitycenter` / `com.miui.securityadd`
+  - `/home/john/android/lineage/_checkpoints/postfailure_myron_product_security_owner_20260313_203158`
+- remaining highest-signal external claimants:
+  - `com.miui.rom`
+  - `com.xiaomi.aicr`
+  - `com.miui.yellowpage`
+  - `com.xiaomi.scanner`
+- current supporting evidence:
+  - `com.miui.securitycenter.POWER_CENTER_COMMON_PERMISSION` is still already declared in `com.miui.rom`
+  - `hyperos.permission.READ_AIACTION` is still already declared in `com.xiaomi.aicr`
+  - `com.miui.securitycenter.permission.SYSTEM_PERMISSION_DECLARE` still collides via `com.miui.yellowpage`, `com.xiaomi.scanner`, and `com.mi.android.globalFileexplorer`
 - next planned tooling:
   - `tools/inspect_myron_owner_conflicts.sh`
   - intended output:
     - report all visible owners for the surviving provider/permission conflicts
     - identify the canonical stock owner
-    - recommend one owner-family control
+    - recommend which remaining external claimant family should be isolated next
 
 The older vendor/odm contract-restoration work is still useful history, but it is no longer the default strategy, and the broad product-first ladder is now complete.
 
@@ -317,6 +359,9 @@ The older vendor/odm contract-restoration work is still useful history, but it i
 - [tools/prepare_myron_product_pkg_cleanup_super.sh](/Users/benny/Homelab/ROM/tools/prepare_myron_product_pkg_cleanup_super.sh)
 - [tools/inspect_myron_security_contract.sh](/Users/benny/Homelab/ROM/tools/inspect_myron_security_contract.sh)
 - [tools/prepare_myron_product_security_contract_super.sh](/Users/benny/Homelab/ROM/tools/prepare_myron_product_security_contract_super.sh)
+- [tools/inspect_myron_owner_conflicts.sh](/Users/benny/Homelab/ROM/tools/inspect_myron_owner_conflicts.sh)
+- [tools/prepare_myron_product_cloudservice_owner_super.sh](/Users/benny/Homelab/ROM/tools/prepare_myron_product_cloudservice_owner_super.sh)
+- [tools/prepare_myron_product_security_owner_super.sh](/Users/benny/Homelab/ROM/tools/prepare_myron_product_security_owner_super.sh)
 
 ## Related Docs
 
