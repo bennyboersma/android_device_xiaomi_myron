@@ -1,6 +1,6 @@
 # Myron AI Handoff
 
-Last updated: 2026-03-12
+Last updated: 2026-03-13
 
 ## Current Status
 
@@ -35,6 +35,30 @@ Practical conclusion:
 - stock lower partitions materially change behavior
 - the new default strategy should be stock-vendor-first, not continued custom-vendor reconstruction
 
+Fresh high-signal pivot bundle:
+- [/home/john/android/lineage/_checkpoints/myron_20260312_234734](/home/john/android/lineage/_checkpoints/myron_20260312_234734)
+
+What it proves:
+- old early failures are gone:
+  - no `ld.config.txt` warning
+  - no early `vendor_init` property-denial storm
+- boot now gets through:
+  - `vold`
+  - KeyMint / Gatekeeper / keystore2
+  - `/data`
+  - `apexd`
+  - `system_server`
+- later framework/runtime failures now dominate:
+  - `Manager wrapper not available: security`
+  - `Manager wrapper not available: MiuiWifiService`
+  - `Manager wrapper not available: SlaveWifiService`
+  - `Failed to create service com.android.server.location.LocationPolicyManagerService$Lifecycle`
+  - `Failed to create service com.android.server.powerconsumpiton.PowerConsumptionService`
+  - `SystemServerI: reboot init app level`
+  - `SystemServerI: reboot init app anr level`
+
+So the current primary suspect is the custom upper framework surface, not the lower vendor stack.
+
 ## What Is No Longer The Main Blocker
 
 These have already been tested or eliminated as primary blockers:
@@ -51,18 +75,10 @@ These have already been tested or eliminated as primary blockers:
 
 ## Current Failure Shape
 
-Useful bundle for late-stage analysis:
-- [/home/john/android/lineage/_checkpoints/postfailure_myron_20260312_102812](/home/john/android/lineage/_checkpoints/postfailure_myron_20260312_102812)
-
-What the logs now show:
-- boot gets into `system_server`
-- then package / overlay / framework failures begin
-- later:
-  - `SystemServiceRegistry: Manager wrapper not available: security`
-  - `SystemServerI: reboot init app level`
-  - `SystemServerI: reboot init app anr level`
-
-This is later and more useful than the earlier early-init theories.
+Useful bundles for current analysis:
+- [/home/john/android/lineage/_checkpoints/myron_20260312_234734](/home/john/android/lineage/_checkpoints/myron_20260312_234734)
+- older custom-vendor reference:
+  - [/home/john/android/lineage/_checkpoints/postfailure_myron_20260312_102812](/home/john/android/lineage/_checkpoints/postfailure_myron_20260312_102812)
 
 ## Strategy History
 
@@ -109,6 +125,18 @@ Important completed control tests:
 4. Only reintroduce custom lower-stack pieces when a specific runtime contract is understood.
 5. Keep `system/bin/init` instrumentation and broad property experiments deprioritized.
 
+Current tighter control under test:
+- stock `vendor`
+- stock `odm`
+- stock `vendor_dlkm`
+- stock `mi_ext`
+- stock `product`
+- stock `system_ext`
+- custom `system`
+- custom `system_dlkm`
+- image:
+  - [/home/john/android/lineage/out/target/product/myron/super_stock_vendor_miui_upper.img](/home/john/android/lineage/out/target/product/myron/super_stock_vendor_miui_upper.img)
+
 ## Latest Useful Bundle
 
 - [/home/john/android/lineage/_checkpoints/postfailure_myron_20260312_102812](/home/john/android/lineage/_checkpoints/postfailure_myron_20260312_102812)
@@ -120,6 +148,8 @@ Useful current comparison targets:
   - [/home/john/android/lineage/out/target/product/myron/super_stock_framework.img](/home/john/android/lineage/out/target/product/myron/super_stock_framework.img)
 - stock-vendor pivot image:
   - [/home/john/android/lineage/out/target/product/myron/super_stock_vendor.img](/home/john/android/lineage/out/target/product/myron/super_stock_vendor.img)
+- tighter stock-vendor + stock-MIUI-upper control:
+  - [/home/john/android/lineage/out/target/product/myron/super_stock_vendor_miui_upper.img](/home/john/android/lineage/out/target/product/myron/super_stock_vendor_miui_upper.img)
 
 ## Recovery Path
 

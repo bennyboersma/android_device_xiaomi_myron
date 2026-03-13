@@ -1,6 +1,6 @@
 # Poco F8 Ultra (`myron`) Bring-up Status
 
-Last updated: 2026-03-12
+Last updated: 2026-03-13
 
 ## Summary
 
@@ -99,6 +99,20 @@ These are the major bring-up strategies and what they taught us:
 - current strategy:
   - keep iterating from the stock-vendor-first baseline instead of reconstructing custom `vendor` / `odm` one service at a time
 
+6. Tighter stock-vendor + stock-MIUI-upper control
+- stock `vendor_a`
+- stock `odm_a`
+- stock `vendor_dlkm_a`
+- stock `mi_ext_a`
+- stock `product_a`
+- stock `system_ext_a`
+- custom `system_a`
+- custom `system_dlkm_a`
+- image:
+  - [/home/john/android/lineage/out/target/product/myron/super_stock_vendor_miui_upper.img](/home/john/android/lineage/out/target/product/myron/super_stock_vendor_miui_upper.img)
+- purpose:
+  - isolate whether the remaining blocker is now in custom `system` alone
+
 ## What Has Been Eliminated As The Main Blocker
 
 These are no longer the primary problem:
@@ -124,18 +138,29 @@ Meaning:
 
 ## Current Failure Shape
 
-High-signal bundle:
-- [/home/john/android/lineage/_checkpoints/postfailure_myron_20260312_102812](/home/john/android/lineage/_checkpoints/postfailure_myron_20260312_102812)
+High-signal stock-vendor-first pivot bundle:
+- [/home/john/android/lineage/_checkpoints/myron_20260312_234734](/home/john/android/lineage/_checkpoints/myron_20260312_234734)
 
-Useful late-stage signals from that bundle:
-- `SystemServer: Entered the Android system server!`
-- then package / overlay / framework failure storm
-- later:
-  - `SystemServiceRegistry: Manager wrapper not available: security`
+Useful late-stage signals from that pivot bundle:
+- old early failures are gone:
+  - no `ld.config.txt` warning
+  - no early `vendor_init` property-denial storm
+- boot now gets through:
+  - `vold`
+  - KeyMint / Gatekeeper / keystore2
+  - `/data` mount
+  - `apexd.status=activated`
+  - `SystemServer: Entered the Android system server!`
+- later framework/runtime failures:
+  - `Manager wrapper not available: security`
+  - `Manager wrapper not available: MiuiWifiService`
+  - `Manager wrapper not available: SlaveWifiService`
+  - `Failed to create service com.android.server.location.LocationPolicyManagerService$Lifecycle`
+  - `Failed to create service com.android.server.powerconsumpiton.PowerConsumptionService`
   - `SystemServerI: reboot init app level`
   - `SystemServerI: reboot init app anr level`
 
-This means the current debugging surface is later than classic early-init bring-up.
+This means the current debugging surface has shifted up into the custom upper framework layer, not the lower vendor stack.
 
 ## Current Direction
 
@@ -150,7 +175,12 @@ Current baseline for the pivot:
 Current best next work:
 1. use the stock-vendor-first image as the new control baseline
 2. compare its failure bundles against the old custom-vendor bundles
-3. only reintroduce custom lower-stack pieces when the runtime contract impact is understood
+3. use the tighter stock-vendor + stock-MIUI-upper control to isolate custom `system`
+4. compare stock vs custom `system/framework` and `system_ext/framework` class providers for:
+   - `LocationPolicyManagerService`
+   - `PowerConsumptionService`
+   - MIUI security / wifi wrapper classes
+5. avoid further lower-stack restoration unless the pivot evidence points back downward
 
 The older vendor/odm contract-restoration work is still useful history, but it is no longer the default strategy.
 
@@ -165,6 +195,7 @@ The older vendor/odm contract-restoration work is still useful history, but it i
 - [tools/prepare_myron_stock_framework_super.sh](/Users/benny/Homelab/ROM/tools/prepare_myron_stock_framework_super.sh)
 - [tools/prepare_myron_stock_core_super.sh](/Users/benny/Homelab/ROM/tools/prepare_myron_stock_core_super.sh)
 - [tools/prepare_myron_stock_vendor_super.sh](/Users/benny/Homelab/ROM/tools/prepare_myron_stock_vendor_super.sh)
+- [tools/prepare_myron_stock_vendor_miui_upper_super.sh](/Users/benny/Homelab/ROM/tools/prepare_myron_stock_vendor_miui_upper_super.sh)
 
 ## Related Docs
 
