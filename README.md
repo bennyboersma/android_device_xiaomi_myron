@@ -226,7 +226,8 @@ Focus has shifted from broad rollback controls to stable-failure analysis:
 - the first targeted package-conflict cleanup control is now complete and was **sideways**
 - the targeted security-contract restore control is now also complete and was **sideways**
 - both owner-conflict family controls are now also complete and **sideways**
-- the next targeted issue class is deeper static ownership/source analysis around the remaining external claimants
+- the external-claimant restore control and the `yellowpage/rom` owner restore are now also complete and **sideways**
+- the next stage is runtime package-state and framework-policy analysis, not more APK-owner restore images
 
 Current best next work:
 1. freeze the completed targeted issue classes:
@@ -234,14 +235,17 @@ Current best next work:
    - security privilege/layout restore
    - `com.miui.cloudservice` / `com.xiaomi.finddevice` owner-family control
    - `com.miui.securitycenter` / `com.miui.securityadd` / `com.mi.android.globalFileexplorer` owner-family control
-2. stop building more owner-family flash controls until the remaining external claimants are mapped statically
-3. trace the surviving duplicate-permission graph back to the remaining external claimants:
-   - `com.miui.rom`
-   - `com.xiaomi.aicr`
-   - `com.miui.yellowpage`
-   - `com.xiaomi.scanner`
-4. identify where those packages live in effective mounted userspace and what exactly they declare
-5. only then choose the next single-family control, if any
+   - external-claimant restore
+   - `yellowpage/rom` owner restore
+2. stop building more narrow restore images until a runtime-state finding justifies one
+3. treat the surviving blocker as a package-state / framework-policy problem:
+   - stock creates valid runtime permission state for `com.miui.rom`, `com.miui.yellowpage`, `com.xiaomi.aicr`, and `com.xiaomi.scanner`
+   - failing custom userspace still reports `Missing permission state` for those same packages
+4. trace the runtime/package-policy path through:
+   - `frameworks/base/services/core/java/com/android/server/pm/Settings.java`
+   - `frameworks/base/services/permission/java/com/android/server/permission/access/permission/AppIdPermissionPolicy.kt`
+   - `frameworks/base/core/java/android/app/SystemServiceRegistry.java`
+5. only build another image if that analysis identifies one concrete missing runtime-state input or one concrete framework-policy fix
 
 Completed targeted package-conflict control:
 - image:
@@ -314,28 +318,55 @@ The owner-family controls now also exhausted:
 - `com.miui.cloudservice` / `com.xiaomi.finddevice`
 - `com.miui.securitycenter` / `com.miui.securityadd` / `com.mi.android.globalFileexplorer`
 
+Completed external-claimant and `yellowpage/rom` controls:
+- external-claimant restore:
+  - image: `/home/john/android/lineage/out/target/product/myron/super_product_external_claimants.img`
+  - bundle: `/home/john/android/lineage/_checkpoints/postfailure_myron_20260313_213402`
+  - comparison against `postfailure_myron_product_security_owner_20260313_203158`:
+    - `classification=sideways`
+    - stage score stayed `5 -> 5`
+  - restored:
+    - `data-app/MiuiScanner`
+    - `priv-app/MIUIAICR`
+    - `etc/device_features/myron.xml`
+    - `etc/removable_apk_info.xml`
+    - `etc/permissions/privapp-permissions-product.xml`
+- `yellowpage/rom` owner restore:
+  - image: `/home/john/android/lineage/out/target/product/myron/super_product_yellowpage_rom_owner.img`
+  - bundle: `/home/john/android/lineage/_checkpoints/postfailure_myron_20260313_221344`
+  - comparison against `postfailure_myron_20260313_213402`:
+    - `classification=sideways`
+    - stage score stayed `5 -> 5`
+  - restored:
+    - `/product/priv-app/MIUIYellowPageGlobal`
+    - `/system_ext/framework/framework-ext-res`
+
 Current default next issue class:
-- deeper static ownership/source analysis around the remaining external claimants
-- latest owner-conflict and security-contract inspection reports remain useful context:
-  - `/home/john/android/lineage/_checkpoints/owner_conflicts_20260313_184219/summary.md`
-  - `/home/john/android/lineage/_checkpoints/security_contract_inspection_20260313_175857/summary.md`
-- nearest new baseline bundle:
-  - `/home/john/android/lineage/_checkpoints/postfailure_myron_product_security_owner_20260313_203158`
-- remaining highest-signal external claimants:
-  - `com.miui.rom`
-  - `com.xiaomi.aicr`
-  - `com.miui.yellowpage`
-  - `com.xiaomi.scanner`
-- current supporting evidence:
-  - `com.miui.securitycenter.POWER_CENTER_COMMON_PERMISSION` is still already declared in `com.miui.rom`
-  - `hyperos.permission.READ_AIACTION` is still already declared in `com.xiaomi.aicr`
-  - `com.miui.securitycenter.permission.SYSTEM_PERMISSION_DECLARE` still collides via `com.miui.yellowpage`, `com.xiaomi.scanner`, and `com.mi.android.globalFileexplorer`
-- next planned tooling:
-  - `tools/inspect_myron_owner_conflicts.sh`
-  - intended output:
-    - report all visible owners for the surviving provider/permission conflicts
-    - identify the canonical stock owner
-    - recommend which remaining external claimant family should be isolated next
+- runtime package-state and framework-policy analysis
+- latest reports:
+  - `/home/john/android/lineage/_checkpoints/stock_runtime_packages_20260313_222827/summary.md`
+  - `/home/john/android/lineage/_checkpoints/fake_package_flow_20260313_222827/summary.md`
+  - `/home/john/android/lineage/_checkpoints/runtime_state_gaps_20260313_224150/summary.md`
+  - `/home/john/android/lineage/_checkpoints/framework_policy_paths_20260313_224328/summary.md`
+- newest valid failing baseline bundle:
+  - `/home/john/android/lineage/_checkpoints/postfailure_myron_20260313_221344`
+- stock runtime truth now confirms:
+  - `com.miui.rom` is a real framework APK identity from `/system_ext/framework/framework-ext-res/framework-ext-res.apk`
+  - `com.miui.yellowpage` is a real stock package on the live device at `/product/priv-app/MIUIYellowPageGlobal/MIUIYellowPageGlobal.apk`
+  - `com.xiaomi.aicr` is a stock product priv-app at `/product/priv-app/MIUIAICR/MIUIAICR.apk`
+  - `com.xiaomi.scanner` is a stock product data-app at `/product/data-app/MiuiScanner/MiuiScanner.apk`
+- but the failing custom userspace still reports:
+  - `Missing permission state for package com.miui.rom`
+  - `Missing permission state for package com.miui.yellowpage`
+  - `Missing permission state for package com.xiaomi.aicr`
+  - `Missing permission state for package com.xiaomi.scanner`
+- source-level choke points are now identified:
+  - `Settings.java:6522` emits `Missing permission state` when per-user runtime-permission entries are absent
+  - `AppIdPermissionPolicy.kt:505` emits the duplicate system-owner warnings
+  - `SystemServiceRegistry.java:2111` emits `Manager wrapper not available: security` as downstream fallout
+- current conclusion:
+  - do not build another image yet
+  - the next fix is more likely a `system` / `system_ext` framework-policy or runtime-state-input fix than another `product` APK restore
 
 The older vendor/odm contract-restoration work is still useful history, but it is no longer the default strategy, and the broad product-first ladder is now complete.
 
@@ -362,6 +393,13 @@ The older vendor/odm contract-restoration work is still useful history, but it i
 - [tools/inspect_myron_owner_conflicts.sh](/Users/benny/Homelab/ROM/tools/inspect_myron_owner_conflicts.sh)
 - [tools/prepare_myron_product_cloudservice_owner_super.sh](/Users/benny/Homelab/ROM/tools/prepare_myron_product_cloudservice_owner_super.sh)
 - [tools/prepare_myron_product_security_owner_super.sh](/Users/benny/Homelab/ROM/tools/prepare_myron_product_security_owner_super.sh)
+- [tools/inspect_myron_preinstall_claimants.sh](/Users/benny/Homelab/ROM/tools/inspect_myron_preinstall_claimants.sh)
+- [tools/prepare_myron_product_external_claimants_super.sh](/Users/benny/Homelab/ROM/tools/prepare_myron_product_external_claimants_super.sh)
+- [tools/prepare_myron_product_yellowpage_rom_owner_super.sh](/Users/benny/Homelab/ROM/tools/prepare_myron_product_yellowpage_rom_owner_super.sh)
+- [tools/inspect_myron_stock_runtime_packages.sh](/Users/benny/Homelab/ROM/tools/inspect_myron_stock_runtime_packages.sh)
+- [tools/inspect_myron_fake_package_flow.sh](/Users/benny/Homelab/ROM/tools/inspect_myron_fake_package_flow.sh)
+- [tools/analyze_myron_runtime_state_gaps.sh](/Users/benny/Homelab/ROM/tools/analyze_myron_runtime_state_gaps.sh)
+- [tools/inspect_myron_framework_policy_paths.sh](/Users/benny/Homelab/ROM/tools/inspect_myron_framework_policy_paths.sh)
 
 ## Related Docs
 
