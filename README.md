@@ -11,9 +11,10 @@ Current project state:
 - there is still no confirmed custom userspace boot
 - custom `super.img` flashing works
 - failed custom boots are recoverable with the full stock boot chain plus stock `super`
-- the project is now pivoting to a stock-vendor-first strategy
-- the newest control says custom `product` alone is enough to break boot
-- stock vs custom `product` diff points at missing MIUI `product` surface, not lower-stack regressions
+- the broad stock-slice rollback matrix is now closed
+- custom `product` alone is enough to break boot
+- restoring full stock `product`, stock `system_ext`, or stock `system` on top of that does not fix boot
+- the next stage is failure-signature and userspace-composition analysis, not broader partition swaps
 
 ## What Is Proven
 
@@ -165,19 +166,21 @@ These are no longer the primary problem:
 
 ## Strongest Current Result
 
-The strongest current result is now the newest control after the pivot:
+The broad stock-slice rollback matrix is now closed:
 - stock-everything-except-product still fails
-- that means custom `product` alone is enough to break boot
-
-The pivot result still matters:
-- stock-vendor-first changed the visible failure shape to a stable POCO-logo stall
-- that is a stronger signal than the older quick bootloop-to-`fastboot` behavior
+- stock `product` with custom `system` and `system_ext` still fails
+- stock `product` plus stock `system_ext` still fails
+- stock `product` plus stock `system` still fails
 
 Meaning:
-- stock `vendor` / `odm` does matter materially
-- custom `product` is now the highest-confidence upper-layer blocker
-- Xiaomi's `product` content also feeds `/system` through overlay mounts, so this is not just an isolated app-packaging issue
-- the next work should be framed around a stock-vendor-first baseline with `product` isolation first, not continued custom-vendor reconstruction
+- custom `product` alone is sufficient to break boot
+- whole-partition rollback of `product`, `system_ext`, or `system` does not move the failure
+- the stable blocker now looks like a tighter cross-partition composition problem:
+  - package parsing
+  - package duplication
+  - privilege/layout mismatch
+  - overlay/package-manager conflicts
+- further broad stock-slice flashing is no longer the default path
 
 ## Current Failure Shape
 
@@ -217,26 +220,82 @@ Why `product` can still break apparent `/system` services:
 
 ## Current Direction
 
-Focus has shifted from `init` and property experiments to a stock-vendor-first pivot:
-- keep stock lower partitions intact
-- adapt upper framework layers around them
-
-Current baseline for the pivot:
-- stock `vendor` / `odm` / `vendor_dlkm` / `mi_ext`
-- custom `system` / `system_ext` / `product` / `system_dlkm`
+Focus has shifted from broad rollback controls to stable-failure analysis:
+- keep the lower stock baseline frozen for future targeted tests
+- stop building larger stock-slice `super` controls unless a later finding justifies reopening that branch
+- the first targeted package-conflict cleanup control is now complete and was **sideways**
+- the targeted security-contract restore control is now also complete and was **sideways**
+- the next targeted issue class is owner-conflict isolation, not more broad package restores
 
 Current best next work:
-1. use the stock-vendor-first image as the new control baseline
-2. compare its failure bundles against the old custom-vendor bundles
-3. use the `product` diff result to restore the smallest stock MIUI surface first
-4. test a patched `product` that restores stock `pangu/system`, security-center privilege, MIUI settings/service apps, and key MIUI overlays
-5. compare stock vs custom `product` contents, overlays, priv-apps, and framework jars that feed:
-   - `LocationPolicyManagerService`
-   - `PowerConsumptionService`
-   - MIUI security / wifi wrapper classes
-6. avoid further lower-stack restoration unless the pivot evidence points back downward
+1. freeze the completed targeted issue classes:
+   - package-conflict cleanup
+   - security privilege/layout restore
+2. add `tools/inspect_myron_owner_conflicts.sh`
+3. use it to report all visible owners for the surviving provider/permission conflicts
+4. identify the canonical stock owner for each surviving conflict family
+5. build the next flash as one single-family owner-conflict control
+6. start with `com.miui.cloudservice` vs `com.xiaomi.finddevice` unless the owner-conflict inspection disproves it
+7. keep `com.miui.securitycenter` / `com.miui.securityadd` as the second family if the first owner-conflict control is sideways
 
-The older vendor/odm contract-restoration work is still useful history, but it is no longer the default strategy.
+Completed targeted package-conflict control:
+- image:
+  - `/home/john/android/lineage/out/target/product/myron/super_product_pkg_cleanup.img`
+- bundle:
+  - `/home/john/android/lineage/_checkpoints/postfailure_myron_product_pkg_cleanup_20260313_173920`
+- comparison against `postfailure_myron_stock_product_stock_system_20260313_141009`:
+  - `classification=sideways`
+  - stage score stayed `5 -> 5`
+- the exact targeted signatures still survived unchanged:
+  - `/product/app/Calendar`
+  - `/product/app/GoogleCalendarSyncAdapter`
+  - `/product/app/messaging`
+  - `/product/app/MiuiCalendarGlobalPad`
+  - `/product/priv-app/MiuiCalendarGlobalPad`
+  - duplicate `com.miui.miwallpaper.overlay`
+  - duplicate `com.miui.wallpaper.overlay`
+  - duplicate provider/component declarations such as `com.miui.cloudservice/androidx.core.content.FileProvider`
+  - `Manager wrapper not available: security`
+
+Current default next issue class from the March 13 reports:
+Completed targeted security-contract restore control:
+- image:
+  - `/home/john/android/lineage/out/target/product/myron/super_product_security_contract.img`
+- bundle:
+  - `/home/john/android/lineage/_checkpoints/postfailure_myron_product_security_contract_20260313_183049`
+- comparison against `postfailure_myron_product_pkg_cleanup_20260313_173920`:
+  - `classification=sideways`
+  - stage score stayed `5 -> 5`
+- the specific security-side warnings still survived unchanged:
+  - `com.miui.cloudservice/androidx.core.content.FileProvider`
+  - `miui.cloud.finddevice.AccessFindDevice`
+  - `miui.cloud.finddevice.ManageFindDevice`
+  - `com.miui.securitycenter.POWER_CENTER_COMMON_PERMISSION`
+  - `com.miui.securitycenter.permission.CONTROL_VPN`
+  - `Manager wrapper not available: security`
+
+The two targeted issue classes now exhausted:
+- package-conflict cleanup
+- security privilege/layout restore
+
+Current default next issue class:
+- isolate surviving provider/permission owner conflicts
+- latest security-contract inspection report remains useful context:
+  - `/home/john/android/lineage/_checkpoints/security_contract_inspection_20260313_175857/summary.md`
+- nearest new baseline bundle:
+  - `/home/john/android/lineage/_checkpoints/postfailure_myron_product_security_contract_20260313_183049`
+- first owner-conflict family to isolate:
+  - `com.miui.cloudservice` vs `com.xiaomi.finddevice`
+- second owner-conflict family if the first stays sideways:
+  - `com.miui.securitycenter` / `com.miui.securityadd`
+- next planned tooling:
+  - `tools/inspect_myron_owner_conflicts.sh`
+  - intended output:
+    - report all visible owners for the surviving provider/permission conflicts
+    - identify the canonical stock owner
+    - recommend one owner-family control
+
+The older vendor/odm contract-restoration work is still useful history, but it is no longer the default strategy, and the broad product-first ladder is now complete.
 
 ## Useful Tools
 
@@ -252,6 +311,12 @@ The older vendor/odm contract-restoration work is still useful history, but it i
 - [tools/prepare_myron_stock_vendor_miui_upper_super.sh](/Users/benny/Homelab/ROM/tools/prepare_myron_stock_vendor_miui_upper_super.sh)
 - [tools/prepare_myron_stock_except_product_super.sh](/Users/benny/Homelab/ROM/tools/prepare_myron_stock_except_product_super.sh)
 - [tools/prepare_myron_stock_product_miui_restore_super.sh](/Users/benny/Homelab/ROM/tools/prepare_myron_stock_product_miui_restore_super.sh)
+- [tools/analyze_myron_failure_signatures.sh](/Users/benny/Homelab/ROM/tools/analyze_myron_failure_signatures.sh)
+- [tools/diff_myron_effective_userspace.sh](/Users/benny/Homelab/ROM/tools/diff_myron_effective_userspace.sh)
+- [tools/inspect_myron_product_pkg_conflicts.sh](/Users/benny/Homelab/ROM/tools/inspect_myron_product_pkg_conflicts.sh)
+- [tools/prepare_myron_product_pkg_cleanup_super.sh](/Users/benny/Homelab/ROM/tools/prepare_myron_product_pkg_cleanup_super.sh)
+- [tools/inspect_myron_security_contract.sh](/Users/benny/Homelab/ROM/tools/inspect_myron_security_contract.sh)
+- [tools/prepare_myron_product_security_contract_super.sh](/Users/benny/Homelab/ROM/tools/prepare_myron_product_security_contract_super.sh)
 
 ## Related Docs
 
