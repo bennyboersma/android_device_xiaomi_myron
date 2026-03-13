@@ -12,6 +12,7 @@ Current project state:
 - custom `super.img` flashing works
 - failed custom boots are recoverable with the full stock boot chain plus stock `super`
 - the project is now pivoting to a stock-vendor-first strategy
+- the newest control says custom `product` alone is enough to break boot
 
 ## What Is Proven
 
@@ -113,6 +114,20 @@ These are the major bring-up strategies and what they taught us:
 - purpose:
   - isolate whether the remaining blocker is now in custom `system` alone
 
+7. Stock-everything-except-product control
+- stock `system_a`
+- stock `system_ext_a`
+- custom `product_a`
+- stock `vendor_a`
+- stock `odm_a`
+- stock `vendor_dlkm_a`
+- stock `system_dlkm_a`
+- stock `mi_ext_a`
+- image:
+  - [/home/john/android/lineage/out/target/product/myron/super_stock_except_product.img](/home/john/android/lineage/out/target/product/myron/super_stock_except_product.img)
+- result: still failed
+- conclusion: custom `product` alone is already sufficient to break boot
+
 ## What Has Been Eliminated As The Main Blocker
 
 These are no longer the primary problem:
@@ -123,18 +138,22 @@ These are no longer the primary problem:
 - stale duplicate power HAL RC registration
 - secure-element / strongbox / eSE exposure
 - missing stock `mi_ext` lines alone
-- custom `product/system_ext` surface by itself
 - the original custom-vendor-first strategy as the default path
 
 ## Strongest Current Result
 
-The strongest current result is now the strategy pivot itself:
+The strongest current result is now the newest control after the pivot:
+- stock-everything-except-product still fails
+- that means custom `product` alone is enough to break boot
+
+The pivot result still matters:
 - stock-vendor-first changed the visible failure shape to a stable POCO-logo stall
 - that is a stronger signal than the older quick bootloop-to-`fastboot` behavior
 
 Meaning:
 - stock `vendor` / `odm` does matter materially
-- the next work should be framed around a stock-vendor-first baseline, not continued custom-vendor reconstruction
+- custom `product` is now the highest-confidence upper-layer blocker
+- the next work should be framed around a stock-vendor-first baseline with `product` isolation first, not continued custom-vendor reconstruction
 
 ## Current Failure Shape
 
@@ -160,7 +179,7 @@ Useful late-stage signals from that pivot bundle:
   - `SystemServerI: reboot init app level`
   - `SystemServerI: reboot init app anr level`
 
-This means the current debugging surface has shifted up into the custom upper framework layer, not the lower vendor stack.
+This means the current debugging surface has shifted up into the upper framework / `product` layer, not the lower vendor stack.
 
 ## Current Direction
 
@@ -175,8 +194,8 @@ Current baseline for the pivot:
 Current best next work:
 1. use the stock-vendor-first image as the new control baseline
 2. compare its failure bundles against the old custom-vendor bundles
-3. use the tighter stock-vendor + stock-MIUI-upper control to isolate custom `system`
-4. compare stock vs custom `system/framework` and `system_ext/framework` class providers for:
+3. treat `product` as the first partition to isolate and diff
+4. compare stock vs custom `product` contents, overlays, priv-apps, and framework jars that feed:
    - `LocationPolicyManagerService`
    - `PowerConsumptionService`
    - MIUI security / wifi wrapper classes
@@ -196,6 +215,7 @@ The older vendor/odm contract-restoration work is still useful history, but it i
 - [tools/prepare_myron_stock_core_super.sh](/Users/benny/Homelab/ROM/tools/prepare_myron_stock_core_super.sh)
 - [tools/prepare_myron_stock_vendor_super.sh](/Users/benny/Homelab/ROM/tools/prepare_myron_stock_vendor_super.sh)
 - [tools/prepare_myron_stock_vendor_miui_upper_super.sh](/Users/benny/Homelab/ROM/tools/prepare_myron_stock_vendor_miui_upper_super.sh)
+- [tools/prepare_myron_stock_except_product_super.sh](/Users/benny/Homelab/ROM/tools/prepare_myron_stock_except_product_super.sh)
 
 ## Related Docs
 

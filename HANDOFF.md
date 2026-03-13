@@ -12,6 +12,7 @@ Current verified state:
 - there is still no confirmed custom userspace boot
 - the best custom result is a real bootloop before fallback to `fastboot`
 - strategy is now pivoting to stock-vendor-first
+- newest control says custom `product` alone is enough to break boot
 
 ## Most Important New Result
 
@@ -57,7 +58,7 @@ What it proves:
   - `SystemServerI: reboot init app level`
   - `SystemServerI: reboot init app anr level`
 
-So the current primary suspect is the custom upper framework surface, not the lower vendor stack.
+So the current primary suspect is now custom `product`, more specifically the upper framework / MIUI-facing surface it carries, not the lower vendor stack.
 
 ## What Is No Longer The Main Blocker
 
@@ -70,7 +71,6 @@ These have already been tested or eliminated as primary blockers:
 - secure-element / strongbox / eSE exposure
 - stale duplicate power HAL RC registration
 - missing stock `mi_ext` mount lines alone
-- custom `product` / `system_ext` surface by itself
 - the custom-vendor-first strategy as the main path
 
 ## Current Failure Shape
@@ -117,13 +117,29 @@ Important completed control tests:
   - [/home/john/android/lineage/out/target/product/myron/super_stock_vendor.img](/home/john/android/lineage/out/target/product/myron/super_stock_vendor.img)
 - this is now the preferred baseline for the next stage of bring-up
 
+5. Stock-everything-except-product control:
+- stock `system_a`
+- stock `system_ext_a`
+- custom `product_a`
+- stock `vendor_a`
+- stock `odm_a`
+- stock `vendor_dlkm_a`
+- stock `system_dlkm_a`
+- stock `mi_ext_a`
+- image:
+  - [/home/john/android/lineage/out/target/product/myron/super_stock_except_product.img](/home/john/android/lineage/out/target/product/myron/super_stock_except_product.img)
+- still failed
+- strongest new conclusion:
+  - custom `product` alone is enough to break boot
+
 ## What To Do Next
 
 1. Stop treating custom `vendor` / `odm` reconstruction as the default path.
-2. Use stock-vendor-first images as the new control baseline.
-3. Compare stock-vendor-first failure bundles against the old custom-vendor bundles.
-4. Only reintroduce custom lower-stack pieces when a specific runtime contract is understood.
-5. Keep `system/bin/init` instrumentation and broad property experiments deprioritized.
+2. Use stock-vendor-first images as the lower-stack baseline.
+3. Treat `product` as the first upper partition to isolate, diff, and selectively roll back.
+4. Compare stock vs custom `product` overlays, jars, priv-apps, and service providers tied to the missing wrapper classes.
+5. Only reintroduce custom lower-stack pieces when a specific runtime contract is understood.
+6. Keep `system/bin/init` instrumentation and broad property experiments deprioritized.
 
 Current tighter control under test:
 - stock `vendor`
@@ -136,6 +152,13 @@ Current tighter control under test:
 - custom `system_dlkm`
 - image:
   - [/home/john/android/lineage/out/target/product/myron/super_stock_vendor_miui_upper.img](/home/john/android/lineage/out/target/product/myron/super_stock_vendor_miui_upper.img)
+
+Newest narrower control:
+- stock everything except `product`
+- image:
+  - [/home/john/android/lineage/out/target/product/myron/super_stock_except_product.img](/home/john/android/lineage/out/target/product/myron/super_stock_except_product.img)
+- interpretation:
+  - custom `product` alone is sufficient to prevent boot
 
 ## Latest Useful Bundle
 
@@ -150,6 +173,8 @@ Useful current comparison targets:
   - [/home/john/android/lineage/out/target/product/myron/super_stock_vendor.img](/home/john/android/lineage/out/target/product/myron/super_stock_vendor.img)
 - tighter stock-vendor + stock-MIUI-upper control:
   - [/home/john/android/lineage/out/target/product/myron/super_stock_vendor_miui_upper.img](/home/john/android/lineage/out/target/product/myron/super_stock_vendor_miui_upper.img)
+- stock-except-product control:
+  - [/home/john/android/lineage/out/target/product/myron/super_stock_except_product.img](/home/john/android/lineage/out/target/product/myron/super_stock_except_product.img)
 
 ## Recovery Path
 
@@ -174,3 +199,5 @@ Reliable stock recovery path:
   - [/home/john/android/lineage/out/target/product/myron/super_stock_framework.img](/home/john/android/lineage/out/target/product/myron/super_stock_framework.img)
 - Stock-vendor pivot image:
   - [/home/john/android/lineage/out/target/product/myron/super_stock_vendor.img](/home/john/android/lineage/out/target/product/myron/super_stock_vendor.img)
+- Stock-except-product control image:
+  - [/home/john/android/lineage/out/target/product/myron/super_stock_except_product.img](/home/john/android/lineage/out/target/product/myron/super_stock_except_product.img)
