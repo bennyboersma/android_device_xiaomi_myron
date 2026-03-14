@@ -227,7 +227,12 @@ Focus has shifted from broad rollback controls to stable-failure analysis:
 - the targeted security-contract restore control is now also complete and was **sideways**
 - both owner-conflict family controls are now also complete and **sideways**
 - the external-claimant restore control and the `yellowpage/rom` owner restore are now also complete and **sideways**
-- the next stage is runtime package-state and framework-policy analysis, not more APK-owner restore images
+- the combined runtime-state-inputs restore control is now also complete and **sideways**
+- the restore-image lane is exhausted again
+- the next stage is code-level runtime-state materialization analysis, not more restore images
+- the first framework-side experiment is now in progress on the builder:
+  - patch target: `frameworks/base/services/core/java/com/android/server/pm/Settings.java`
+  - goal: normalize missing per-user runtime-permission entries during initial/incomplete state load instead of immediately marking packages missing
 
 Current best next work:
 1. freeze the completed targeted issue classes:
@@ -237,15 +242,26 @@ Current best next work:
    - `com.miui.securitycenter` / `com.miui.securityadd` / `com.mi.android.globalFileexplorer` owner-family control
    - external-claimant restore
    - `yellowpage/rom` owner restore
-2. stop building more narrow restore images until a runtime-state finding justifies one
-3. treat the surviving blocker as a package-state / framework-policy problem:
-   - stock creates valid runtime permission state for `com.miui.rom`, `com.miui.yellowpage`, `com.xiaomi.aicr`, and `com.xiaomi.scanner`
-   - failing custom userspace still reports `Missing permission state` for those same packages
+   - combined runtime-state-inputs restore
+2. stop building more restore images until a source-level finding justifies one
+3. treat the surviving blocker as a runtime-state materialization problem first:
+   - stock owners are winning the relevant duplicate-permission conflicts
+   - the failing custom userspace still re-enters the same duplicate owner/provider graph
+   - the latest combined-inputs run again showed a broad `Missing permission state ...` wave in the captured failed segment
 4. trace the runtime/package-policy path through:
    - `frameworks/base/services/core/java/com/android/server/pm/Settings.java`
    - `frameworks/base/services/permission/java/com/android/server/permission/access/permission/AppIdPermissionPolicy.kt`
    - `frameworks/base/core/java/android/app/SystemServiceRegistry.java`
-5. only build another image if that analysis identifies one concrete missing runtime-state input or one concrete framework-policy fix
+5. only build another image if source-level analysis identifies one concrete runtime-state creation fix
+6. current in-progress framework experiment:
+   - analyzer report:
+     - `/home/john/android/lineage/_checkpoints/permission_state_sequence_20260314_014131/summary.md`
+   - strongest new sequencing signal:
+     - the first `Missing permission state ...` line appears before `MiuiPreinstallHelper init`
+     - this pushes the next fix toward early runtime-state loading rather than later MIUI preinstall registration
+   - current builder work:
+     - patched `Settings.java` rebuild in progress on `john@192.168.200.33`
+     - once `systemimage` finishes, repack `super_runtime_state_patch.img` and run one framework-side control
 
 Completed targeted package-conflict control:
 - image:
@@ -341,32 +357,87 @@ Completed external-claimant and `yellowpage/rom` controls:
     - `/product/priv-app/MIUIYellowPageGlobal`
     - `/system_ext/framework/framework-ext-res`
 
+Completed clean-data and combined runtime-state-inputs controls:
+- clean-data rerun of `yellowpage/rom` owner restore:
+  - marker: `/home/john/android/lineage/_checkpoints/myron_prepare_20260313_230205`
+  - bundle: `/home/john/android/lineage/_checkpoints/postfailure_myron_clean_data_20260313_232200`
+  - comparison against `postfailure_myron_20260313_213402`:
+    - `classification=sideways`
+    - stage score stayed `5 -> 5`
+  - result:
+    - wiping `data` did not change the visible failure class
+    - stale carry-over poisoning was deprioritized, but deterministic first-boot state creation bugs remained possible
+- combined runtime-state-inputs restore:
+  - image: `/home/john/android/lineage/out/target/product/myron/super_product_runtime_state_inputs.img`
+  - bundle: `/home/john/android/lineage/_checkpoints/postfailure_myron_20260314_012147`
+  - comparison against `postfailure_myron_clean_data_20260313_232200`:
+    - `classification=sideways`
+    - stage score stayed `5 -> 5`
+  - restored together:
+    - `priv-app/MIUIYellowPageGlobal`
+    - `priv-app/MIUIAICR`
+    - `data-app/MiuiScanner`
+    - `etc/device_features/myron.xml`
+    - `etc/removable_apk_info.xml`
+    - `etc/permissions/privapp-permissions-product.xml`
+    - `pangu/system/etc/permissions/signature-permission-pangu.xml`
+    - `/system_ext/framework/framework-ext-res`
+  - important log result:
+    - same duplicate owner/provider graph survived unchanged
+    - `Manager wrapper not available: security` survived unchanged
+    - the failed segment again showed a broad `Missing permission state ...` wave
+
 Current default next issue class:
-- runtime package-state and framework-policy analysis
+- runtime-state materialization analysis
 - latest reports:
   - `/home/john/android/lineage/_checkpoints/stock_runtime_packages_20260313_222827/summary.md`
   - `/home/john/android/lineage/_checkpoints/fake_package_flow_20260313_222827/summary.md`
   - `/home/john/android/lineage/_checkpoints/runtime_state_gaps_20260313_224150/summary.md`
   - `/home/john/android/lineage/_checkpoints/framework_policy_paths_20260313_224328/summary.md`
+  - `/home/john/android/lineage/_checkpoints/owner_identity_graph_20260313_233251/summary.md`
+  - `/home/john/android/lineage/_checkpoints/runtime_state_materialization_20260313_233251/summary.md`
+  - `/home/john/android/lineage/_checkpoints/miui_reverse_trace_20260314_005227/summary.md`
 - newest valid failing baseline bundle:
-  - `/home/john/android/lineage/_checkpoints/postfailure_myron_20260313_221344`
+  - `/home/john/android/lineage/_checkpoints/postfailure_myron_20260314_012147`
 - stock runtime truth now confirms:
   - `com.miui.rom` is a real framework APK identity from `/system_ext/framework/framework-ext-res/framework-ext-res.apk`
   - `com.miui.yellowpage` is a real stock package on the live device at `/product/priv-app/MIUIYellowPageGlobal/MIUIYellowPageGlobal.apk`
   - `com.xiaomi.aicr` is a stock product priv-app at `/product/priv-app/MIUIAICR/MIUIAICR.apk`
   - `com.xiaomi.scanner` is a stock product data-app at `/product/data-app/MiuiScanner/MiuiScanner.apk`
-- but the failing custom userspace still reports:
-  - `Missing permission state for package com.miui.rom`
-  - `Missing permission state for package com.miui.yellowpage`
-  - `Missing permission state for package com.xiaomi.aicr`
-  - `Missing permission state for package com.xiaomi.scanner`
+- owner-identity reports now confirm the stock owner is winning the core duplicate-permission families:
+  - `com.miui.rom` wins `POWER_CENTER_COMMON_PERMISSION`
+  - `com.xiaomi.aicr` wins `READ_AIACTION`
+  - `com.miui.securitycenter` wins `SYSTEM_PERMISSION_DECLARE`
+  - `com.miui.securitycenter` wins `CONTROL_VPN`
+- the latest combined runtime-state-inputs run still reports:
+  - a broad `Missing permission state ...` wave in the failed segment
+  - duplicate `com.miui.cloudservice/androidx.core.content.FileProvider`
+  - duplicate `miui.cloud.finddevice.*`
+  - duplicate `POWER_CENTER_COMMON_PERMISSION`
+  - duplicate `READ_AIACTION`
+  - duplicate `SYSTEM_PERMISSION_DECLARE`
+  - duplicate `CONTROL_VPN`
 - source-level choke points are now identified:
   - `Settings.java:6522` emits `Missing permission state` when per-user runtime-permission entries are absent
   - `AppIdPermissionPolicy.kt:505` emits the duplicate system-owner warnings
-  - `SystemServiceRegistry.java:2111` emits `Manager wrapper not available: security` as downstream fallout
+  - `SystemServiceRegistry.java:2111` emits `Manager wrapper not available: security` as downstream `null` service fetch fallout
+- newest sequencing evidence:
+  - `/home/john/android/lineage/_checkpoints/permission_state_sequence_20260314_014131/summary.md`
+  - `340` `Missing permission state ...` lines were found in the failed segment
+  - the first missing-state line appears before `MiuiPreinstallHelper init`
+  - target packages in that early wave include:
+    - `com.miui.rom`
+    - `com.miui.yellowpage`
+    - `com.xiaomi.aicr`
+    - `com.xiaomi.scanner`
+    - `com.miui.securityadd`
 - current conclusion:
-  - do not build another image yet
-  - the next fix is more likely a `system` / `system_ext` framework-policy or runtime-state-input fix than another `product` APK restore
+  - do not build another restore image
+  - the restore-image lane is exhausted again
+  - the next useful control is framework-side, not another `product` restore
+  - current framework patch status:
+    - builder-side `systemimage` rebuild is in progress for a `Settings.java` normalization patch
+    - no flash result exists yet for that patch
 
 The older vendor/odm contract-restoration work is still useful history, but it is no longer the default strategy, and the broad product-first ladder is now complete.
 

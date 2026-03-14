@@ -173,15 +173,25 @@ Important completed control tests:
    - `com.miui.securitycenter` / `com.miui.securityadd` / `com.mi.android.globalFileexplorer` owner-family control
    - external-claimant restore
    - `yellowpage/rom` owner restore
+   - combined runtime-state-inputs restore
 3. Stop creating broader stock-slice controls unless a later focused finding reopens that branch.
-4. Stop creating more narrow restore images until a runtime-state finding justifies one.
-5. Use `/home/john/android/lineage/_checkpoints/postfailure_myron_20260313_221344` as the newest valid failing baseline.
-6. Pivot to runtime package-state and framework-policy analysis:
+4. Stop creating more restore images until a source-level finding justifies one.
+5. Use `/home/john/android/lineage/_checkpoints/postfailure_myron_20260314_012147` as the newest valid failing baseline.
+6. Pivot to runtime-state materialization analysis:
    - `com.miui.rom`
    - `com.xiaomi.aicr`
    - `com.miui.yellowpage`
    - `com.xiaomi.scanner`
 7. Keep `system/bin/init` instrumentation and broad property experiments deprioritized.
+8. Current in-progress framework experiment:
+   - analyzer report:
+     - `/home/john/android/lineage/_checkpoints/permission_state_sequence_20260314_014131/summary.md`
+   - strongest new sequencing signal:
+     - the first `Missing permission state ...` line appears before `MiuiPreinstallHelper init`
+   - current builder work:
+     - patched `frameworks/base/services/core/java/com/android/server/pm/Settings.java`
+     - `m systemimage` rebuild in progress on `john@192.168.200.33`
+   - do not record any result for this patch until the build completes and a flash actually runs
 
 Completed targeted package-conflict control:
 - image:
@@ -276,31 +286,54 @@ Current default next issue class:
     - `/system_ext/framework/framework-ext-res`
 
 Current default next issue class:
-- runtime package-state and framework-policy analysis
+- runtime-state materialization analysis
 - latest reports:
   - `/home/john/android/lineage/_checkpoints/stock_runtime_packages_20260313_222827/summary.md`
   - `/home/john/android/lineage/_checkpoints/fake_package_flow_20260313_222827/summary.md`
   - `/home/john/android/lineage/_checkpoints/runtime_state_gaps_20260313_224150/summary.md`
   - `/home/john/android/lineage/_checkpoints/framework_policy_paths_20260313_224328/summary.md`
+  - `/home/john/android/lineage/_checkpoints/owner_identity_graph_20260313_233251/summary.md`
+  - `/home/john/android/lineage/_checkpoints/runtime_state_materialization_20260313_233251/summary.md`
+  - `/home/john/android/lineage/_checkpoints/miui_reverse_trace_20260314_005227/summary.md`
 - newest valid failing baseline:
-  - `/home/john/android/lineage/_checkpoints/postfailure_myron_20260313_221344`
+  - `/home/john/android/lineage/_checkpoints/postfailure_myron_20260314_012147`
 - stock runtime truth now confirms:
   - `com.miui.rom` is a real framework APK identity from `/system_ext/framework/framework-ext-res/framework-ext-res.apk`
   - `com.miui.yellowpage` is a real stock package on the live device at `/product/priv-app/MIUIYellowPageGlobal/MIUIYellowPageGlobal.apk`
   - `com.xiaomi.aicr` is a stock product priv-app at `/product/priv-app/MIUIAICR/MIUIAICR.apk`
   - `com.xiaomi.scanner` is a stock product data-app at `/product/data-app/MiuiScanner/MiuiScanner.apk`
-- but the failing custom userspace still reports:
-  - `Missing permission state for package com.miui.rom`
-  - `Missing permission state for package com.miui.yellowpage`
-  - `Missing permission state for package com.xiaomi.aicr`
-  - `Missing permission state for package com.xiaomi.scanner`
+- owner-identity reports now confirm the stock owner is winning the core duplicate-permission families:
+  - `com.miui.rom` wins `POWER_CENTER_COMMON_PERMISSION`
+  - `com.xiaomi.aicr` wins `READ_AIACTION`
+  - `com.miui.securitycenter` wins `SYSTEM_PERMISSION_DECLARE`
+  - `com.miui.securitycenter` wins `CONTROL_VPN`
+- the latest combined runtime-state-inputs run still reports:
+  - a broad `Missing permission state ...` wave in the failed segment
+  - duplicate `com.miui.cloudservice/androidx.core.content.FileProvider`
+  - duplicate `miui.cloud.finddevice.*`
+  - duplicate `POWER_CENTER_COMMON_PERMISSION`
+  - duplicate `READ_AIACTION`
+  - duplicate `SYSTEM_PERMISSION_DECLARE`
+  - duplicate `CONTROL_VPN`
 - source-level choke points are now identified:
   - `frameworks/base/services/core/java/com/android/server/pm/Settings.java:6522`
   - `frameworks/base/services/permission/java/com/android/server/permission/access/permission/AppIdPermissionPolicy.kt:505`
   - `frameworks/base/core/java/android/app/SystemServiceRegistry.java:2111`
+- newest sequencing evidence:
+  - `/home/john/android/lineage/_checkpoints/permission_state_sequence_20260314_014131/summary.md`
+  - `340` `Missing permission state ...` lines were found in the failed segment
+  - the first missing-state line appears before `MiuiPreinstallHelper init`
+  - target packages in that early wave include:
+    - `com.miui.rom`
+    - `com.miui.yellowpage`
+    - `com.xiaomi.aicr`
+    - `com.xiaomi.scanner`
+    - `com.miui.securityadd`
 - current conclusion:
-  - do not build another image yet
-  - the next fix is more likely a `system` / `system_ext` framework-policy or runtime-state-input fix than another `product` APK restore
+  - do not build another restore image
+  - the restore-image lane is exhausted again
+  - the next useful control is framework-side, not another `product` restore
+  - the first framework-side control is still only a build in progress, not a completed experiment
 
 Current mechanism that still matters:
 - Xiaomi overlays `/product/pangu/system/*` back into `/system/*` through [fstab.qcom](/Users/benny/Homelab/ROM/device/xiaomi/sm8850-common/init/fstab.qcom#L63)
