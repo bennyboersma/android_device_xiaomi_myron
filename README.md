@@ -220,19 +220,19 @@ Why `product` can still break apparent `/system` services:
 
 ## Current Direction
 
-Focus has shifted from broad rollback controls to stable-failure analysis:
+Focus has shifted again, from framework-side runtime-state patching to runtime-source attribution and the surviving MIUI owner/provider/security graph:
 - keep the lower stock baseline frozen for future targeted tests
-- stop building larger stock-slice `super` controls unless a later finding justifies reopening that branch
-- the first targeted package-conflict cleanup control is now complete and was **sideways**
-- the targeted security-contract restore control is now also complete and was **sideways**
-- both owner-conflict family controls are now also complete and **sideways**
-- the external-claimant restore control and the `yellowpage/rom` owner restore are now also complete and **sideways**
-- the combined runtime-state-inputs restore control is now also complete and **sideways**
-- the restore-image lane is exhausted again
-- the next stage is code-level runtime-state materialization analysis, not more restore images
-- the first framework-side experiment is now in progress on the builder:
-  - patch target: `frameworks/base/services/core/java/com/android/server/pm/Settings.java`
-  - goal: normalize missing per-user runtime-permission entries during initial/incomplete state load instead of immediately marking packages missing
+- keep the completed restore-image controls frozen; that lane is exhausted
+- the framework/runtime-state experiments produced one useful discriminator:
+  - the flashed no-preopt image really contained only the patched `system/framework/services.jar`
+  - the compiled `Settings$RuntimePermissionPersistence` bytecode is patched
+  - but live logs still emitted the old plain `PackageSettings` warning text
+- the clean-data + no-preopt run finally moved the visible behavior:
+  - previous no-preopt run: blind stall
+  - clean-data no-preopt run: bootloop
+- the clean-data + no-preopt captured failed segment also changed:
+  - the broad `Missing permission state ...` wave is absent there
+  - the surviving failures are now centered on the MIUI owner/provider/security graph
 
 Current best next work:
 1. freeze the completed targeted issue classes:
@@ -243,25 +243,54 @@ Current best next work:
    - external-claimant restore
    - `yellowpage/rom` owner restore
    - combined runtime-state-inputs restore
-2. stop building more restore images until a source-level finding justifies one
-3. treat the surviving blocker as a runtime-state materialization problem first:
-   - stock owners are winning the relevant duplicate-permission conflicts
-   - the failing custom userspace still re-enters the same duplicate owner/provider graph
-   - the latest combined-inputs run again showed a broad `Missing permission state ...` wave in the captured failed segment
-4. trace the runtime/package-policy path through:
-   - `frameworks/base/services/core/java/com/android/server/pm/Settings.java`
-   - `frameworks/base/services/permission/java/com/android/server/permission/access/permission/AppIdPermissionPolicy.kt`
-   - `frameworks/base/core/java/android/app/SystemServiceRegistry.java`
-5. only build another image if source-level analysis identifies one concrete runtime-state creation fix
-6. current in-progress framework experiment:
-   - analyzer report:
-     - `/home/john/android/lineage/_checkpoints/permission_state_sequence_20260314_014131/summary.md`
-   - strongest new sequencing signal:
-     - the first `Missing permission state ...` line appears before `MiuiPreinstallHelper init`
-     - this pushes the next fix toward early runtime-state loading rather than later MIUI preinstall registration
-   - current builder work:
-     - patched `Settings.java` rebuild in progress on `john@192.168.200.33`
-     - once `systemimage` finishes, repack `super_runtime_state_patch.img` and run one framework-side control
+2. stop building more restore images until the surviving runtime blocker is better explained
+3. treat stale runtime reuse as part of the earlier noise:
+   - removing `/system` `services` preopt alone did not move logs
+   - removing `/system` `services` preopt plus wiping `data` did change visible behavior
+4. treat the current active blocker as the surviving MIUI owner/provider/security path:
+   - duplicate provider: `com.miui.cloudservice/androidx.core.content.FileProvider`
+   - duplicate owners:
+     - `POWER_CENTER_COMMON_PERMISSION`
+     - `READ_AIACTION`
+     - `SYSTEM_PERMISSION_DECLARE`
+     - `CONTROL_VPN`
+     - `miui.cloud.finddevice.*`
+   - repeated `Manager wrapper not available: security`
+5. pivot the next source-level work toward:
+   - `com.miui.cloudservice` / `com.xiaomi.finddevice`
+   - `com.miui.securitycenter` / `com.miui.securityadd` / `com.mi.android.globalFileexplorer`
+   - `SystemServiceRegistry` `security` service fetch fallout
+6. keep the runtime-source attribution result recorded:
+   - built source is patched
+   - compiled `services.core.unboosted` bytecode is patched
+   - flashed no-preopt image contains only the patched `services.jar`
+   - live logs still show the old plain warning text
+   - so the patched `Settings` warning path is not the active on-device emitter in the captured failing boot
+
+Latest discriminator runs:
+- no-preopt diagnostic run:
+  - image:
+    - `/home/john/android/lineage/out/target/product/myron/super_runtime_state_no_preopt.img`
+  - bundle:
+    - `/home/john/android/lineage/_checkpoints/postfailure_myron_20260314_152552`
+  - result:
+    - `classification=sideways`
+    - old plain `PackageSettings` warning text still survived
+- clean-data + no-preopt diagnostic run:
+  - marker:
+    - `/home/john/android/lineage/_checkpoints/myron_prepare_20260314_153403`
+  - bundle:
+    - `/home/john/android/lineage/_checkpoints/postfailure_myron_clean_data_no_preopt_20260314_155244`
+  - comparison against `postfailure_myron_20260314_152552`:
+    - `classification=sideways`
+    - stage score stayed `5 -> 5`
+  - important differences:
+    - visible result changed to bootloop
+    - the captured failed segment no longer shows the broad `Missing permission state ...` wave
+    - surviving failures remain:
+      - duplicate provider `com.miui.cloudservice/androidx.core.content.FileProvider`
+      - duplicate MIUI permission-owner conflicts
+      - repeated `Manager wrapper not available: security`
 
 Completed targeted package-conflict control:
 - image:
@@ -471,6 +500,9 @@ The older vendor/odm contract-restoration work is still useful history, but it i
 - [tools/inspect_myron_fake_package_flow.sh](/Users/benny/Homelab/ROM/tools/inspect_myron_fake_package_flow.sh)
 - [tools/analyze_myron_runtime_state_gaps.sh](/Users/benny/Homelab/ROM/tools/analyze_myron_runtime_state_gaps.sh)
 - [tools/inspect_myron_framework_policy_paths.sh](/Users/benny/Homelab/ROM/tools/inspect_myron_framework_policy_paths.sh)
+- [tools/prepare_myron_runtime_state_diag_super.sh](/Users/benny/Homelab/ROM/tools/prepare_myron_runtime_state_diag_super.sh)
+- [tools/analyze_myron_runtime_state_diag.sh](/Users/benny/Homelab/ROM/tools/analyze_myron_runtime_state_diag.sh)
+- [tools/prepare_myron_runtime_state_no_preopt_super.sh](/Users/benny/Homelab/ROM/tools/prepare_myron_runtime_state_no_preopt_super.sh)
 
 ## Related Docs
 
