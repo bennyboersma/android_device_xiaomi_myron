@@ -1,6 +1,6 @@
 # Myron AI Handoff
 
-Last updated: 2026-03-13
+Last updated: 2026-03-15
 
 ## Current Status
 
@@ -14,7 +14,34 @@ Current verified state:
 - broad stock-slice rollback testing is now closed
 - newest control says custom `product` alone is enough to break boot
 - whole-partition rollback of `product`, `system_ext`, and `system` all stayed sideways
-- next work is failure-signature and effective-userspace analysis
+- package-removal slicing is no longer the main path
+- next work is runtime partition provenance
+
+## Newest Result
+
+Boot-priority control:
+- image:
+  - [/home/john/android/lineage/out/target/product/myron/super_boot_priority.img](/home/john/android/lineage/out/target/product/myron/super_boot_priority.img)
+- bundle:
+  - [/home/john/android/lineage/_checkpoints/postfailure_myron_boot_priority_20260314_232530](/home/john/android/lineage/_checkpoints/postfailure_myron_boot_priority_20260314_232530)
+
+What it proved:
+- the repacked `product_boot_priority.img` and `system_ext_boot_priority.img` were extracted offline and the removed package directories were absent
+- the failed boot still logged those same package families from `/product/...` and `/system_ext/...`
+- so mounted runtime source is now a stronger suspect than package semantics
+
+Default branch order now:
+1. wrong partition source / wrong slot / snapshot-backed view
+2. runtime rebind / overlay
+3. package-manager reconstruction only if disk provenance comes back clean
+
+Current baseline bundle:
+- [/home/john/android/lineage/_checkpoints/postfailure_myron_boot_priority_20260314_232530](/home/john/android/lineage/_checkpoints/postfailure_myron_boot_priority_20260314_232530)
+
+Current provenance tools:
+- [prepare_myron_partition_provenance_super.sh](/Users/benny/Homelab/ROM/tools/prepare_myron_partition_provenance_super.sh)
+- [capture_myron_postfailure_bundle.sh](/Users/benny/Homelab/ROM/tools/capture_myron_postfailure_bundle.sh)
+- [analyze_myron_partition_provenance.sh](/Users/benny/Homelab/ROM/tools/analyze_myron_partition_provenance.sh)
 
 ## Most Important New Result
 

@@ -1,6 +1,6 @@
 # Poco F8 Ultra (`myron`) Bring-up Status
 
-Last updated: 2026-03-13
+Last updated: 2026-03-15
 
 ## Summary
 
@@ -14,7 +14,40 @@ Current project state:
 - the broad stock-slice rollback matrix is now closed
 - custom `product` alone is enough to break boot
 - restoring full stock `product`, stock `system_ext`, or stock `system` on top of that does not fix boot
-- the next stage is failure-signature and userspace-composition analysis, not broader partition swaps
+- package-removal slicing is no longer the leading strategy
+- the next stage is runtime partition provenance, not more package-semantic guesses
+
+## Newest High-Signal Result
+
+Boot-priority control:
+- image:
+  - [/home/john/android/lineage/out/target/product/myron/super_boot_priority.img](/home/john/android/lineage/out/target/product/myron/super_boot_priority.img)
+- bundle:
+  - [/home/john/android/lineage/_checkpoints/postfailure_myron_boot_priority_20260314_232530](/home/john/android/lineage/_checkpoints/postfailure_myron_boot_priority_20260314_232530)
+
+What it proved:
+- the repacked `product_boot_priority.img` and `system_ext_boot_priority.img` were extracted offline and do not contain:
+  - `MIUICloudServiceGlobal`
+  - `MIUIMiCloudSync`
+  - `MIUISecurityCenterGlobal`
+  - `MIUISecurityAdd`
+  - `MIUIFileExplorerGlobal`
+  - `FindDevice`
+- the failed custom boot still logged those same package families from `/product/...` and `/system_ext/...`
+- so image contents and effective runtime package set no longer match
+
+Current default interpretation:
+1. wrong mounted source for `/product` or `/system_ext`
+2. runtime rebind / overlay / snapshot-backed view
+3. package-manager reconstruction only if mounted-disk evidence comes back clean
+
+Current default baseline:
+- [/home/john/android/lineage/_checkpoints/postfailure_myron_boot_priority_20260314_232530](/home/john/android/lineage/_checkpoints/postfailure_myron_boot_priority_20260314_232530)
+
+Current default next tools:
+- [prepare_myron_partition_provenance_super.sh](/Users/benny/Homelab/ROM/tools/prepare_myron_partition_provenance_super.sh)
+- [capture_myron_postfailure_bundle.sh](/Users/benny/Homelab/ROM/tools/capture_myron_postfailure_bundle.sh)
+- [analyze_myron_partition_provenance.sh](/Users/benny/Homelab/ROM/tools/analyze_myron_partition_provenance.sh)
 
 ## What Is Proven
 
