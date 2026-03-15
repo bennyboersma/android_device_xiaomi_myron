@@ -9,45 +9,69 @@ This repository is for LineageOS bring-up on Xiaomi Poco F8 Ultra (`myron` / SM8
 Current project state:
 - stock Android is safe and booting on slot `a`
 - there is still no confirmed custom userspace boot
-- custom `super.img` flashing works
-- failed custom boots are recoverable with the full stock boot chain plus stock `super`
-- the broad stock-slice rollback matrix is now closed
-- custom `product` alone is enough to break boot
-- restoring full stock `product`, stock `system_ext`, or stock `system` on top of that does not fix boot
-- package-removal slicing is no longer the leading strategy
-- the next stage is runtime partition provenance, not more package-semantic guesses
+- the fastest reliable custom test path is now upper-stack-only flashing through `fastbootd`
+- failed custom boots are recoverable with the stock lower stack plus stock userspace restore
+- clean `userdata` + `metadata` wipes do not change the core failed-boot signature
+- even effectively empty flashed `product` and `system_ext` do not remove the Xiaomi runtime package set
+- preserving Xiaomi userspace compatibility is out of scope for boot-first work
+- the leading root-cause theory is now MIUI preinstall/materialization rebuilding a Xiaomi package graph at boot
 
 ## Newest High-Signal Result
 
-Boot-priority control:
-- image:
-  - [/home/john/android/lineage/out/target/product/myron/super_boot_priority.img](/home/john/android/lineage/out/target/product/myron/super_boot_priority.img)
+Clean empty-upper forcing-function run:
 - bundle:
-  - [/home/john/android/lineage/_checkpoints/postfailure_myron_boot_priority_20260314_232530](/home/john/android/lineage/_checkpoints/postfailure_myron_boot_priority_20260314_232530)
+  - [/home/john/android/lineage/_checkpoints/postfailure_myron_lineage_empty_upper_20260315_180520](/home/john/android/lineage/_checkpoints/postfailure_myron_lineage_empty_upper_20260315_180520)
+- comparison baseline:
+  - [/home/john/android/lineage/_checkpoints/postfailure_myron_lineage_first_upper_stack_clean_20260315_172841](/home/john/android/lineage/_checkpoints/postfailure_myron_lineage_first_upper_stack_clean_20260315_172841)
 
 What it proved:
-- the repacked `product_boot_priority.img` and `system_ext_boot_priority.img` were extracted offline and do not contain:
-  - `MIUICloudServiceGlobal`
-  - `MIUIMiCloudSync`
-  - `MIUISecurityCenterGlobal`
-  - `MIUISecurityAdd`
-  - `MIUIFileExplorerGlobal`
-  - `FindDevice`
-- the failed custom boot still logged those same package families from `/product/...` and `/system_ext/...`
-- so image contents and effective runtime package set no longer match
+- `fastbootd` upper-stack flashing is working well enough to run controlled experiments
+- wiping both `userdata` and `metadata` did not change the Xiaomi-heavy late-userspace failure
+- flashing effectively empty `product` and `system_ext` still produced the same runtime package paths:
+  - `/product/app/MIUICloudServiceGlobal`
+  - `/product/app/MIUIFileExplorerGlobal`
+  - `/product/app/MIUISecurityAdd`
+  - `/product/priv-app/MIUISecurityCenterGlobal`
+  - `/system_ext/priv-app/FindDevice`
+- trimming more APKs in flashed upper partitions is therefore not the main lever anymore
 
-Current default interpretation:
-1. wrong mounted source for `/product` or `/system_ext`
-2. runtime rebind / overlay / snapshot-backed view
-3. package-manager reconstruction only if mounted-disk evidence comes back clean
+## Current Default Interpretation
 
-Current default baseline:
-- [/home/john/android/lineage/_checkpoints/postfailure_myron_boot_priority_20260314_232530](/home/john/android/lineage/_checkpoints/postfailure_myron_boot_priority_20260314_232530)
+1. The active late-userspace blocker is still a Xiaomi package graph, not a generic Lineage framework failure.
+2. That package graph is most likely being rebuilt at boot by MIUI preinstall/materialization, not simply read from the flashed `product/system_ext` APK payloads.
+3. The next boot-first fix path is to disable MIUI preinstall inputs before going back to broader runtime-source archaeology.
 
-Current default next tools:
-- [prepare_myron_partition_provenance_super.sh](/Users/benny/Homelab/ROM/tools/prepare_myron_partition_provenance_super.sh)
-- [capture_myron_postfailure_bundle.sh](/Users/benny/Homelab/ROM/tools/capture_myron_postfailure_bundle.sh)
-- [analyze_myron_partition_provenance.sh](/Users/benny/Homelab/ROM/tools/analyze_myron_partition_provenance.sh)
+## Current Default Baselines
+
+- Preinstall/materialization baseline:
+  - [/home/john/android/lineage/_checkpoints/postfailure_myron_lineage_empty_upper_20260315_180520](/home/john/android/lineage/_checkpoints/postfailure_myron_lineage_empty_upper_20260315_180520)
+- Earlier fastbootd runtime baseline:
+  - [/home/john/android/lineage/_checkpoints/postfailure_myron_vendor_init_target_provenance_fastbootd_20260315_151330](/home/john/android/lineage/_checkpoints/postfailure_myron_vendor_init_target_provenance_fastbootd_20260315_151330)
+
+## Current Default Tools
+
+- [prepare_myron_lineage_first_super.sh](/Users/benny/Homelab/ROM/tools/prepare_myron_lineage_first_super.sh)
+- [prepare_myron_lineage_first_avb_super.sh](/Users/benny/Homelab/ROM/tools/prepare_myron_lineage_first_avb_super.sh)
+- [prepare_myron_lineage_empty_upper_avb.sh](/Users/benny/Homelab/ROM/tools/prepare_myron_lineage_empty_upper_avb.sh)
+- [flash_myron_upper_stack_via_fastbootd.sh](/Users/benny/Homelab/ROM/tools/flash_myron_upper_stack_via_fastbootd.sh)
+- [run_myron_lineage_first_upper_stack_clean.sh](/Users/benny/Homelab/ROM/tools/run_myron_lineage_first_upper_stack_clean.sh)
+
+## Current Fix In Progress
+
+The current experimental fix is to neutralize MIUI preinstall/materialization in the flashed `product` image by forcing:
+- `ro.miui.preinstall_to_data=0`
+- `ro.miui.has_cust_partition=0`
+- `ro.miui.cust_erofs=0`
+- `ro.miui.cust_img_path=/dev/null`
+- `ro.miui.pai.preinstall.path=/dev/null`
+- `ro.appsflyer.preinstall.path=/dev/null`
+
+Those properties are now set in:
+- [device/xiaomi/myron/device.mk](/Users/benny/Homelab/ROM/device/xiaomi/myron/device.mk)
+- [prepare_myron_lineage_first_super.sh](/Users/benny/Homelab/ROM/tools/prepare_myron_lineage_first_super.sh)
+
+The latest signed upper-stack artifacts carrying that change live under:
+- `/home/john/android/lineage/_checkpoints/lineage_first_avb_super_myron_20260315_181743/`
 
 ## What Is Proven
 
