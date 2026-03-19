@@ -1,507 +1,223 @@
 # Myron AI Handoff
 
-Last updated: 2026-03-15
+Last updated: 2026-03-19
 
 ## Current Status
 
-The phone is safe on stock Android on slot `a`.
+The device is safe on stock Android.
 
-Current verified state:
-- upper-stack-only flashing through `fastbootd` works reliably
-- stock userspace restore works reliably
-- there is still no confirmed custom userspace boot
-- the latest clean boot-first runs wipe both `userdata` and `metadata`
-- even with that clean wipe, the bootloop remains in late userspace
-- even with effectively empty flashed `product` and `system_ext`, the same Xiaomi runtime package set still appears
-- the leading root-cause theory is now MIUI preinstall/materialization rebuilding a Xiaomi package graph during boot
+The booting hybrid branch remains available, but it is no longer the main effort.
 
-## Newest Result
+Main effort now:
+- lowest-risk Lineage bring-up ladder
+- clean builder artifacts only
+- first success target = boot to `adb`
+- active bring-up target = `lineage_myron_bringup-bp4a-userdebug`
+- attempt 1 = stock `boot` + stock `init_boot` + stock `vendor_boot` + custom `system` + custom `system_ext` + custom `vbmeta_system`
+- attempt 2 only if needed = stock `boot` + stock `vendor_boot` + Lineage `init_boot`
 
-Empty-upper forcing-function bundle:
-- [/home/john/android/lineage/_checkpoints/postfailure_myron_lineage_empty_upper_20260315_180520](/home/john/android/lineage/_checkpoints/postfailure_myron_lineage_empty_upper_20260315_180520)
+## Frozen Primary Rollback Branch
 
-What it proved:
-- clean wipes do not remove the active blocker
-- the flashed upper APK payload is not the only source of the runtime Xiaomi package graph
-- the same failed-boot markers survive:
-  - `/product/app/MIUICloudServiceGlobal`
-  - `/product/app/MIUIFileExplorerGlobal`
-  - `/product/app/MIUISecurityAdd`
-  - `/product/priv-app/MIUISecurityCenterGlobal`
-  - `/system_ext/priv-app/FindDevice`
-  - duplicate `com.miui.cloudservice/...FileProvider`
-  - duplicate `miui.cloud.finddevice.*`
-  - `Manager wrapper not available: security`
+Known-good rollback branch:
+- `system_a`:
+  - [/home/john/android/lineage/out/target/product/myron/stock_based_system_cycle/system_stockbase_printrecommendation_extshared_captiveportal_pacprocessor_btmidi_camproxy_certinstaller_avb.img](/home/john/android/lineage/out/target/product/myron/stock_based_system_cycle/system_stockbase_printrecommendation_extshared_captiveportal_pacprocessor_btmidi_camproxy_certinstaller_avb.img)
+  - sha256: `09fa2bb3712dbb32e11f0b2fc5ab4026c5bf257877929d543896eaed14380492`
+- `vbmeta_system_a`:
+  - [/home/john/android/lineage/out/target/product/myron/stock_based_system_cycle/vbmeta_system_stockbase_printrecommendation_extshared_captiveportal_pacprocessor_btmidi_camproxy_certinstaller.img](/home/john/android/lineage/out/target/product/myron/stock_based_system_cycle/vbmeta_system_stockbase_printrecommendation_extshared_captiveportal_pacprocessor_btmidi_camproxy_certinstaller.img)
+  - sha256: `d7d522f2c08d7fdd1336f7389d5ef22e1077fb40e7cbfcf3fbb5cdbc2ded4928`
 
-## Current Interpretation
+Rollback branch partition composition:
+- `system_a` = stock-based rebuilt SAR image
+- `system_ext_a` = stock
+- `product_a` = stock
+- `mi_ext_a` = stock
+- `vbmeta_system_a` = matching custom image
+- `vbmeta_a` = stock
+- lower stack = stock
 
-Default branch order now:
-1. Disable MIUI preinstall/materialization in the Lineage-first upper stack.
-2. Re-test with the same stock lower stack and clean wipe flow.
-3. Only return to deeper runtime-source archaeology if the Xiaomi-heavy signature survives even with preinstall disabled.
+## Final App-Layer Classification
 
-Current baseline bundles:
-- [/home/john/android/lineage/_checkpoints/postfailure_myron_lineage_empty_upper_20260315_180520](/home/john/android/lineage/_checkpoints/postfailure_myron_lineage_empty_upper_20260315_180520)
-- [/home/john/android/lineage/_checkpoints/postfailure_myron_lineage_first_upper_stack_clean_20260315_172841](/home/john/android/lineage/_checkpoints/postfailure_myron_lineage_first_upper_stack_clean_20260315_172841)
+Safe:
+- `PrintRecommendationService`
+- `ExtShared`
+- `CaptivePortalLogin`
+- `PacProcessor`
+- `BluetoothMidiService`
+- `CameraExtensionsProxy`
+- `CertInstaller`
 
-Current active tools:
-- [prepare_myron_lineage_first_super.sh](/Users/benny/Homelab/ROM/tools/prepare_myron_lineage_first_super.sh)
-- [prepare_myron_lineage_first_avb_super.sh](/Users/benny/Homelab/ROM/tools/prepare_myron_lineage_first_avb_super.sh)
-- [prepare_myron_lineage_empty_upper_avb.sh](/Users/benny/Homelab/ROM/tools/prepare_myron_lineage_empty_upper_avb.sh)
-- [flash_myron_upper_stack_via_fastbootd.sh](/Users/benny/Homelab/ROM/tools/flash_myron_upper_stack_via_fastbootd.sh)
-- [run_myron_lineage_first_upper_stack_clean.sh](/Users/benny/Homelab/ROM/tools/run_myron_lineage_first_upper_stack_clean.sh)
+Unsafe for now:
+- `HTMLViewer`
+- `DocumentsUI`
+- `KeyChain`
 
-## Current Fix Path
+App-layer migration is finished. Do not continue it unless strategy changes again.
 
-The current fix path is based on MIUI preinstall evidence from failed boot logs:
-- `MiuiPreinstallHelper init`
-- `MiuiPreinstallHelper: use Miui Preinstall Frame.`
-- `MiuiPreinstallHelper scan preinstall`
+## Bring-up History Summary
 
-And confirmed stock properties:
-- `ro.miui.preinstall_to_data=1`
-- `ro.miui.cust_img_path=/data/preinstall/cust.img`
-- `ro.miui.pai.preinstall.path=/data/miui/pai/`
-- `ro.appsflyer.preinstall.path=/data/miui/pai/pre_install.appsflyer`
+What was tried and what happened:
 
-The current mitigation disables those inputs in the flashed `product` image:
-- `ro.miui.preinstall_to_data=0`
-- `ro.miui.has_cust_partition=0`
-- `ro.miui.cust_erofs=0`
-- `ro.miui.cust_img_path=/dev/null`
-- `ro.miui.pai.preinstall.path=/dev/null`
-- `ro.appsflyer.preinstall.path=/dev/null`
+1. Lineage-heavy `system_a`
+- failed very early
 
-Implemented in:
-- [device/xiaomi/myron/device.mk](/Users/benny/Homelab/ROM/device/xiaomi/myron/device.mk)
-- [prepare_myron_lineage_first_super.sh](/Users/benny/Homelab/ROM/tools/prepare_myron_lineage_first_super.sh)
+2. SAR-shape correction
+- required
+- did not fix boot alone
 
-Latest signed artifacts carrying this change:
-- `/home/john/android/lineage/_checkpoints/lineage_first_avb_super_myron_20260315_181743/`
+3. AVB correction
+- required
+- did not fix boot alone
 
-## Most Important New Result
+4. Generic framework/classpath micro-bridges
+- did not fix boot
 
-The pivot image changed the failure shape:
-- stock `vendor_a`
-- stock `odm_a`
-- stock `vendor_dlkm_a`
-- stock `mi_ext_a`
-- custom `system_a`
-- custom `system_ext_a`
-- custom `product_a`
-- custom `system_dlkm_a`
+5. Stock-based `system_a` runtime-core pivot
+- booted
+- established the project’s first stable custom-path baseline
 
-Built as:
-- [/home/john/android/lineage/out/target/product/myron/super_stock_vendor.img](/home/john/android/lineage/out/target/product/myron/super_stock_vendor.img)
+6. App-layer micro-delta pass
+- 7 deltas proved safe
+- 3 deltas proved unsafe
+- useful for dependency mapping, but no longer main path
 
-Observed result:
-- stable POCO-logo stall instead of the earlier quick bootloop-to-`fastboot` path
+7. Unsafe app dependency mapping
+- `HTMLViewer` tied to MIUI/Settings/OTA/cloud package role and `system_ext` package hooks
+- `DocumentsUI` tied to package identity / privapp / sysconfig contract mismatches
+- `KeyChain` unsafe without a narrow `system_ext/product` contract explanation
 
-Practical conclusion:
-- stock lower partitions materially change behavior
-- the new default strategy should be stock-vendor-first, not continued custom-vendor reconstruction
+8. Lineage-heavy `system_a` + `system_ext_a` test with stock first-stage
+- still failed with `POCO -> black -> POCO`
+- no useful `adb` evidence collected
 
-Fresh high-signal pivot bundle:
-- [/home/john/android/lineage/_checkpoints/myron_20260312_234734](/home/john/android/lineage/_checkpoints/myron_20260312_234734)
+9. Clean builder reset
+- old remote tree is not trusted for fresh bring-up images
+- clean tree now builds from `/home/john/android/lineage_clean`
 
-What it proves:
-- old early failures are gone:
-  - no `ld.config.txt` warning
-  - no early `vendor_init` property-denial storm
-- boot now gets through:
-  - `vold`
-  - KeyMint / Gatekeeper / keystore2
-  - `/data`
-  - `apexd`
-  - `system_server`
-- later framework/runtime failures now dominate:
-  - `Manager wrapper not available: security`
-  - `Manager wrapper not available: MiuiWifiService`
-  - `Manager wrapper not available: SlaveWifiService`
-  - `Failed to create service com.android.server.location.LocationPolicyManagerService$Lifecycle`
-  - `Failed to create service com.android.server.powerconsumpiton.PowerConsumptionService`
-  - `SystemServerI: reboot init app level`
-  - `SystemServerI: reboot init app anr level`
+## Strategic Conclusions
 
-So the current primary suspect is now custom `product`, more specifically the MIUI-facing framework surface it carries and injects into `/system`, not the lower vendor stack.
+These are the conclusions to preserve:
+- stock-based hybrid proved the device can boot under a preserved stock runtime core
+- AVB and SAR mattered, but they were not the primary remaining blocker
+- hybrid polish is not the fastest route to Lineage now
+- the most likely early blocker is still stock first-stage behavior mixed with Lineage-heavy userspace
+- the next serious test should keep `init_boot` stock by default and only change it if attempt 1 fails the same way
+- do not strengthen the `sm8750`/`kalama` fallback proactively; if the narrowed test still fails early, pivot to a real `kaanapali` kernel/vendor_boot bring-up
 
-## What Is No Longer The Main Blocker
+## Main Branch Under Preparation
 
-These have already been tested or eliminated as primary blockers:
-- `fastbootd`
-- AVB experiments
-- `super` geometry mismatch
-- stale repack inputs
-- duplicate `service_contexts` warnings
-- secure-element / strongbox / eSE exposure
-- stale duplicate power HAL RC registration
-- missing stock `mi_ext` mount lines alone
-- the custom-vendor-first strategy as the main path
+Target branch for the next serious bring-up test:
+- product target = `lineage_myron_bringup`
+- `system_a` = Lineage-heavy SAR
+- `system_ext_a` = Lineage-heavy
+- `init_boot_a` = stock for attempt 1, Lineage-built only for attempt 2
+- `vendor_boot_a` = stock
+- `vbmeta_system_a` = matching custom image
 
-## Current Failure Shape
+Remain stock for first matched-stack test:
+- `product_a`
+- `mi_ext_a`
+- `vbmeta_a`
+- `vendor_a`
+- `odm_a`
+- `boot_a`
+- `vendor_boot_a`
+- lower stack other than `init_boot_a` on attempt 2
 
-Useful bundles for current analysis:
-- [/home/john/android/lineage/_checkpoints/myron_20260312_234734](/home/john/android/lineage/_checkpoints/myron_20260312_234734)
-- older custom-vendor reference:
-  - [/home/john/android/lineage/_checkpoints/postfailure_myron_20260312_102812](/home/john/android/lineage/_checkpoints/postfailure_myron_20260312_102812)
+## Builder State
 
-## Strategy History
+Old node:
+- `/home/john/android/lineage`
+- forensic/reference only
 
-Important completed control tests:
+Active clean node:
+- `/home/john/android/lineage_clean`
 
-1. Stock-framework control:
-- stock `product_a`
-- stock `system_ext_a`
-- stock `mi_ext_a`
-- custom `system` / `vendor` / `odm`
-- failed
+Clean-node state:
+- `m nothing`: passes
+- `m checkvintf`: passes
+- `m host_init_verifier`: passes
+- image build running for:
+  - `systemimage`
+  - `systemextimage`
+  - `vbmetasystemimage`
 
-2. Stock-core control:
-- stock `system_a`
-- stock `product_a`
-- stock `system_ext_a`
-- stock `mi_ext_a`
-- custom `vendor_a`
-- custom `odm_a`
-- custom `vendor_dlkm_a`
-- custom `system_dlkm_a`
-- image:
-  - [/home/john/android/lineage/out/target/product/myron/super_stock_core.img](/home/john/android/lineage/out/target/product/myron/super_stock_core.img)
-- failed
+Bring-up reductions already implemented:
+- no inherited `manifest_kalama.xml`
+- no `mi_ext`
+- no overlay mounts in bring-up `fstab`
+- minimal bring-up manifest only
+- stock `init_boot` by default
+- reduced common feature surface for first `adb`:
+  - NFC removed
+  - sensors removed
+  - thermal removed
+  - GNSS permission surface removed
+  - secure-element permission surface removed
 
-3. Custom-vendor reconstruction path:
-- restored multiple Qualcomm/Xiaomi service batches
-- fixed concrete RC/VINTF mismatches:
-  - `vendor.qti.hardware.perf2.IPerf/default`
-  - `vendor.qti.qhcp.IQHDC/default`
-  - Xiaomi ODM AIDL interface declarations
-- logs evolved, but no boot
+Attempt 1 is not flash-ready until `system.img`, `system_ext.img`, and `vbmeta_system.img` exist and pass acceptance, and stock `init_boot`/`vendor_boot` paths are confirmed.
 
-4. Stock-vendor-first pivot:
-- image:
-  - [/home/john/android/lineage/out/target/product/myron/super_stock_vendor.img](/home/john/android/lineage/out/target/product/myron/super_stock_vendor.img)
-- this is now the preferred baseline for the next stage of bring-up
+## Current Tooling To Use
 
-5. Stock-everything-except-product control:
-- stock `system_a`
-- stock `system_ext_a`
-- custom `product_a`
-- stock `vendor_a`
-- stock `odm_a`
-- stock `vendor_dlkm_a`
-- stock `system_dlkm_a`
-- stock `mi_ext_a`
-- image:
-  - [/home/john/android/lineage/out/target/product/myron/super_stock_except_product.img](/home/john/android/lineage/out/target/product/myron/super_stock_except_product.img)
-- still failed
-- strongest new conclusion:
-  - custom `product` alone is enough to break boot
+For logging/capture:
+- [prepare_myron_log_capture.sh](/Users/benny/Homelab/ROM/tools/prepare_myron_log_capture.sh)
+- [first_boot_capture_and_diff.sh](/Users/benny/Homelab/ROM/tools/first_boot_capture_and_diff.sh)
+- [capture_myron_postfailure_bundle.sh](/Users/benny/Homelab/ROM/tools/capture_myron_postfailure_bundle.sh)
 
-6. Focused stock-vs-custom `product` diff:
-- stock `product` file count: `1613`
-- custom `product` file count: `521`
-- focused boot-relevant surface (`framework`, `priv-app`, `app`, overlays, permissions, sysconfig):
-  - stock: `451`
-  - custom: `157`
-- strongest stock-only gaps:
-  - `pangu/system`
-  - `priv-app/MIUISecurityCenterGlobal`
-  - `priv-app/MISettings`
-  - `priv-app/MIServiceGlobal`
-  - `app/MIUIGlobalLayout`
-  - `app/MIUISecurityAdd`
-  - `app/MIUISystemUIPlugin`
-  - `overlay/MiuiFrameworkResOverlay.apk`
-  - `overlay/MiuiPermissionControllerOverlay.apk`
-  - `overlay/MiuiPowerInsightOverlay.apk`
-  - `overlay/MiuiServiceOverlay`
-  - `overlay/SafetyCenterMiuiConfigOverlay.apk`
-  - `overlay/SafetyCenterMiuiOverlay.apk`
-- highest-signal package mismatch:
-  - stock carries `MIUISecurityCenterGlobal` as `priv-app`
-  - custom currently carries it only as plain `app`
-- interpretation:
-  - this looks like a missing MIUI `product` contract, not a lower-stack vendor failure
+For matched-stack readiness:
+- [check_myron_clean_matched_stack_artifacts.sh](/Users/benny/Homelab/ROM/tools/check_myron_clean_matched_stack_artifacts.sh)
+- [check_myron_clean_boot_critical_vendor_stack.sh](/Users/benny/Homelab/ROM/tools/check_myron_clean_boot_critical_vendor_stack.sh)
+- [flash_myron_clean_matched_stack.sh](/Users/benny/Homelab/ROM/tools/flash_myron_clean_matched_stack.sh)
+- [recover_myron_hybrid_rollback_slot_a.sh](/Users/benny/Homelab/ROM/tools/recover_myron_hybrid_rollback_slot_a.sh)
+- [recover_myron_stock_slot_a.sh](/Users/benny/Homelab/ROM/tools/recover_myron_stock_slot_a.sh)
 
-## What To Do Next
+Core runbooks:
+- [matched_lineage_first_stack_checklist.md](/Users/benny/Homelab/ROM/tools/runbooks/matched_lineage_first_stack_checklist.md)
+- [myron_builder_reset_20260319.md](/Users/benny/Homelab/ROM/tools/runbooks/myron_builder_reset_20260319.md)
+- [myron_bringup_history_20260319.md](/Users/benny/Homelab/ROM/tools/runbooks/myron_bringup_history_20260319.md)
 
-1. Treat the broad rollback matrix as complete:
-   - `stock product` stayed sideways
-   - `stock product + stock system_ext` stayed sideways
-   - `stock product + stock system` stayed sideways
-2. Treat the targeted issue classes below as complete and exhausted:
-   - package-conflict cleanup
-   - security privilege/layout restore
-   - `com.miui.cloudservice` / `com.xiaomi.finddevice` owner-family control
-   - `com.miui.securitycenter` / `com.miui.securityadd` / `com.mi.android.globalFileexplorer` owner-family control
-   - external-claimant restore
-   - `yellowpage/rom` owner restore
-   - combined runtime-state-inputs restore
-3. Treat the framework/runtime-state patch lane as diagnostic history, not the current default fix lane:
-   - built source is patched
-   - compiled `services.core.unboosted` bytecode is patched
-   - flashed no-preopt image contains only the patched `services.jar`
-   - live logs still emit the old plain `PackageSettings` warning text
-4. Record the useful discriminator:
-   - removing `/system` `services` preopt alone did not move the log shape
-   - removing `/system` `services` preopt and wiping `data` changed visible behavior to a bootloop
-   - the clean-data + no-preopt captured failed segment no longer shows the broad `Missing permission state ...` wave
-5. Use `/home/john/android/lineage/_checkpoints/postfailure_myron_clean_data_no_preopt_20260314_155244` as the newest high-signal failing bundle.
-6. Treat the current active blocker as the surviving MIUI owner/provider/security path:
-   - duplicate provider `com.miui.cloudservice/androidx.core.content.FileProvider`
-   - duplicate MIUI permission-owner conflicts:
-     - `POWER_CENTER_COMMON_PERMISSION`
-     - `READ_AIACTION`
-     - `SYSTEM_PERMISSION_DECLARE`
-     - `CONTROL_VPN`
-     - `miui.cloud.finddevice.*`
-   - repeated `Manager wrapper not available: security`
-7. Focus the next source-level work on:
-   - `com.miui.cloudservice` / `com.xiaomi.finddevice`
-   - `com.miui.securitycenter` / `com.miui.securityadd` / `com.mi.android.globalFileexplorer`
-   - `SystemServiceRegistry` `security` fetch fallout
-8. Keep `system/bin/init` instrumentation, broad property experiments, and new restore-image slicing deprioritized.
+## Known Current Gates
 
-Completed targeted package-conflict control:
-- image:
-  - `/home/john/android/lineage/out/target/product/myron/super_product_pkg_cleanup.img`
-- bundle:
-  - `/home/john/android/lineage/_checkpoints/postfailure_myron_product_pkg_cleanup_20260313_173920`
-- comparison against `postfailure_myron_stock_product_stock_system_20260313_141009`:
-  - `classification=sideways`
-  - stage score stayed `5 -> 5`
-- the targeted package-duplication / parse-path issue class did not move the failure
-- the exact parse/duplicate/provider signatures survived unchanged:
-  - `/product/app/Calendar`
-  - `/product/app/GoogleCalendarSyncAdapter`
-  - `/product/app/messaging`
-  - `/product/app/MiuiCalendarGlobalPad`
-  - `/product/priv-app/MiuiCalendarGlobalPad`
-  - duplicate `com.miui.miwallpaper.overlay`
-  - duplicate `com.miui.wallpaper.overlay`
-  - duplicate provider/component declarations such as `com.miui.cloudservice/androidx.core.content.FileProvider`
-  - `Manager wrapper not available: security`
+Matched-stack artifact gate requires:
+- `system.img`
+- `system_ext.img`
+- `vbmeta_system.img`
+Attempt 2 additionally requires:
+- `init_boot.img`
 
-Current default next issue class from the new reports:
-Completed targeted security-contract restore control:
-- image:
-  - `/home/john/android/lineage/out/target/product/myron/super_product_security_contract.img`
-- bundle:
-  - `/home/john/android/lineage/_checkpoints/postfailure_myron_product_security_contract_20260313_183049`
-- comparison against `postfailure_myron_product_pkg_cleanup_20260313_173920`:
-  - `classification=sideways`
-  - stage score stayed `5 -> 5`
-- the targeted security-contract issue class did not move the failure
-- the specific surviving conflict set is now centered on ownership:
-  - `com.miui.cloudservice/androidx.core.content.FileProvider`
-  - `miui.cloud.finddevice.AccessFindDevice`
-  - `miui.cloud.finddevice.ManageFindDevice`
-  - `com.miui.securitycenter.POWER_CENTER_COMMON_PERMISSION`
-  - `com.miui.securitycenter.permission.CONTROL_VPN`
-  - `Manager wrapper not available: security`
+Bring-up contract gate currently checks for:
+- bring-up product exists
+- bring-up `fstab` removes `mi_ext` and overlay remounts into Lineage partitions
+- bring-up manifest trims nonessential HAL declarations from the first-`adb` target
+- bring-up target does not inherit `manifest_kalama.xml`
+- bring-up target keeps stock `init_boot` by default
 
-Current default next issue class:
-- owner-conflict inspection report:
-  - `/home/john/android/lineage/_checkpoints/owner_conflicts_20260313_184219/summary.md`
-- first owner-family control:
-  - image: `/home/john/android/lineage/out/target/product/myron/super_product_cloudservice_owner.img`
-  - bundle: `/home/john/android/lineage/_checkpoints/postfailure_myron_product_cloudservice_owner_20260313_200712`
-  - comparison against `postfailure_myron_product_security_contract_20260313_183049`:
-    - `classification=sideways`
-    - stage score stayed `5 -> 5`
-  - unchanged target-family signatures:
-    - `Provider ComponentInfo{com.miui.cloudservice/androidx.core.content.FileProvider} already defined`
-    - `miui.cloud.finddevice.AccessFindDevice`
-    - `miui.cloud.finddevice.ManageFindDevice`
-- second owner-family control:
-  - image: `/home/john/android/lineage/out/target/product/myron/super_product_security_owner.img`
-  - bundle: `/home/john/android/lineage/_checkpoints/postfailure_myron_product_security_owner_20260313_203158`
-  - comparison against `postfailure_myron_product_cloudservice_owner_20260313_200712`:
-    - `classification=sideways`
-    - stage score stayed `5 -> 5`
-  - unchanged target-family signatures:
-    - `Missing permission state for package com.miui.securityadd`
-    - `Missing permission state for package com.mi.android.globalFileexplorer`
-    - `com.miui.securitycenter.permission.SYSTEM_PERMISSION_DECLARE`
-    - `com.miui.securitycenter.permission.CONTROL_VPN`
-    - `com.miui.securitycenter.POWER_CENTER_COMMON_PERMISSION`
-    - `Manager wrapper not available: security`
+Legacy later-phase source-vendor output list:
+- [boot_critical_vendor_outputs.txt](/Users/benny/Homelab/ROM/tools/boot_critical_vendor_outputs.txt)
 
-Current default next issue class:
-- deeper static ownership/source analysis around the remaining external claimants
-- supporting reports:
-  - `/home/john/android/lineage/_checkpoints/owner_conflicts_20260313_184219/summary.md`
-  - `/home/john/android/lineage/_checkpoints/security_contract_inspection_20260313_175857/summary.md`
-- external-claimant restore:
-  - image: `/home/john/android/lineage/out/target/product/myron/super_product_external_claimants.img`
-  - bundle: `/home/john/android/lineage/_checkpoints/postfailure_myron_20260313_213402`
-  - comparison against `postfailure_myron_product_security_owner_20260313_203158`:
-    - `classification=sideways`
-    - stage score stayed `5 -> 5`
-  - restored:
-    - `data-app/MiuiScanner`
-    - `priv-app/MIUIAICR`
-    - `etc/device_features/myron.xml`
-    - `etc/removable_apk_info.xml`
-    - `etc/permissions/privapp-permissions-product.xml`
-- `yellowpage/rom` owner restore:
-  - image: `/home/john/android/lineage/out/target/product/myron/super_product_yellowpage_rom_owner.img`
-  - bundle: `/home/john/android/lineage/_checkpoints/postfailure_myron_20260313_221344`
-  - comparison against `postfailure_myron_20260313_213402`:
-    - `classification=sideways`
-    - stage score stayed `5 -> 5`
-  - restored:
-    - `/product/priv-app/MIUIYellowPageGlobal`
-    - `/system_ext/framework/framework-ext-res`
+Recent clean-build blockers already fixed:
+- missing `vendor_hal_soter_client` in Lineage QCOM sepolicy path
+- duplicate local `vendor_hal_soter*` declarations
+- broad inherited common manifest/package surface for bring-up
 
-Current default next issue class:
-- runtime-state materialization analysis
-- latest reports:
-  - `/home/john/android/lineage/_checkpoints/stock_runtime_packages_20260313_222827/summary.md`
-  - `/home/john/android/lineage/_checkpoints/fake_package_flow_20260313_222827/summary.md`
-  - `/home/john/android/lineage/_checkpoints/runtime_state_gaps_20260313_224150/summary.md`
-  - `/home/john/android/lineage/_checkpoints/framework_policy_paths_20260313_224328/summary.md`
-  - `/home/john/android/lineage/_checkpoints/owner_identity_graph_20260313_233251/summary.md`
-  - `/home/john/android/lineage/_checkpoints/runtime_state_materialization_20260313_233251/summary.md`
-  - `/home/john/android/lineage/_checkpoints/miui_reverse_trace_20260314_005227/summary.md`
-- newest valid failing baseline:
-  - `/home/john/android/lineage/_checkpoints/postfailure_myron_20260314_012147`
-- stock runtime truth now confirms:
-  - `com.miui.rom` is a real framework APK identity from `/system_ext/framework/framework-ext-res/framework-ext-res.apk`
-  - `com.miui.yellowpage` is a real stock package on the live device at `/product/priv-app/MIUIYellowPageGlobal/MIUIYellowPageGlobal.apk`
-  - `com.xiaomi.aicr` is a stock product priv-app at `/product/priv-app/MIUIAICR/MIUIAICR.apk`
-  - `com.xiaomi.scanner` is a stock product data-app at `/product/data-app/MiuiScanner/MiuiScanner.apk`
-- owner-identity reports now confirm the stock owner is winning the core duplicate-permission families:
-  - `com.miui.rom` wins `POWER_CENTER_COMMON_PERMISSION`
-  - `com.xiaomi.aicr` wins `READ_AIACTION`
-  - `com.miui.securitycenter` wins `SYSTEM_PERMISSION_DECLARE`
-  - `com.miui.securitycenter` wins `CONTROL_VPN`
-- the latest combined runtime-state-inputs run still reports:
-  - a broad `Missing permission state ...` wave in the failed segment
-  - duplicate `com.miui.cloudservice/androidx.core.content.FileProvider`
-  - duplicate `miui.cloud.finddevice.*`
-  - duplicate `POWER_CENTER_COMMON_PERMISSION`
-  - duplicate `READ_AIACTION`
-  - duplicate `SYSTEM_PERMISSION_DECLARE`
-  - duplicate `CONTROL_VPN`
-- source-level choke points are now identified:
-  - `frameworks/base/services/core/java/com/android/server/pm/Settings.java:6522`
-  - `frameworks/base/services/permission/java/com/android/server/permission/access/permission/AppIdPermissionPolicy.kt:505`
-  - `frameworks/base/core/java/android/app/SystemServiceRegistry.java:2111`
-- newest sequencing evidence:
-  - `/home/john/android/lineage/_checkpoints/permission_state_sequence_20260314_014131/summary.md`
-  - `340` `Missing permission state ...` lines were found in the failed segment
-  - the first missing-state line appears before `MiuiPreinstallHelper init`
-  - target packages in that early wave include:
-    - `com.miui.rom`
-    - `com.miui.yellowpage`
-    - `com.xiaomi.aicr`
-    - `com.xiaomi.scanner`
-    - `com.miui.securityadd`
-- current conclusion:
-  - do not build another generic restore image
-  - the restore-image lane is exhausted again
-  - stale runtime reuse was part of the earlier noise
-  - the current active blocker is the surviving MIUI owner/provider/security path after the clean-data + no-preopt discriminator
+## Working Rules
 
-Latest discriminator runs:
-- no-preopt diagnostic run:
-  - image:
-    - `/home/john/android/lineage/out/target/product/myron/super_runtime_state_no_preopt.img`
-  - bundle:
-    - `/home/john/android/lineage/_checkpoints/postfailure_myron_20260314_152552`
-  - result:
-    - `classification=sideways`
-    - old plain `PackageSettings` warning text still survived
-- clean-data + no-preopt diagnostic run:
-  - marker:
-    - `/home/john/android/lineage/_checkpoints/myron_prepare_20260314_153403`
-  - bundle:
-    - `/home/john/android/lineage/_checkpoints/postfailure_myron_clean_data_no_preopt_20260314_155244`
-  - comparison against `postfailure_myron_20260314_152552`:
-    - `classification=sideways`
-    - stage score stayed `5 -> 5`
-  - important differences:
-    - visible result changed to bootloop
-    - the captured failed segment no longer shows the broad `Missing permission state ...` wave
-    - surviving failures remain:
-      - duplicate provider `com.miui.cloudservice/androidx.core.content.FileProvider`
-      - duplicate MIUI permission-owner conflicts
-      - repeated `Manager wrapper not available: security`
+1. Do not use old AI-produced Lineage images for future tests.
+2. Do not reopen app-layer migration.
+3. Do not spend cycles on hybrid polish.
+4. Do not flash a matched-stack Lineage test until:
+   - the attempt-specific required artifacts exist and are fresh
+   - the bring-up contract gate passes
+5. Keep the hybrid rollback branch ready at all times.
 
-Current mechanism that still matters:
-- Xiaomi overlays `/product/pangu/system/*` back into `/system/*` through [fstab.qcom](/Users/benny/Homelab/ROM/device/xiaomi/sm8850-common/init/fstab.qcom#L63)
-- stock `product` has that subtree; custom `product` does not
-- but restoring whole stock `product` alone was still not enough, so the problem is now likely layout/composition rather than raw absence of one whole partition
+## Immediate Next Step
 
-## Latest Useful Bundle
+Wait for the clean build to finish, then rerun:
 
-- [/home/john/android/lineage/_checkpoints/postfailure_myron_20260312_102812](/home/john/android/lineage/_checkpoints/postfailure_myron_20260312_102812)
+```bash
+bash /Users/benny/Homelab/ROM/tools/check_myron_clean_matched_stack_artifacts.sh /Users/benny/Homelab/ROM myron
+bash /Users/benny/Homelab/ROM/tools/check_myron_clean_boot_critical_vendor_stack.sh /Users/benny/Homelab/ROM myron
+```
 
-Useful current comparison targets:
-- stock-core image:
-  - [/home/john/android/lineage/out/target/product/myron/super_stock_core.img](/home/john/android/lineage/out/target/product/myron/super_stock_core.img)
-- stock-framework image:
-  - [/home/john/android/lineage/out/target/product/myron/super_stock_framework.img](/home/john/android/lineage/out/target/product/myron/super_stock_framework.img)
-- stock-vendor pivot image:
-  - [/home/john/android/lineage/out/target/product/myron/super_stock_vendor.img](/home/john/android/lineage/out/target/product/myron/super_stock_vendor.img)
-- tighter stock-vendor + stock-MIUI-upper control:
-  - [/home/john/android/lineage/out/target/product/myron/super_stock_vendor_miui_upper.img](/home/john/android/lineage/out/target/product/myron/super_stock_vendor_miui_upper.img)
-- stock-except-product control:
-  - [/home/john/android/lineage/out/target/product/myron/super_stock_except_product.img](/home/john/android/lineage/out/target/product/myron/super_stock_except_product.img)
-- targeted stock-MIUI-product restore helper:
-  - [tools/prepare_myron_stock_product_miui_restore_super.sh](/Users/benny/Homelab/ROM/tools/prepare_myron_stock_product_miui_restore_super.sh)
-- failure-signature analyzer:
-  - [tools/analyze_myron_failure_signatures.sh](/Users/benny/Homelab/ROM/tools/analyze_myron_failure_signatures.sh)
-- effective-userspace diff:
-  - [tools/diff_myron_effective_userspace.sh](/Users/benny/Homelab/ROM/tools/diff_myron_effective_userspace.sh)
-- product package-conflict inspector:
-  - [tools/inspect_myron_product_pkg_conflicts.sh](/Users/benny/Homelab/ROM/tools/inspect_myron_product_pkg_conflicts.sh)
-- product package-cleanup builder:
-  - [tools/prepare_myron_product_pkg_cleanup_super.sh](/Users/benny/Homelab/ROM/tools/prepare_myron_product_pkg_cleanup_super.sh)
-- security-contract inspector:
-  - [tools/inspect_myron_security_contract.sh](/Users/benny/Homelab/ROM/tools/inspect_myron_security_contract.sh)
-- security-contract builder:
-  - [tools/prepare_myron_product_security_contract_super.sh](/Users/benny/Homelab/ROM/tools/prepare_myron_product_security_contract_super.sh)
-- preinstall claimant inspector:
-  - [tools/inspect_myron_preinstall_claimants.sh](/Users/benny/Homelab/ROM/tools/inspect_myron_preinstall_claimants.sh)
-- external-claimant builder:
-  - [tools/prepare_myron_product_external_claimants_super.sh](/Users/benny/Homelab/ROM/tools/prepare_myron_product_external_claimants_super.sh)
-- `yellowpage/rom` owner builder:
-  - [tools/prepare_myron_product_yellowpage_rom_owner_super.sh](/Users/benny/Homelab/ROM/tools/prepare_myron_product_yellowpage_rom_owner_super.sh)
-- stock runtime package inspector:
-  - [tools/inspect_myron_stock_runtime_packages.sh](/Users/benny/Homelab/ROM/tools/inspect_myron_stock_runtime_packages.sh)
-- fake-package flow inspector:
-  - [tools/inspect_myron_fake_package_flow.sh](/Users/benny/Homelab/ROM/tools/inspect_myron_fake_package_flow.sh)
-- runtime-state gap analyzer:
-  - [tools/analyze_myron_runtime_state_gaps.sh](/Users/benny/Homelab/ROM/tools/analyze_myron_runtime_state_gaps.sh)
-- framework policy path inspector:
-  - [tools/inspect_myron_framework_policy_paths.sh](/Users/benny/Homelab/ROM/tools/inspect_myron_framework_policy_paths.sh)
-
-## Recovery Path
-
-Reliable stock recovery path:
-- `fastboot flash boot_a .../boot.img`
-- `fastboot flash vendor_boot_a .../vendor_boot.img`
-- `fastboot flash dtbo_a .../dtbo.img`
-- `fastboot flash init_boot_a .../init_boot.img`
-- `fastboot flash vbmeta_a .../vbmeta.img`
-- `fastboot flash vbmeta_system_a .../vbmeta_system.img`
-- `fastboot flash super .../stock super.img`
-- `fastboot set_active a`
-- `fastboot reboot`
-
-## Useful Paths
-
-- Local workspace: [/Users/benny/Homelab/ROM](/Users/benny/Homelab/ROM)
-- Remote tree: `/home/john/android/lineage`
-- Current stock-core control image:
-  - [/home/john/android/lineage/out/target/product/myron/super_stock_core.img](/home/john/android/lineage/out/target/product/myron/super_stock_core.img)
-- Stock-framework control image:
-  - [/home/john/android/lineage/out/target/product/myron/super_stock_framework.img](/home/john/android/lineage/out/target/product/myron/super_stock_framework.img)
-- Stock-vendor pivot image:
-  - [/home/john/android/lineage/out/target/product/myron/super_stock_vendor.img](/home/john/android/lineage/out/target/product/myron/super_stock_vendor.img)
-- Stock-except-product control image:
-  - [/home/john/android/lineage/out/target/product/myron/super_stock_except_product.img](/home/john/android/lineage/out/target/product/myron/super_stock_except_product.img)
-- Next targeted control output:
-  - [/home/john/android/lineage/out/target/product/myron/super_stock_product_miui_restore.img](/home/john/android/lineage/out/target/product/myron/super_stock_product_miui_restore.img)
+Only after that decide whether to:
+- flash attempt 1 with stock `init_boot`
+- or fix the next build/output blocker first
