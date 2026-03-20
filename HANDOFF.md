@@ -1,20 +1,15 @@
 # Myron AI Handoff
 
-Last updated: 2026-03-19
+Last updated: 2026-03-20
 
 ## Current Status
 
-The device is safe on stock Android.
+The device is not on a trusted booting state right now.
 
-The booting hybrid branch remains available, but it is no longer the main effort.
-
-Main effort now:
-- lowest-risk Lineage bring-up ladder
-- clean builder artifacts only
-- first success target = boot to `adb`
-- active bring-up target = `lineage_myron_bringup-bp4a-userdebug`
-- attempt 1 = stock `boot` + stock `init_boot` + stock `vendor_boot` + custom `system` + custom `system_ext` + custom `vbmeta_system`
-- attempt 2 only if needed = stock `boot` + stock `vendor_boot` + Lineage `init_boot`
+The last trustworthy conclusions are:
+- the kept booting branch is still the stock-based hybrid branch below
+- the fastest safe recovery path is the full hybrid rollback script, not a partial `system`/`vbmeta_system` flash
+- Lineage convergence stalled on the `systemserverclasspath` transition inside `system`
 
 ## Frozen Primary Rollback Branch
 
@@ -34,6 +29,10 @@ Rollback branch partition composition:
 - `vbmeta_system_a` = matching custom image
 - `vbmeta_a` = stock
 - lower stack = stock
+
+Important:
+- restoring only `system_a` and `vbmeta_system_a` is not sufficient from arbitrary mixed test states
+- use [recover_myron_hybrid_rollback_slot_a.sh](/Users/benny/Homelab/ROM/tools/recover_myron_hybrid_rollback_slot_a.sh) for the known-good recovery path
 
 ## Final App-Layer Classification
 
@@ -93,35 +92,48 @@ What was tried and what happened:
 - old remote tree is not trusted for fresh bring-up images
 - clean tree now builds from `/home/john/android/lineage_clean`
 
+10. Stock-shaped carrier pivot
+- patched stock `vendor_boot` plus stock `init_boot` got past `fastbootd`
+- this proved the primary blocker was no longer the first-stage carrier
+
+11. System-only Lineage userspace tests
+- patched stock `vendor_boot` + stock `init_boot` + custom `system` still bootlooped
+- stock `system_ext` was not enough to make a full Lineage `system` bootable
+
+12. Family 2 protobuf isolation
+- `bootclasspath.pb` and `systemserverclasspath.pb` together broke the kept booting branch
+
+13. Family 2b isolation
+- changing only `systemserverclasspath.pb` was enough to break the kept booting branch
+- `systemserverclasspath.pb` is a confirmed blocker surface
+
+14. Family 2d widening
+- adding `org.lineageos.platform.jar` plus the matching Lineage `systemserverclasspath.pb` still bootlooped
+- the blocker is not explained by the missing jar alone
+
 ## Strategic Conclusions
 
 These are the conclusions to preserve:
-- stock-based hybrid proved the device can boot under a preserved stock runtime core
-- AVB and SAR mattered, but they were not the primary remaining blocker
-- hybrid polish is not the fastest route to Lineage now
-- the most likely early blocker is still stock first-stage behavior mixed with Lineage-heavy userspace
-- the next serious test should keep `init_boot` stock by default and only change it if attempt 1 fails the same way
-- do not strengthen the `sm8750`/`kalama` fallback proactively; if the narrowed test still fails early, pivot to a real `kaanapali` kernel/vendor_boot bring-up
+- the stock-based hybrid branch is the only confirmed booting custom path
+- a stock-shaped first-stage carrier can pass `fastbootd`, so the critical blocker moved into `system`
+- `system_ext` is not the first blocker
+- `systemserverclasspath.pb` is a confirmed blocker surface
+- `org.lineageos.platform.jar` missing from the Family 0 filesystem was a real invalidity in the first Lineage-side classpath step
+- adding that jar alone was not sufficient; the broader Lineage `systemserverclasspath` contract remains incompatible with the booting Family 0 `system`
+- do not continue widening beyond this classpath surface until the device is restored and the next plan is explicit
 
-## Main Branch Under Preparation
+## Confirmed Blocker Surface
 
-Target branch for the next serious bring-up test:
-- product target = `lineage_myron_bringup`
-- `system_a` = Lineage-heavy SAR
-- `system_ext_a` = Lineage-heavy
-- `init_boot_a` = stock for attempt 1, Lineage-built only for attempt 2
-- `vendor_boot_a` = stock
-- `vbmeta_system_a` = matching custom image
+Confirmed blocker surface:
+- `system/etc/classpaths/systemserverclasspath.pb`
 
-Remain stock for first matched-stack test:
-- `product_a`
-- `mi_ext_a`
-- `vbmeta_a`
-- `vendor_a`
-- `odm_a`
-- `boot_a`
-- `vendor_boot_a`
-- lower stack other than `init_boot_a` on attempt 2
+What is proven:
+- Family 0 `systemserverclasspath.pb` is bootable
+- replacing it with the Lineage-side variant breaks the booting Family 0 branch
+- adding `/system/framework/org.lineageos.platform.jar` alongside that Lineage-side `systemserverclasspath.pb` still breaks boot
+
+What is not yet proven:
+- whether the remaining blocker is ordering, removal of the two stock `system_ext` jars, or a broader system-server contract mismatch
 
 ## Builder State
 
@@ -133,13 +145,8 @@ Active clean node:
 - `/home/john/android/lineage_clean`
 
 Clean-node state:
-- `m nothing`: passes
-- `m checkvintf`: passes
-- `m host_init_verifier`: passes
-- image build running for:
-  - `systemimage`
-  - `systemextimage`
-  - `vbmetasystemimage`
+- clean node successfully produced the later Family 2 / 2B / 2D artifacts
+- those artifacts are forensic/reference only now; they are not trusted as a booting branch
 
 Bring-up reductions already implemented:
 - no inherited `manifest_kalama.xml`
@@ -211,13 +218,11 @@ Recent clean-build blockers already fixed:
 
 ## Immediate Next Step
 
-Wait for the clean build to finish, then rerun:
+Recover the device with the full hybrid rollback:
 
 ```bash
-bash /Users/benny/Homelab/ROM/tools/check_myron_clean_matched_stack_artifacts.sh /Users/benny/Homelab/ROM myron
-bash /Users/benny/Homelab/ROM/tools/check_myron_clean_boot_critical_vendor_stack.sh /Users/benny/Homelab/ROM myron
+cd /home/john/android/lineage_clean
+DRY_RUN=0 bash tools/recover_myron_hybrid_rollback_slot_a.sh /home/john/android/lineage_clean myron
 ```
 
-Only after that decide whether to:
-- flash attempt 1 with stock `init_boot`
-- or fix the next build/output blocker first
+After recovery, stop. The next attempt should be planned from the confirmed `systemserverclasspath` dead end, not from the older matched-stack plan.

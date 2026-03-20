@@ -1,20 +1,16 @@
 # Poco F8 Ultra (`myron`) Bring-up Status
 
-Last updated: 2026-03-19
+Last updated: 2026-03-20
 
 ## Summary
 
 This repository is for LineageOS bring-up on Xiaomi Poco F8 Ultra (`myron` / `sm8850`).
 
 Current project state:
-- stock Android is restored and safe
-- the booting hybrid branch is frozen as rollback only
-- app-layer migration is finished and no longer the main path
-- the main path is now the lowest-risk Lineage bring-up ladder
-- fresh Lineage artifacts are being rebuilt from the clean builder tree only
-- active bring-up target = `lineage_myron_bringup-bp4a-userdebug`
-- attempt 1 = stock `boot` + stock `init_boot` + stock `vendor_boot` + custom `system` + custom `system_ext` + custom `vbmeta_system`
-- attempt 2 only if needed = same as attempt 1, but with Lineage `init_boot`
+- the only confirmed booting custom path is the stock-based hybrid rollback branch
+- the recent Lineage convergence work has reached a confirmed blocker in `systemserverclasspath.pb`
+- the latest partial rollback guidance was too narrow; use the full hybrid rollback script from arbitrary mixed states
+- fresh clean-builder artifacts exist, but the recent Family 2 / 2B / 2D images are reference-only because none of them booted
 
 ## Current Rollback Branch
 
@@ -106,57 +102,44 @@ Why those unsafe apps matter:
   - a minimal bring-up manifest only
   - reduced common package surface for first `adb`
 
-11. Current clean-build blocker sequence
-- resolved:
-  - `vendor_hal_soter_client` missing in Lineage QCOM sepolicy
-  - broad inherited `manifest_kalama.xml` HAL surface
-  - bring-up incorrectly defaulting to source `init_boot`
-  - duplicate local `vendor_hal_soter*` declarations
-- current build continues from the narrowed attempt-1 target
+11. Stock-shaped carrier pivot
+- patched stock `vendor_boot` plus stock `init_boot` passed `fastbootd`
+- first-stage stopped being the primary blocker
+
+12. Full Lineage `system` remained unbootable
+- patched stock `vendor_boot` + stock `init_boot` + custom `system` still bootlooped
+- stock `system_ext` did not save it
+
+13. Family 2 protobuf isolation
+- changing both `bootclasspath.pb` and `systemserverclasspath.pb` broke the booting baseline
+
+14. Family 2b isolation
+- changing only `systemserverclasspath.pb` still broke the booting baseline
+- `systemserverclasspath.pb` is a confirmed blocker surface
+
+15. Family 2d widening
+- adding `org.lineageos.platform.jar` plus the matching Lineage-side `systemserverclasspath.pb` still bootlooped
+- the missing jar was not sufficient to explain the failure by itself
 
 ## What This Proves
 
 1. A stock-based `system_a` runtime core can boot on this device.
-2. Earlier Lineage-heavy failures were not just AVB or SAR mistakes.
-3. Mixing stock first-stage behavior with Lineage-heavy userspace is a likely early blocker.
-4. Hybrid polish is not the fastest route to Lineage anymore.
-5. The next serious test should minimize first-stage change and keep `init_boot` stock by default.
-6. The broad inherited common manifest/package surface was itself a blocker and has now been reduced for bring-up.
+2. The first-stage carrier can be made good enough to pass `fastbootd`.
+3. The critical remaining blocker moved into `system`.
+4. `system_ext` is not the first blocker.
+5. `systemserverclasspath.pb` is a confirmed blocker surface.
+6. Adding `org.lineageos.platform.jar` alone is not sufficient to make the Lineage-side `systemserverclasspath` transition bootable.
 
-## Main Bring-up Path Now
+## Current Recovery Rule
 
-Next serious bring-up branch:
-- product target = `lineage_myron_bringup`
-- `system_a` = Lineage-heavy SAR
-- `system_ext_a` = Lineage-heavy
-- `init_boot_a` = stock for attempt 1, Lineage-built only for attempt 2
-- `vendor_boot_a` = stock
-- `vbmeta_system_a` = matching custom image
+If the device is in a mixed failed state, use the full hybrid rollback:
 
-Still stock for that first matched-stack test:
-- `product_a`
-- `mi_ext_a`
-- `vbmeta_a`
-- `vendor_a`
-- `odm_a`
-- `boot_a`
-- `vendor_boot_a`
-- lower stack other than `init_boot_a` on attempt 2
+```bash
+cd /home/john/android/lineage_clean
+DRY_RUN=0 bash tools/recover_myron_hybrid_rollback_slot_a.sh /home/john/android/lineage_clean myron
+```
 
-Bring-up config now also guarantees:
-- no inherited `manifest_kalama.xml`
-- no `mi_ext`
-- no overlay remounts into Lineage partitions
-- reduced common feature surface:
-  - no NFC
-  - no sensors
-  - no thermal
-  - no GNSS permission surface
-  - no secure-element permission surface
-
-Default success target:
-- first boot to `adb`
-- not first boot to UI
+Do not assume that flashing only `system_a` and `vbmeta_system_a` is enough to recover the booting branch.
 
 ## Current Clean Builder State
 
@@ -167,36 +150,18 @@ Old builder:
 - `/home/john/android/lineage`
 - forensic reference only
 
-Clean builder status as of 2026-03-19:
-- `m nothing`: passes
-- `m checkvintf`: passes
-- `m host_init_verifier`: passes
-- full build running for:
-  - `systemimage`
-  - `systemextimage`
-  - `vbmetasystemimage`
+Clean builder status:
+- produced the Family 2 / 2B / 2D artifacts successfully
+- those artifacts are not a booting path
+- they should be treated as analysis artifacts, not as the next flash default
 
-Attempt-1 artifacts are not accepted yet until all of these exist and are fresh:
-- `system.img`
-- `system_ext.img`
-- `vbmeta_system.img`
-and stock path presence is confirmed for:
-- `init_boot.img`
-- `vendor_boot.img`
+## Current Known Blocker
 
-## Current Known Blockers
+Confirmed blocker surface:
+- `system/etc/classpaths/systemserverclasspath.pb`
 
-The clean build is not flash-ready yet because:
-- the 3 attempt-1 artifacts are not all present yet
-- the bring-up contract gate must pass for:
-  - minimal bring-up `fstab`
-  - minimal bring-up manifest
-  - bring-up product wiring
-  - stock `init_boot` by default
-  - no inherited `manifest_kalama.xml`
-
-Legacy later-phase source-vendor output list:
-- [boot_critical_vendor_outputs.txt](/Users/benny/Homelab/ROM/tools/boot_critical_vendor_outputs.txt)
+Current highest-confidence conclusion:
+- the broader Lineage-side `systemserverclasspath` transition is incompatible with the kept booting Family 0 `system`
 
 ## Current Logging And Flash Workflow
 
@@ -226,15 +191,9 @@ The hybrid branch is rollback only.
 
 ## Recommended Next Step
 
-Wait for the clean build to finish, then:
-1. run the attempt-1 artifact gate
-2. run the bring-up contract gate
-3. flash attempt 1 with stock `init_boot`
-4. only if it fails the same way, enable custom `init_boot` for attempt 2
+Recover to the known-good hybrid branch and stop there.
 
-Keep in mind:
-- do not proactively force a stronger `sm8750`/`kalama` fallback as a fix
-- if the narrowed stock-first-stage userspace test still fails early, the next serious step is a real `kaanapali` kernel/vendor_boot bring-up
+The next future attempt should start from the confirmed `systemserverclasspath` dead end, not from the older matched-stack plan.
 
 For full historical context:
 - [HANDOFF.md](/Users/benny/Homelab/ROM/HANDOFF.md)
