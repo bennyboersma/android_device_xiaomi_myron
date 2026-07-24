@@ -975,15 +975,15 @@ odm/lib64/camera/com.qti.sensor.myron_ofilm_ov32d40_front_i.so
 odm/lib64/camera/com.qti.sensor.myron_semco_s5kjn5_tele_i.so
 odm/lib64/camera/com.qti.sensor.myron_sunny_ovx9500_wide_i.so
 odm/lib64/camera/com.qti.sensormodule.myron_aac_ov50m_ultra_i.bin
-odm/lib64/camera/com.qti.sensormodule.myron_aac_ovx9500_wide_ii.bin
-odm/lib64/camera/com.qti.sensormodule.myron_aac_s5kjn5_tele_ii.bin
+# First-boot EEA camera quarantine:
+# OS3.0.301.0.WPMEUXM references these AAC wide/tele resources,
+# but the official EEA fastboot package does not contain them.
+# Do not substitute China-derived blobs.
 odm/lib64/camera/com.qti.sensormodule.myron_ofilm_ov32d40_front_i.bin
 odm/lib64/camera/com.qti.sensormodule.myron_semco_s5kjn5_tele_i.bin
 odm/lib64/camera/com.qti.sensormodule.myron_sunny_ovx9500_wide_i.bin
 odm/lib64/camera/com.qti.tuned.default.canoe.bin
 odm/lib64/camera/com.qti.tuned.myron_aac_ov50m_ultra_i.bin
-odm/lib64/camera/com.qti.tuned.myron_aac_ovx9500_wide_ii.bin
-odm/lib64/camera/com.qti.tuned.myron_aac_s5kjn5_tele_ii.bin
 odm/lib64/camera/com.qti.tuned.myron_ofilm_ov32d40_front_i.bin
 odm/lib64/camera/com.qti.tuned.myron_semco_s5kjn5_tele_i.bin
 odm/lib64/camera/com.qti.tuned.myron_sunny_ovx9500_wide_i.bin

@@ -1,0 +1,15 @@
+# First-boot EEA camera quarantine
+# Stock build: OS3.0.301.0.WPMEUXM
+# Stock archive SHA-256: 11472ad50af79513d69bdfc63e31b0368fb52f18bb20000b74d9af774b8fe0f2
+# Evidence: absent from every extracted EEA logical-partition root and raw
+# partition-image search.  The stock cameradfx_config.json nevertheless selects
+# myron_aac_ovx9500_wide_ii (roleID 0) and myron_aac_s5kjn5_tele_ii (roleID 23).
+# Expected impact: camera-provider runtime behavior for the AAC wide/tele
+# variants is unverified; framework startup and build configuration do not use
+# these names.  Do not substitute a differently named variant or China blob.
+# Removal criteria: obtain the same four files from a verified official EEA
+# source, or first-boot evidence proves an authoritative EEA replacement.
+odm/lib64/camera/com.qti.sensormodule.myron_aac_ovx9500_wide_ii.bin
+odm/lib64/camera/com.qti.sensormodule.myron_aac_s5kjn5_tele_ii.bin
+odm/lib64/camera/com.qti.tuned.myron_aac_ovx9500_wide_ii.bin
+odm/lib64/camera/com.qti.tuned.myron_aac_s5kjn5_tele_ii.bin
