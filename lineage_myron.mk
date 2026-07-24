@@ -18,7 +18,7 @@ $(call inherit-product, device/xiaomi/myron/device.mk)
 PRODUCT_DEVICE := myron
 PRODUCT_NAME := lineage_myron
 PRODUCT_BRAND := Xiaomi
-PRODUCT_MODEL := 25102RKBEC
+PRODUCT_MODEL := 25102PCBEG
 PRODUCT_MANUFACTURER := xiaomi
 
-BUILD_FINGERPRINT := Xiaomi/myron/myron:16/BQ2A.250705.001-BP2A.250605.031.A3/OS3.0.303.0.WPMCNXM:user/release-keys
+BUILD_FINGERPRINT := POCO/myron_eea/myron:16/BQ2A.250705.001-BP2A.250605.031.A3/OS3.0.301.0.WPMEUXM:user/release-keys

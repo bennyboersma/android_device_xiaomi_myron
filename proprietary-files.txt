@@ -1,5 +1,5 @@
 ## All proprietary files from this list, unless pinned and noted otherwise,
-## are from Redmi K90 Pro Max (OS3.0.306.0.WPMCNXM). 
+## are generated from POCO F8 Ultra EEA (OS3.0.301.0.WPMEUXM).
 
 # ACDBs
 odm/etc/acdbdata/Mi/Ext_AiOff_fixed.eai

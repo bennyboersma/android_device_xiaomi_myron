@@ -9,10 +9,10 @@ persist.vendor.fingerprint.type=udfps
 persist.vendor.fingerprint.sensor_location=526|1956|148
 
 # Marketname
-ro.product.marketname=Redmi K90 Pro Max
+ro.product.marketname=POCO F8 Ultra
 
 # Bluetooth
-bluetooth.device.default_name=Redmi K90 Pro Max
+bluetooth.device.default_name=POCO F8 Ultra
 
 # Sensor
 persist.vendor.sensor.mischeck=true
@@ -20,4 +20,4 @@ ro.vendor.sensor.maxbrightness=6750
 ro.vendor.proxcal.factor=2.84
 
 # USB
-vendor.usb.product_string=Redmi K90 Pro Max
+vendor.usb.product_string=POCO F8 Ultra
